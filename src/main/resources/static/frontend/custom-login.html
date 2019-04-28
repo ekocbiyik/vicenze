@@ -1,0 +1,20 @@
+<link rel="import" href="../bower_components/vaadin-login/theme/lumo/vaadin-login-overlay-styles.html">
+
+<dom-module id="custom-login-styles" theme-for="vaadin-login-overlay-wrapper">
+    <template>
+        <style>
+            [part="card"] {
+                width: 600px;
+            }
+
+            /* Small screen */
+            @media only screen
+            and (max-width: 500px) {
+                [part="card"] {
+                    /* Adding back the width to 100% in small screens */
+                    width: 100%;
+                }
+            }
+        </style>
+    </template>
+</dom-module>
