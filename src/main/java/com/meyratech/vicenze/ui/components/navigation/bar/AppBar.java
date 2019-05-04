@@ -106,6 +106,7 @@ public class AppBar extends Composite<FlexLayout> {
         avatar.setClassName(CLASS_NAME + "__avatar");
         avatar.setSrc(IMG_PATH + "logo-18.png");
         avatar.setAlt("User menu");
+        avatar.setVisible(false);
 
         ContextMenu contextMenu = new ContextMenu(avatar);
         contextMenu.setOpenOnClick(true);

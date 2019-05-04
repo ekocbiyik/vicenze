@@ -70,11 +70,6 @@ public class DataGenerator implements HasLogger {
         getLogger().info("Generating project data");
         for (int i = 0; i < 30; i++) {
             projectService.save(null, createProject("Proje1_" + i, "desciption_" + i, true));
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         getLogger().info("Generated project data");
     }

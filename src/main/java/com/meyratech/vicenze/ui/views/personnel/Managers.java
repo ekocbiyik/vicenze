@@ -56,27 +56,16 @@ public class Managers extends SplitViewFrame {
 
     private Grid createGrid() {
         grid = new Grid<>();
-        grid.addSelectionListener(event -> event.getFirstSelectedItem()
-                .ifPresent(this::showDetails));
+        grid.addSelectionListener(event -> event.getFirstSelectedItem().ifPresent(this::showDetails));
         dataProvider = DataProvider.ofCollection(DummyData.getPersons());
         grid.setDataProvider(dataProvider);
         grid.setSizeFull();
 
-        grid.addColumn(Person::getId).setHeader("ID").setFrozen(true)
-                .setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XS)
-                .setFlexGrow(0);
-        grid.addColumn(new ComponentRenderer<>(this::createUserInfo))
-                .setHeader("Name").setWidth(UIUtils.COLUMN_WIDTH_XL);
-        grid.addColumn(new ComponentRenderer<>(this::createActive))
-                .setHeader("Active").setWidth(UIUtils.COLUMN_WIDTH_XS)
-                .setFlexGrow(0).setTextAlign(ColumnTextAlign.END);
-        grid.addColumn(new ComponentRenderer<>(this::createApprovalLimit))
-                .setHeader("Approval Limit ($)")
-                .setWidth(UIUtils.COLUMN_WIDTH_L).setFlexGrow(0)
-                .setTextAlign(ColumnTextAlign.END);
-        grid.addColumn(new ComponentRenderer<>(this::createDate))
-                .setHeader("Last Report").setWidth(UIUtils.COLUMN_WIDTH_M)
-                .setFlexGrow(0).setTextAlign(ColumnTextAlign.END);
+        grid.addColumn(Person::getId).setHeader("ID").setFrozen(true).setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XS).setFlexGrow(0);
+        grid.addColumn(new ComponentRenderer<>(this::createUserInfo)).setHeader("Name").setWidth(UIUtils.COLUMN_WIDTH_XL);
+        grid.addColumn(new ComponentRenderer<>(this::createActive)).setHeader("Active").setWidth(UIUtils.COLUMN_WIDTH_XS).setFlexGrow(0).setTextAlign(ColumnTextAlign.END);
+        grid.addColumn(new ComponentRenderer<>(this::createApprovalLimit)).setHeader("Approval Limit ($)").setWidth(UIUtils.COLUMN_WIDTH_L).setFlexGrow(0).setTextAlign(ColumnTextAlign.END);
+        grid.addColumn(new ComponentRenderer<>(this::createDate)).setHeader("Last Report").setWidth(UIUtils.COLUMN_WIDTH_M).setFlexGrow(0).setTextAlign(ColumnTextAlign.END);
 
         return grid;
     }

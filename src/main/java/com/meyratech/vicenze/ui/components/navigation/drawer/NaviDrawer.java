@@ -1,20 +1,24 @@
 package com.meyratech.vicenze.ui.components.navigation.drawer;
 
+import com.meyratech.vicenze.backend.security.SecurityUtils;
+import com.meyratech.vicenze.ui.util.UIUtils;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
-import com.meyratech.vicenze.ui.util.UIUtils;
-
 import elemental.json.JsonObject;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @HtmlImport("swipe-away.html")
 public class NaviDrawer extends Composite<Div>
@@ -25,11 +29,10 @@ public class NaviDrawer extends Composite<Div>
     private static final String OPEN = "open";
 
     private Div scrim;
-
     private Div mainContent;
     private TextField search;
     private Div scrollableArea;
-
+    private TextField avatar;
     private Button railButton;
     private NaviMenu menu;
 
@@ -54,8 +57,8 @@ public class NaviDrawer extends Composite<Div>
         initMainContent();
 
         initHeader();
-        initSearch();
-
+//        initSearch();
+        initAvatar();
         initScrollableArea();
         initMenu();
 
@@ -89,6 +92,21 @@ public class NaviDrawer extends Composite<Div>
         mainContent.add(search);
     }
 
+    private void initAvatar() {
+
+        avatar = new TextField();
+        avatar.setValue(SecurityUtils.getUsername());
+        avatar.setPrefixComponent(new Icon(VaadinIcon.USER_CARD));
+        avatar.setReadOnly(true);
+
+        ContextMenu contextMenu = new ContextMenu(avatar);
+        contextMenu.setOpenOnClick(true);
+        contextMenu.addItem("john.smith@gmail.com", e -> Notification.show("Not implemented yet.", 3000, Notification.Position.BOTTOM_CENTER));
+        contextMenu.addItem("Settings", e -> Notification.show("Not implemented yet.", 3000, Notification.Position.BOTTOM_CENTER));
+        contextMenu.addItem("Log Out", e -> UI.getCurrent().getPage().executeJavaScript("location.assign('logout')"));
+        mainContent.add(avatar);
+    }
+
     private void initScrollableArea() {
         scrollableArea = new Div();
         scrollableArea.addClassName(CLASS_NAME + "__scroll-area");
@@ -101,8 +119,7 @@ public class NaviDrawer extends Composite<Div>
     }
 
     private void initFooter() {
-        railButton = UIUtils.createSmallButton("Collapse",
-                VaadinIcon.CHEVRON_LEFT_SMALL);
+        railButton = UIUtils.createSmallButton("Collapse", VaadinIcon.CHEVRON_LEFT_SMALL);
         railButton.addClassName(CLASS_NAME + "__footer");
         railButton.addClickListener(event -> toggleRailMode());
         railButton.getElement().setAttribute("aria-label", "Collapse menu");
