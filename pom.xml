@@ -13,7 +13,7 @@
     <artifactId>vicenze</artifactId>
     <name>Vicenze</name>
     <version>0.0.2</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
