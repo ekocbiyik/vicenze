@@ -8,8 +8,7 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
 
-public class DetailsDrawer extends Composite<FlexLayout>
-        implements HasStyle, HasSize {
+public class DetailsDrawer extends Composite<FlexLayout> implements HasStyle, HasSize {
 
     private static final String CLASS_NAME = "details-drawer";
 

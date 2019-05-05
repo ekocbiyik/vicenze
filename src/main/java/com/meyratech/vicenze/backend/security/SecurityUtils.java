@@ -1,5 +1,8 @@
 package com.meyratech.vicenze.backend.security;
 
+import com.meyratech.vicenze.backend.model.User;
+import com.meyratech.vicenze.backend.repository.dao.IUserDao;
+import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
 import com.meyratech.vicenze.ui.views.LoginView;
 import com.meyratech.vicenze.ui.views.errors.AccessDeniedView;
 import com.meyratech.vicenze.ui.views.errors.CustomRouteNotFoundError;
@@ -44,6 +47,12 @@ public final class SecurityUtils {
         }
         // Anonymous or no authentication.
         return null;
+    }
+
+    public static User getCurrentUser() {
+        return UtilsForSpring
+                .getSingleBeanOfType(IUserDao.class)
+                .findByEmailIgnoreCase(getUsername());
     }
 
     /**

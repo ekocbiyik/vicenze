@@ -32,37 +32,32 @@ public class NaviMenu extends Div {
         });
     }
 
-    public NaviItem addNaviItem(VaadinIcon icon, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem addNaviItem(VaadinIcon icon, String text, Class<? extends Component> navigationTarget) {
         NaviItem item = new NaviItem(icon, text, navigationTarget);
         addNaviItem(item);
         return item;
     }
 
-    public NaviItem addNaviItem(Image image, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem addNaviItem(Image image, String text, Class<? extends Component> navigationTarget) {
         NaviItem item = new NaviItem(image, text, navigationTarget);
         addNaviItem(item);
         return item;
     }
 
-    public NaviItem addNaviItem(String path, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem addNaviItem(String path, String text, Class<? extends Component> navigationTarget) {
         NaviItem item = new NaviItem(path, text, navigationTarget);
         addNaviItem(item);
         return item;
     }
 
-    public NaviItem addNaviItem(NaviItem parent, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem addNaviItem(NaviItem parent, String text, Class<? extends Component> navigationTarget) {
         NaviItem item = new NaviItem(text, navigationTarget);
         addNaviItem(parent, item);
         return item;
     }
 
     public List<NaviItem> getNaviItems() {
-        List<NaviItem> items = (List) getChildren()
-                .collect(Collectors.toList());
+        List<NaviItem> items = (List) getChildren().collect(Collectors.toList());
         return items;
     }
 

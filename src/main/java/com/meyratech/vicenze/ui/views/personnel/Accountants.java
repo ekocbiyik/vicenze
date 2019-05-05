@@ -174,10 +174,8 @@ public class Accountants extends SplitViewFrame {
         FormLayout.FormItem phoneItem = form.addFormItem(phone, "Phone");
         FormLayout.FormItem emailItem = form.addFormItem(email, "Email");
         FormLayout.FormItem companyItem = form.addFormItem(company, "Company");
-        FormLayout.FormItem uploadItem = form.addFormItem(new Upload(),
-                "Image");
-        UIUtils.setColSpan(2, statusItem, phoneItem, emailItem, companyItem,
-                uploadItem);
+        FormLayout.FormItem uploadItem = form.addFormItem(new Upload(), "Image");
+        UIUtils.setColSpan(2, statusItem, phoneItem, emailItem, companyItem, uploadItem);
         return form;
     }
 

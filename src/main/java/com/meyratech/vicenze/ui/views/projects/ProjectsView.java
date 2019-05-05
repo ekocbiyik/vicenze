@@ -54,7 +54,7 @@ public class ProjectsView extends ViewFrame implements RouterLayout {
     @Autowired
     public ProjectsView(ProjectServiceImpl projectService) {
         this.projectService = projectService;
-        setViewHeader(UIUtils.createH5Label(" "), createSearchBar());
+        setViewHeader(createSearchBar());
         setViewContent(createContent());
         setViewFooter(createFooter());
     }
@@ -69,7 +69,6 @@ public class ProjectsView extends ViewFrame implements RouterLayout {
         searchField.addValueChangeListener(e -> {
             dataProvider.addFilter(project -> StringUtils.containsIgnoreCase(project.getProjectName(), searchField.getValue()));
         });
-
 
         FlexBoxLayout container = new FlexBoxLayout(searchField);
         container.addClassName("app-bar__container");
