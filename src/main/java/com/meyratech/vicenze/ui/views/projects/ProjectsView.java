@@ -115,8 +115,12 @@ public class ProjectsView extends ViewFrame implements RouterLayout {
     }
 
     private Component createProjectInfo(Project project) {
-        ListItem item = new ListItem(project.getProjectName(), " ");
+        ListItem item = new ListItem(
+                UIUtils.createInitials(project.getProjectName().substring(0, 1)),
+                project.getProjectName(),
+                " ");
         item.setHorizontalPadding(false);
+
         return item;
     }
 

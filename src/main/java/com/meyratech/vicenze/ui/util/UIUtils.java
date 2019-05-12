@@ -40,6 +40,7 @@ public class UIUtils {
     public static final String COLUMN_WIDTH_M = "160px";
     public static final String COLUMN_WIDTH_L = "200px";
     public static final String COLUMN_WIDTH_XL = "240px";
+    public static final String COLUMN_WIDTH_FULL = "100%";
 
     /**
      * Thread-unsafe formatters.
@@ -404,7 +405,7 @@ public class UIUtils {
     }
 
     public static String formatDatetime(LocalDateTime date) {
-        return dateTimeFormat.get().format(date);
+        return date == null ? "" : dateTimeFormat.get().format(date);
     }
 
     /* === NOTIFICATIONS === */

@@ -15,6 +15,7 @@ import com.meyratech.vicenze.ui.views.HomeView;
 import com.meyratech.vicenze.ui.views.Payments;
 import com.meyratech.vicenze.ui.views.personnel.Accountants;
 import com.meyratech.vicenze.ui.views.personnel.Managers;
+import com.meyratech.vicenze.ui.views.personnel.PersonelView;
 import com.meyratech.vicenze.ui.views.projects.ProjectsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
@@ -115,11 +116,13 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
         NaviMenu menu = naviDrawer.getMenu();
         menu.addNaviItem(VaadinIcon.HOME, ViewConst.TITLE_HOME, HomeView.class);
         menu.addNaviItem(VaadinIcon.INSTITUTION, ViewConst.TITLE_PROJECTS, ProjectsView.class);
+        menu.addNaviItem(VaadinIcon.USERS, "Personnel", PersonelView.class);
         menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
 
-        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
-        menu.addNaviItem(personnel, "Accountants", Accountants.class);
-        menu.addNaviItem(personnel, "Managers", Managers.class);
+
+//        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
+//        menu.addNaviItem(personnel, "Accountants", Accountants.class);
+//        menu.addNaviItem(personnel, "Managers", Managers.class);
     }
 
     /**

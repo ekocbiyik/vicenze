@@ -3,6 +3,7 @@ package com.meyratech.vicenze.backend.security;
 import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.dao.IUserDao;
+import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -41,11 +42,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserServiceImpl userService;
+
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public CurrentUser currentUser(IUserDao IUserDao) {
+    public CurrentUser currentUser(IUserDao userDao) {
         final String username = SecurityUtils.getUsername();
-        User user = username != null ? IUserDao.findByEmailIgnoreCase(username) : null;
+        User user = username != null ? userDao.findByEmailIgnoreCase(username) : null;
         return () -> user;
     }
 
@@ -87,7 +91,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .loginProcessingUrl(LOGIN_PROCESSING_URL)
                 .failureUrl(LOGIN_FAILURE_URL)
-                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+                .successHandler(new CustomAuthenticationSuccessHandler(userService))
                 .and()
                 .logout()
                 .logoutSuccessUrl(LOGOUT_SUCCESS_URL);

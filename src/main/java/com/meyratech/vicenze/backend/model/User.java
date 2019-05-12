@@ -3,14 +3,15 @@ package com.meyratech.vicenze.backend.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity(name = "t_user")
+@Entity
+@Table(name = "t_user")
 public class User extends AbstractEntity {
 
     @NotEmpty
@@ -43,6 +44,10 @@ public class User extends AbstractEntity {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
+    public String getFullName() {
+        return String.format("%s %s", getFirstName(), getLastName());
+    }
+
     public String getEmail() {
         return email;
     }
@@ -73,10 +78,6 @@ public class User extends AbstractEntity {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getFullName() {
-        return String.format("%s %s", getFirstName(), getLastName());
     }
 
     public String getRole() {

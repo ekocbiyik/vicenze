@@ -2,13 +2,15 @@ package com.meyratech.vicenze.backend.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
  * ekocbiyik on 4/28/19
  */
-@Entity(name = "t_project")
+@Entity
+@Table(name = "t_project")
 public class Project extends AbstractEntity {
 
     @NotBlank

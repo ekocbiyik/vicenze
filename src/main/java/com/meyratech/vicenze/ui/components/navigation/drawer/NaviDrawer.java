@@ -11,17 +11,13 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import elemental.json.JsonObject;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @HtmlImport("swipe-away.html")
 public class NaviDrawer extends Composite<Div> implements AfterNavigationObserver {

@@ -18,11 +18,11 @@ public abstract class AbstractEntity<U> implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @CreationTimestamp
-    private LocalDateTime creationDate;
-
     @CreatedBy
     private User createdBy;
+
+    @CreationTimestamp
+    private LocalDateTime creationDate;
 
     public Long getId() {
         return id;
@@ -30,14 +30,6 @@ public abstract class AbstractEntity<U> implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public LocalDateTime getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(LocalDateTime creationDate) {
-        this.creationDate = creationDate;
     }
 
     public User getCreatedBy() {
@@ -48,4 +40,11 @@ public abstract class AbstractEntity<U> implements Serializable {
         this.createdBy = createdBy;
     }
 
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
 }

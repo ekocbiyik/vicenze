@@ -55,9 +55,6 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
 
-        // TODO: 4/28/19 burada kaldık
-
-
         AppBar appBar = initAppBar();
         appBar.setTitle(project.getProjectName());
 //        UI.getCurrent().getPage().setTitle(account.getOwner());

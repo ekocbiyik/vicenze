@@ -3,8 +3,6 @@ package com.meyratech.vicenze.backend.utils;
 import com.meyratech.vicenze.backend.model.Project;
 import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
-import com.meyratech.vicenze.backend.repository.dao.IProjectDao;
-import com.meyratech.vicenze.backend.repository.dao.IUserDao;
 import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
 import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
 import com.meyratech.vicenze.backend.security.HasLogger;
@@ -14,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 @SpringComponent
 public class DataGenerator implements HasLogger {
@@ -39,25 +36,25 @@ public class DataGenerator implements HasLogger {
     }
 
     private void generateUser() {
-        if (userService.count() != 0L) {
+        if (userService.findAll().size() != 0L) {
             getLogger().info("Using existing database");
             return;
         }
         getLogger().info("Generating user data");
 
         // admin
-        userService.save(null, createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Malin", "Castro", false, true));
+        userService.save(createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Malin", "Castro", false, true));
 
         // barista
-        userService.save(null, createUser("barista@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista", "Nikola", false, true));
-        userService.save(null, createUser("barista2@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista2", "Nikola", false, true));
-        userService.save(null, createUser("barista3@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista3", "Nikola", false, true));
+        userService.save(createUser("barista@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista", "Nikola", false, true));
+        userService.save(createUser("barista2@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista2", "Nikola", false, true));
+        userService.save(createUser("barista3@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista3", "Nikola", false, true));
 
         // customer
-        userService.save(null, createUser("customer@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank", "Riberry", false, true));
-        userService.save(null, createUser("customer2@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank2", "Riberry", false, true));
-        userService.save(null, createUser("customer3@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank3", "Riberry", false, true));
-        userService.save(null, createUser("customer4@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank4", "Riberry", false, true));
+        userService.save(createUser("customer@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank", "Riberry", false, true));
+        userService.save(createUser("customer2@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank2", "Riberry", false, true));
+        userService.save(createUser("customer3@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank3", "Riberry", false, true));
+        userService.save(createUser("customer4@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank4", "Riberry", false, true));
 
         getLogger().info("Generated user data");
     }
@@ -68,7 +65,7 @@ public class DataGenerator implements HasLogger {
             return;
         }
         getLogger().info("Generating project data");
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 8; i++) {
             projectService.save(null, createProject("Proje1_" + i, "desciption_" + i, true));
         }
         getLogger().info("Generated project data");

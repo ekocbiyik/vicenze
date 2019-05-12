@@ -46,8 +46,7 @@ public class NaviTabs extends Tabs {
     /**
      * Creates a tab that when clicked navigates to the specified target.
      */
-    public Tab addTab(String text,
-            Class<? extends Component> navigationTarget) {
+    public Tab addTab(String text, Class<? extends Component> navigationTarget) {
         Tab tab = new NaviTab(text, navigationTarget);
         add(tab);
         return tab;
@@ -57,8 +56,7 @@ public class NaviTabs extends Tabs {
      * Creates a (closable) tab that when clicked navigates to the specified
      * target.
      */
-    public Tab addClosableTab(String text,
-            Class<? extends Component> navigationTarget) {
+    public Tab addClosableTab(String text, Class<? extends Component> navigationTarget) {
         ClosableNaviTab tab = new ClosableNaviTab(text, navigationTarget);
         add(tab);
 
@@ -76,18 +74,8 @@ public class NaviTabs extends Tabs {
     public void navigateToSelectedTab() {
         if (getSelectedTab() instanceof NaviTab) {
             try {
-                UI.getCurrent().navigate(
-                        ((NaviTab) getSelectedTab()).getNavigationTarget());
+                UI.getCurrent().navigate(((NaviTab) getSelectedTab()).getNavigationTarget());
             } catch (Exception e) {
-                // @todo this is an code flow by exception anti-pattern. Either
-                // handle the case without the exception, or
-                // @todo at least document meticulously why this can't be done
-                // any other way and what kind of exceptions are we catching
-                // @todo and when they can occur.
-                // @todo this block consumes all exceptions, even
-                // backend-originated, and may result in exceptions disappearing
-                // mysteriously.
-
                 // If the right-most tab is closed, the Tabs component does not
                 // auto-select tabs on the left.
                 if (getTabCount() > 0) {
@@ -102,8 +90,7 @@ public class NaviTabs extends Tabs {
     /**
      * Updates the current tab's name and navigation target.
      */
-    public void updateSelectedTab(String text,
-            Class<? extends Component> navigationTarget) {
+    public void updateSelectedTab(String text, Class<? extends Component> navigationTarget) {
         Tab tab = getSelectedTab();
         tab.setLabel(text);
 
@@ -122,8 +109,7 @@ public class NaviTabs extends Tabs {
      * Returns the number of tabs.
      */
     public int getTabCount() {
-        return Math.toIntExact(getChildren()
-                .filter(component -> component instanceof Tab).count());
+        return Math.toIntExact(getChildren().filter(component -> component instanceof Tab).count());
     }
 
 }
