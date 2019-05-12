@@ -12,7 +12,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 import javax.servlet.http.HttpServletResponse;
 
 @Tag("access-denied-view")
-@HtmlImport("src/views/errors/access-denied-view.html")
+@HtmlImport("src/components/access-denied-view.html")
 @ParentLayout(MainLayout.class)
 @PageTitle(ViewConst.TITLE_ACCESS_DENIED)
 @Route
