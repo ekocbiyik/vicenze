@@ -16,6 +16,8 @@ import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
+import com.vaadin.flow.component.charts.model.style.Color;
+import com.vaadin.flow.component.charts.model.style.LabelStyle;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -38,11 +40,14 @@ public class HomeView extends ViewFrame {
     }
 
     private Component createContent() {
-        Component payments = createPayments();
-        Component transactions = createTransactions();
-        Component docs = createDocs();
 
-        FlexBoxLayout content = new FlexBoxLayout(payments, transactions, docs);
+        FlexBoxLayout content = new FlexBoxLayout(
+                createPayments(),
+                createTransactions(),
+//                createPieChart(),
+                createMixedChart(),
+                createDocs()
+        );
         content.setAlignItems(FlexComponent.Alignment.CENTER);
         content.setFlexDirection(FlexDirection.COLUMN);
         return content;
@@ -76,13 +81,11 @@ public class HomeView extends ViewFrame {
         for (Payment.Status status : Payment.Status.values()) {
             charts.add(createPaymentChart(status));
         }
-
         return charts;
     }
 
     private Component createPaymentChart(Payment.Status status) {
         int value;
-
         switch (status) {
             case PENDING:
                 value = 24;
@@ -107,11 +110,9 @@ public class HomeView extends ViewFrame {
         textContainer.setSpacing(Right.XS);
 
         Chart chart = createProgressChart(status, value);
-
         FlexBoxLayout chartContainer = new FlexBoxLayout(chart, textContainer);
         chartContainer.setAlignItems(FlexComponent.Alignment.CENTER);
-        chartContainer
-                .setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        chartContainer.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
         chartContainer.setPosition(Position.RELATIVE);
         chartContainer.setHeight("120px");
         chartContainer.setWidth("120px");
@@ -176,6 +177,7 @@ public class HomeView extends ViewFrame {
         Chart chart = new Chart(ChartType.AREASPLINE);
         Configuration conf = chart.getConfiguration();
         conf.setTitle("2019");
+        conf.setExporting(true);
         conf.getLegend().setEnabled(false);
 
         XAxis xAxis = new XAxis();
@@ -194,6 +196,128 @@ public class HomeView extends ViewFrame {
         card.setPadding(Uniform.M);
         card.setShadow(Shadow.S);
         return card;
+    }
+
+    private Component createPieChart() {
+        Chart chart = new Chart(ChartType.PIE);
+        Configuration conf = chart.getConfiguration();
+        conf.setExporting(true);
+        conf.setTitle("Browser market shares in January, 2018");
+
+        Tooltip tooltip = new Tooltip();
+        tooltip.setValueDecimals(1);
+        conf.setTooltip(tooltip);
+
+        PlotOptionsPie plotOptions = new PlotOptionsPie();
+        plotOptions.setAllowPointSelect(true);
+        plotOptions.setCursor(Cursor.POINTER);
+        plotOptions.setShowInLegend(true);
+        conf.setPlotOptions(plotOptions);
+
+        DataSeries series = new DataSeries();
+        DataSeriesItem chrome = new DataSeriesItem("Chrome", 61.41);
+        chrome.setSliced(true);
+        chrome.setSelected(true);
+        series.add(chrome);
+        series.add(new DataSeriesItem("Internet Explorer", 11.84));
+        series.add(new DataSeriesItem("Firefox", 10.85));
+        series.add(new DataSeriesItem("Edge", 4.67));
+        series.add(new DataSeriesItem("Safari", 4.18));
+        series.add(new DataSeriesItem("Sogou Explorer", 1.64));
+        series.add(new DataSeriesItem("Opera", 6.2));
+        series.add(new DataSeriesItem("QQ", 1.2));
+        series.add(new DataSeriesItem("Others", 2.61));
+        conf.setSeries(series);
+        chart.setVisibilityTogglingDisabled(true);
+
+        chart.addPointLegendItemClickListener(event -> {
+            UIUtils.showNotification("Legend item click" + " : " + event.getItemIndex() + " : " + event.getItem().getName());
+        });
+
+        FlexBoxLayout pieLayer = new FlexBoxLayout(createHeader(VaadinIcon.MONEY_EXCHANGE, "Transactions"), chart);
+
+        return pieLayer;
+    }
+
+    public Component createMixedChart() {
+        Chart chart = new Chart();
+        Configuration conf = chart.getConfiguration();
+        conf.setTitle("Combined Chart");
+        conf.setExporting(true);
+
+        XAxis x = new XAxis();
+        x.setCategories(new String[]{"Apples", "Oranges", "Pears", "Bananas", "Plums"});
+        conf.addxAxis(x);
+
+        LabelStyle labelStyle = new LabelStyle();
+        labelStyle.setTop("8px");
+        labelStyle.setLeft("40px");
+        conf.setLabels(new HTMLLabels(labelStyle, new HTMLLabelItem("Total fruit consumption")));
+
+        DataSeries series = new DataSeries();
+        PlotOptionsColumn plotOptions = new PlotOptionsColumn();
+        series.setPlotOptions(plotOptions);
+        series.setName("Jane");
+        series.setData(3, 2, 1, 3, 4);
+        conf.addSeries(series);
+
+        series = new DataSeries();
+        plotOptions = new PlotOptionsColumn();
+        series.setPlotOptions(plotOptions);
+        series.setName("John");
+        series.setData(2, 3, 5, 7, 6);
+        conf.addSeries(series);
+
+        series = new DataSeries();
+        plotOptions = new PlotOptionsColumn();
+        series.setPlotOptions(plotOptions);
+        series.setName("Joe");
+        series.setData(4, 3, 3, 9, 0);
+        conf.addSeries(series);
+
+        series = new DataSeries();
+        PlotOptionsSpline splinePlotOptions = new PlotOptionsSpline();
+        series.setPlotOptions(splinePlotOptions);
+        series.setName("Average");
+        series.setData(3, 2.67, 3, 6.33, 3.33);
+        conf.addSeries(series);
+
+        series = new DataSeries();
+        series.setPlotOptions(new PlotOptionsPie());
+        series.setName("Total consumption");
+        DataSeriesItem item = new DataSeriesItem("Jane", 13);
+        series.add(item);
+        item = new DataSeriesItem("John", 23);
+        series.add(item);
+        item = new DataSeriesItem("Joe", 19);
+        series.add(item);
+
+        PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
+        plotOptionsPie.setSize("100px");
+        plotOptionsPie.setCenter("100px", "80px");
+        plotOptionsPie.setShowInLegend(false);
+        series.setPlotOptions(plotOptionsPie);
+        conf.addSeries(series);
+
+        FlexBoxLayout card = new FlexBoxLayout(chart);
+        card.setBorderRadius(BorderRadius.S);
+        card.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
+        card.setBoxSizing(BoxSizing.BORDER_BOX);
+        card.setHeight("400px");
+        card.setPadding(Uniform.M);
+        card.setShadow(Shadow.S);
+
+
+        FlexBoxLayout transactions = new FlexBoxLayout(createHeader(VaadinIcon.CALC_BOOK, "Statistics"), card);
+        transactions.setBoxSizing(BoxSizing.BORDER_BOX);
+        transactions.setDisplay(Display.BLOCK);
+        transactions.setMargin(Top.XL);
+        transactions.setMaxWidth(MAX_WIDTH);
+        transactions.setPadding(Horizontal.RESPONSIVE_L);
+        transactions.setWidth("100%");
+
+        return transactions;
+
     }
 
     private Component createDocs() {

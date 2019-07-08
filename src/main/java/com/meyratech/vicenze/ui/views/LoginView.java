@@ -4,14 +4,9 @@ import com.meyratech.vicenze.backend.security.HasLogger;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.HtmlImport;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.templatemodel.TemplateModel;
@@ -22,7 +17,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 @Route
 @PageTitle("Vicenze Accounting")
 @HtmlImport("styles/shared-styles.html")
-//@HtmlImport("frontend://custom-login.html")
+@HtmlImport("frontend://custom-login.html")
 @PWA(name = "Vicenze", shortName = "Vicenze",
         startPath = "login",
         backgroundColor = "#227aef", themeColor = "#227aef",
@@ -36,8 +31,8 @@ public class LoginView extends ViewFrame implements AfterNavigationObserver, Bef
 
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
-        i18n.getHeader().setTitle("Vicenze");
-        i18n.getHeader().setDescription("description");
+//        i18n.getHeader().setTitle("Vicenze");
+//        i18n.getHeader().setDescription("description");
         i18n.setAdditionalInformation(null);
 
         i18n.setForm(new LoginI18n.Form());
@@ -52,6 +47,7 @@ public class LoginView extends ViewFrame implements AfterNavigationObserver, Bef
         login.setOpened(true);
 
         UIUtils.showNotification("Vicenze accounting platform");
+
 
 //        Label content = new Label("Vicenze accounting platform");
 //        Button rightButton = new Button(new Icon(VaadinIcon.CLOSE));

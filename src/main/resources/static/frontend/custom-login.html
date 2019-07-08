@@ -1,10 +1,26 @@
-<link rel="import" href="../bower_components/vaadin-login/theme/lumo/vaadin-login-overlay-styles.html">
+<!--<link rel="import" href="../bower_components/vaadin-login/theme/lumo/vaadin-login-overlay-styles.html">-->
 
 <dom-module id="custom-login-styles" theme-for="vaadin-login-overlay-wrapper">
     <template>
         <style>
+
+            /* this will add bg image to title part */
+            [part="brand"] {
+                background-image: url(../images/logo.svg);
+                background-size: cover; /*or cover, your choice*/
+                background-repeat: no-repeat;
+                background-position-x: left;
+                background-position-y: center;
+            }
+
+            /* this will add bg image to surrounding grey area */
+            [part="content"] {
+                background-image: url(../images/walpaper3.jpg);
+                background-size: cover;
+            }
+
             [part="card"] {
-                width: 600px;
+                width: 500px;
             }
 
             /* Small screen */

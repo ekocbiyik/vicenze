@@ -106,12 +106,12 @@ public class NaviDrawer extends Composite<Div> implements AfterNavigationObserve
     }
 
     private void initFooter() {
-        railButton = UIUtils.createSmallButton("Expand", VaadinIcon.CHEVRON_RIGHT_SMALL);
+        railButton = UIUtils.createSmallButton("Collapse", VaadinIcon.CHEVRON_LEFT_SMALL);
         railButton.addClassName(CLASS_NAME + "__footer");
         railButton.addClickListener(event -> toggleRailMode());
         railButton.getElement().setAttribute("aria-label", "Collapse menu");
 
-        getElement().setAttribute(RAIL, true);
+        getElement().setAttribute(RAIL, false);
         mainContent.add(railButton);
     }
 
