@@ -81,6 +81,7 @@ public class DataGenerator implements HasLogger {
         user.setRole(role);
         user.setLocked(locked);
         user.setActive(isActive);
+        user.setCreatedBy("System");
         return user;
     }
 
@@ -89,6 +90,7 @@ public class DataGenerator implements HasLogger {
         project.setProjectName(projectName);
         project.setDescription(description);
         project.setActive(new Random().nextBoolean());
+        project.setCreatedBy("System");
         return project;
     }
 

@@ -11,7 +11,7 @@ public class Role {
     }
 
     public static String[] getAllRoles() {
-        return new String[]{ADMIN, ACCOUNTANT, CUSTOMER};
+        return new String[]{ADMIN, ACCOUNTANT};
     }
 
 }

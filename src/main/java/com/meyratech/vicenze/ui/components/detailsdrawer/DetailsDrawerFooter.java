@@ -36,4 +36,7 @@ public class DetailsDrawerFooter extends Composite<FlexBoxLayout> {
         return cancel.addClickListener(listener);
     }
 
+    public Button getSaveButton() {
+        return save;
+    }
 }

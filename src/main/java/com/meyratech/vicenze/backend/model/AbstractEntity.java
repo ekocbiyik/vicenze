@@ -1,15 +1,14 @@
 package com.meyratech.vicenze.backend.model;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedBy;
 
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @MappedSuperclass
 public abstract class AbstractEntity<U> implements Serializable {
@@ -18,8 +17,9 @@ public abstract class AbstractEntity<U> implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @CreatedBy
-    private User createdBy;
+    @NotBlank
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
 
     @CreationTimestamp
     private LocalDateTime creationDate;
@@ -32,11 +32,11 @@ public abstract class AbstractEntity<U> implements Serializable {
         this.id = id;
     }
 
-    public User getCreatedBy() {
+    public String getCreatedBy() {
         return createdBy;
     }
 
-    public void setCreatedBy(User createdBy) {
+    public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 

@@ -3,6 +3,7 @@ package com.meyratech.vicenze.ui.views.personnel;
 import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
+import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
@@ -15,10 +16,10 @@ import com.meyratech.vicenze.ui.layout.size.Vertical;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.views.SplitViewFrame;
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -32,9 +33,11 @@ import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -42,6 +45,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.time.LocalDate;
 
 /**
  * ekocbiyik on 12.05.2019
@@ -54,13 +59,13 @@ public class PersonelView extends SplitViewFrame {
     private UserServiceImpl userService;
     private PasswordEncoder passwordEncoder;
 
+    private Binder<User> binder;
     private Grid<User> userGrid;
     private ListDataProvider<User> userDataProvider;
     private TextField searchField;
     private Button btnCreate;
     private DetailsDrawer detailsDrawer;
-    private DetailsDrawerHeader detailsDrawerHeader;
-
+    private DetailsDrawerFooter detailedFooter;
 
     // components
     private User detailedUser;
@@ -68,14 +73,11 @@ public class PersonelView extends SplitViewFrame {
     private TextField txtLastName;
     private EmailField txtEmail;
     private PasswordField txtPassword;
-    private ComboBox cbxRole;
-    private RadioButtonGroup<String> rdActive;
-    private RadioButtonGroup<String> rdLock;
-
-    private static final String ACTIVE = "Active";
-    private static final String IN_ACTIVE = "Inactive";
-    private static final String LOCKED = "Locked";
-    private static final String UN_LOCKED = "Unlocked";
+    private ComboBox<String> cbxRole;
+    private RadioButtonGroup<Boolean> rdActive;
+    private RadioButtonGroup<Boolean> rdLock;
+    private TextField txtCreatedBy;
+    private DatePicker creationDate;
 
 
     @Autowired
@@ -87,17 +89,13 @@ public class PersonelView extends SplitViewFrame {
         setViewContent(createContent());
         setViewDetails(createDetailsDrawer());
         setViewFooter(createFooter());
-
-        // TODO: 5/12/19 user ekleme pop-up oluşturulacak...
     }
 
     private Component createSearchBar() {
-
         searchField = new TextField();
         searchField.setPlaceholder("Search");
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
-
         searchField.addValueChangeListener(e -> userDataProvider.addFilter(user -> StringUtils.containsIgnoreCase(user.getFullName(), searchField.getValue())));
 
         FlexBoxLayout container = new FlexBoxLayout(searchField);
@@ -111,7 +109,6 @@ public class PersonelView extends SplitViewFrame {
         Div content = new Div(createGrid());
         content.addClassName("grid-view");
         return content;
-
     }
 
     private Grid createGrid() {
@@ -134,36 +131,16 @@ public class PersonelView extends SplitViewFrame {
 
     private DetailsDrawer createDetailsDrawer() {
         detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.RIGHT);
+        detailsDrawer.setHeader(new DetailsDrawerHeader("User Info"));
 
-        // Header
-        detailsDrawerHeader = new DetailsDrawerHeader("Info");
-        detailsDrawer.setHeader(detailsDrawerHeader);
+        detailedFooter = new DetailsDrawerFooter();
+        detailsDrawer.setFooter(detailedFooter);
 
-        // Footer
-        DetailsDrawerFooter footer = new DetailsDrawerFooter();
-        detailsDrawer.setFooter(footer);
-
-        footer.addCancelListener(e -> {
+        detailedFooter.addCancelListener(e -> {
             detailedUser = null;
             detailsDrawer.hide();
         });
-        footer.addSaveListener(e -> {
-            detailedUser.setFirstName(txtFirstName.getValue());
-            detailedUser.setLastName(txtLastName.getValue());
-            detailedUser.setEmail(txtEmail.getValue());
-            if (!txtPassword.isEmpty()) {
-                detailedUser.setPassword(passwordEncoder.encode(txtPassword.getValue()));
-            }
-            detailedUser.setRole((String) cbxRole.getValue());
-            detailedUser.setActive(ACTIVE.equals(rdActive.getValue()));
-            detailedUser.setLocked(LOCKED.equals(rdLock.getValue()));
-            userService.save(detailedUser);
-
-            Notification.show("Updated!", 3000, Notification.Position.BOTTOM_END);
-            detailsDrawer.hide();
-            detailedUser = null;
-            userGrid.getDataProvider().refreshAll();
-        });
+        detailedFooter.addSaveListener(e -> saveDetailedUser());
         return detailsDrawer;
     }
 
@@ -174,71 +151,168 @@ public class PersonelView extends SplitViewFrame {
         footer.setSpacing(Right.S);
         footer.setWidth("100%");
         btnCreate = UIUtils.createPrimaryButton("New Personnel");
-        btnCreate.addClickListener(e -> openNewPersonnelView(e));
+        btnCreate.addClickListener(e -> showDetails(null));
         footer.add(btnCreate);
         return footer;
     }
 
-    public void openNewPersonnelView(ClickEvent<Button> e) {
-        Notification.show("not implemented!", 3000, Notification.Position.BOTTOM_END);
-    }
-
     private void showDetails(User user) {
         detailedUser = user;
-        detailsDrawerHeader.setText(user.getFullName());
-        detailsDrawer.setContent(createDetails(user));
+        detailsDrawer.setContent(createDetails());
+        initializeValidators();
+        if (user != null) {
+            initializeUserDetails();
+            cbxRole.setEnabled(false);
+        }
         detailsDrawer.show();
     }
 
+    private FormLayout createDetails() {
 
-    private FormLayout createDetails(User user) {
         txtFirstName = new TextField();
-        txtFirstName.setValue(user.getFirstName());
         txtFirstName.setWidth("100%");
+        txtFirstName.setRequired(true);
 
         txtLastName = new TextField();
-        txtLastName.setValue(user.getLastName());
         txtLastName.setWidth("100%");
+        txtLastName.setRequired(true);
 
         txtEmail = new EmailField();
-        txtEmail.setValue(user.getEmail());
         txtEmail.setWidth("100%");
 
         txtPassword = new PasswordField();
         txtPassword.setWidth("100%");
+        txtPassword.setValueChangeMode(ValueChangeMode.EAGER);
+        txtPassword.addValueChangeListener(e -> binder.validate());
 
         cbxRole = new ComboBox();
         cbxRole.setItems(Role.getAllRoles());
-        cbxRole.setValue(user.getRole());
         cbxRole.setWidth("100%");
+        cbxRole.setRequired(true);
 
         rdActive = new RadioButtonGroup<>();
-        rdActive.setItems(ACTIVE, IN_ACTIVE);
-        rdActive.setValue(user.isActive() ? ACTIVE : IN_ACTIVE);
+        rdActive.setItems(true, false);
 
         rdLock = new RadioButtonGroup<>();
-        rdLock.setItems(LOCKED, UN_LOCKED);
-        rdLock.setValue(user.isLocked() ? LOCKED : UN_LOCKED);
+        rdLock.setItems(true, false);
+
+        creationDate = new DatePicker();
+        creationDate.setEnabled(false);
+        creationDate.setValue(LocalDate.now());
+
+        txtCreatedBy = new TextField();
+        txtCreatedBy.setEnabled(false);
+        txtCreatedBy.setValue(SecurityUtils.getCurrentUser().getFullName());
 
         // Form layout
         FormLayout form = new FormLayout();
         form.addClassNames(LumoStyles.Padding.Bottom.L, LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
-                new FormLayout.ResponsiveStep("21em", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP));
+                new FormLayout.ResponsiveStep("21em", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
 
         form.addFormItem(txtFirstName, "First Name");
         form.addFormItem(txtLastName, "Last Name");
         FormLayout.FormItem emailItem = form.addFormItem(txtEmail, "Email");
         FormLayout.FormItem passwordItem = form.addFormItem(txtPassword, "Password");
         FormLayout.FormItem roleItem = form.addFormItem(cbxRole, "Role");
-        FormLayout.FormItem statusItem = form.addFormItem(rdActive, "User Status");
-        FormLayout.FormItem loginItem = form.addFormItem(rdLock, "Login Status");
-        UIUtils.setColSpan(2, emailItem, passwordItem, roleItem, statusItem, loginItem);
+        form.addFormItem(rdActive, "User deleted?");
+        form.addFormItem(rdLock, "Login Blocked?");
+        FormLayout.FormItem creation = form.addFormItem(creationDate, "Creation Date");
+        FormLayout.FormItem created = form.addFormItem(txtCreatedBy, "Created By");
+        UIUtils.setColSpan(2, emailItem, passwordItem, roleItem, creation, created);
         return form;
     }
 
-    //
+
+    private void initializeValidators() {
+        binder = new Binder<>(User.class);
+        binder.forField(txtFirstName)
+                .asRequired("Firstname is required!")
+                .withValidator(name -> name.length() >= 3, "Firstname must contain at least 3 characters!")
+                .bind(User::getFirstName, User::setFirstName);
+
+        binder.forField(txtLastName)
+                .asRequired("Lastname is required!")
+                .withValidator(name -> name.length() >= 3, "Lastname must contain at least 3 characters!")
+                .bind(User::getLastName, User::setLastName);
+
+        binder.forField(txtEmail)
+                .asRequired("Email is required!")
+                .withValidator(new EmailValidator("Invalid email address!"))
+                .bind(User::getEmail, User::setEmail);
+
+        binder.forField(cbxRole)
+                .asRequired("Role is required!")
+                .withValidator(rle -> rle.length() > 0, "Please select a role!")
+                .bind(User::getRole, User::setRole);
+
+        binder.forField(rdActive)
+                .asRequired("Please select activation!")
+                .bind(User::isActive, User::setActive);
+
+        binder.forField(rdLock)
+                .asRequired("Please select Lock status!")
+                .bind(User::isLocked, User::setLocked);
+
+        if (detailedUser == null) {
+            binder.forField(txtPassword)
+                    .asRequired("Password is required!")
+                    .withValidator(pass -> pass.length() >= 8, "Password must contain at least 8 characters!")
+                    .bind(User::getPassword, User::setPassword);
+        }
+
+        detailedFooter.getSaveButton().setEnabled(false);
+        binder.readBean(detailedUser == null ? new User() : detailedUser);
+        binder.addStatusChangeListener(status -> detailedFooter.getSaveButton().setEnabled(!status.hasValidationErrors()));
+    }
+
+    private void initializeUserDetails() {
+        txtFirstName.setValue(detailedUser.getFirstName());
+        txtLastName.setValue(detailedUser.getLastName());
+        txtEmail.setValue(detailedUser.getEmail());
+        cbxRole.setValue(detailedUser.getRole());
+        rdActive.setValue(detailedUser.isActive());
+        rdLock.setValue(detailedUser.isLocked());
+        txtCreatedBy.setValue(detailedUser.getCreatedBy());
+        creationDate.setValue(LocalDate.from(detailedUser.getCreationDate()));
+    }
+
+    private void saveDetailedUser() {
+
+        binder.validate();
+        if (!binder.isValid()) {
+            detailedFooter.getSaveButton().setEnabled(false);
+            return;
+        }
+
+        if (detailedUser == null) {
+            detailedUser = new User();
+            detailedUser.setLocked(false);
+            detailedUser.setCreatedBy(SecurityUtils.getCurrentUser().getFullName());
+            detailedUser.setPassword(passwordEncoder.encode(txtPassword.getValue()));
+        }
+
+        if (!txtPassword.isEmpty()) {
+            detailedUser.setPassword(passwordEncoder.encode(txtPassword.getValue()));
+        }
+
+        detailedUser.setFirstName(txtFirstName.getValue());
+        detailedUser.setLastName(txtLastName.getValue());
+        detailedUser.setEmail(txtEmail.getValue());
+        detailedUser.setRole(cbxRole.getValue());
+        detailedUser.setActive(rdActive.getValue());
+        detailedUser.setLocked(rdLock.getValue());
+        userService.save(detailedUser);
+
+        Notification.show("Successfull", 6000, Notification.Position.TOP_END);
+        detailsDrawer.hide();
+        detailedUser = null;
+        userDataProvider = DataProvider.ofCollection(userService.findAll());
+        userGrid.setDataProvider(userDataProvider);
+    }
+
     private Component createUserInfo(User user) {
         ListItem item = new ListItem(
                 UIUtils.createInitials(user.getFirstName().substring(0, 1)),

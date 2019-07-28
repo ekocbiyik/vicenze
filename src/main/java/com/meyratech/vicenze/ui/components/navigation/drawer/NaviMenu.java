@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.applayout.AppLayoutMenuItem;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -26,8 +27,7 @@ public class NaviMenu extends Div {
 
     public void filter(String filter) {
         getNaviItems().forEach(naviItem -> {
-            boolean matches = ((NaviItem) naviItem).getText().toLowerCase()
-                    .contains(filter.toLowerCase());
+            boolean matches = ((NaviItem) naviItem).getText().toLowerCase().contains(filter.toLowerCase());
             naviItem.setVisible(matches);
         });
     }
@@ -60,5 +60,4 @@ public class NaviMenu extends Div {
         List<NaviItem> items = (List) getChildren().collect(Collectors.toList());
         return items;
     }
-
 }

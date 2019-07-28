@@ -72,15 +72,9 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
         setFlexDirection(FlexDirection.COLUMN);
         setSizeFull();
 
-        // Initialise the UI building blocks
         initStructure();
-
-        // Configure the headers and footers (optional)
         initHeadersAndFooters();
-
         if (SecurityUtils.isUserLoggedIn()) {
-
-            // Populate the navigation drawer
             initNaviItems();
         }
     }
@@ -117,14 +111,15 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
         NaviMenu menu = naviDrawer.getMenu();
 
         menu.addNaviItem(VaadinIcon.HOME, ViewConst.TITLE_HOME, HomeView.class);
-        if (SecurityUtils.isAccessGranted(ProjectsView.class)) {
-            menu.addNaviItem(VaadinIcon.INSTITUTION, ViewConst.TITLE_PROJECTS, ProjectsView.class);
-        }
         if (SecurityUtils.isAccessGranted(PersonelView.class)) {
             menu.addNaviItem(VaadinIcon.USERS, "Personnel", PersonelView.class);
         }
-        menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
 
+        if (SecurityUtils.isAccessGranted(ProjectsView.class)) {
+            menu.addNaviItem(VaadinIcon.INSTITUTION, ViewConst.TITLE_PROJECTS, ProjectsView.class);
+        }
+
+        menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
 
 //        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
 //        menu.addNaviItem(personnel, "Accountants", Accountants.class);
