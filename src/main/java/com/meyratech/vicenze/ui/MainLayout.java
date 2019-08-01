@@ -119,8 +119,8 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
         }
 
         menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
-        menu.addNaviItem(VaadinIcon.ACCESSIBILITY, "Accounts", Accountants.class);
-        menu.addNaviItem(VaadinIcon.MAGNET, "Managers", Managers.class);
+//        menu.addNaviItem(VaadinIcon.ACCESSIBILITY, "Accounts", Accountants.class);
+//        menu.addNaviItem(VaadinIcon.MAGNET, "Managers", Managers.class);
 
 //        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
 //        menu.addNaviItem(personnel, "Accountants", Accountants.class);
