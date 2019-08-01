@@ -1,4 +1,4 @@
-package com.meyratech.vicenze.ui.views;
+package com.meyratech.vicenze.ui.views.home;
 
 import com.meyratech.vicenze.backend.Payment;
 import com.meyratech.vicenze.ui.MainLayout;
@@ -11,6 +11,7 @@ import com.meyratech.vicenze.ui.layout.size.Top;
 import com.meyratech.vicenze.ui.util.*;
 import com.meyratech.vicenze.ui.util.css.*;
 import com.meyratech.vicenze.ui.util.css.Position;
+import com.meyratech.vicenze.ui.views.ViewFrame;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;

@@ -2,8 +2,7 @@ package com.meyratech.vicenze.backend.security;
 
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.dao.IUserDao;
-import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
-import com.meyratech.vicenze.ui.views.LoginView;
+import com.meyratech.vicenze.ui.views.login.LoginView;
 import com.meyratech.vicenze.ui.views.errors.AccessDeniedView;
 import com.meyratech.vicenze.ui.views.errors.CustomRouteNotFoundError;
 import com.vaadin.flow.server.ServletHelper.RequestType;

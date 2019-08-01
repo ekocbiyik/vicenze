@@ -26,6 +26,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.management.Notification;
 import java.time.LocalDate;
 
 /**
@@ -38,7 +39,6 @@ public class UserDialog extends Dialog {
     private TextField firstName;
     private TextField lastName;
     private ComboBox<String> role;
-    private RadioButtonGroup<Boolean> isActive;
     private EmailField email;
     private PasswordField password;
     private DatePicker creationDate;
@@ -56,7 +56,7 @@ public class UserDialog extends Dialog {
         this.user = user;
         this.userGrid = userGrid;
         add(createLayout());
-        setHeight("calc(50vh - (var(--lumo-space-m) ))");
+//        setHeight("calc(50vh - (var(--lumo-space-m) ))");
         setWidth("calc(50vw - (var(--lumo-space-m) ))");
     }
 
@@ -108,9 +108,6 @@ public class UserDialog extends Dialog {
         role.setRequired(true);
         role.setItems(Role.getAllRoles());
 
-        isActive = new RadioButtonGroup<>();
-        isActive.setItems(true, false);
-
         creationDate = new DatePicker();
         creationDate.setValue(LocalDate.now());
         creationDate.setEnabled(false);
@@ -131,7 +128,6 @@ public class UserDialog extends Dialog {
         formLayout.addFormItem(email, "Email");
         formLayout.addFormItem(password, "Password");
         formLayout.addFormItem(role, "Role");
-        formLayout.addFormItem(isActive, "Active/Inactive");
         formLayout.addFormItem(creationDate, "Created Date");
         content.add(formLayout);
 
@@ -178,10 +174,6 @@ public class UserDialog extends Dialog {
                 .withValidator(rle -> rle.length() > 0, "Please select a role!")
                 .bind(User::getRole, User::setRole);
 
-        binder.forField(isActive)
-                .asRequired("Please select activation!")
-                .bind(User::isActive, User::setActive);
-
         if (user == null) {
             binder.forField(password)
                     .asRequired("Password is required!")
@@ -200,7 +192,6 @@ public class UserDialog extends Dialog {
         lastName.setValue(user.getLastName());
         email.setValue(user.getEmail());
         role.setValue(user.getRole());
-        isActive.setValue(user.isActive());
         creationDate.setValue(LocalDate.from(user.getCreationDate()));
     }
 
@@ -230,11 +221,11 @@ public class UserDialog extends Dialog {
         user.setLastName(lastName.getValue());
         user.setEmail(email.getValue());
         user.setRole(role.getValue());
-        user.setActive(isActive.getValue());
         userService.save(user);
 
         close();
         if (userGrid != null) userGrid.getDataProvider().refreshAll();
+        UIUtils.showNotification("Successfull!");
     }
 
 }

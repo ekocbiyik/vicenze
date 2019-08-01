@@ -18,13 +18,10 @@ public class ListItem extends FlexLayout implements HasStyle {
 
     private Div prefix;
     private Div suffix;
-
-    private FlexBoxLayout content;
-
     private Label primary;
     private Label secondary;
-
     private Div divider;
+    private FlexBoxLayout content;
 
     public ListItem(String primary, String secondary) {
         setClassName(CLASS_NAME);
@@ -55,7 +52,6 @@ public class ListItem extends FlexLayout implements HasStyle {
     }
 
     /* === SUFFIX === */
-
     public ListItem(String primary, String secondary, Component suffix) {
         this(primary, secondary);
         setSuffix(suffix);
@@ -66,9 +62,7 @@ public class ListItem extends FlexLayout implements HasStyle {
     }
 
     /* === PREFIX & SUFFIX === */
-
-    public ListItem(Component prefix, String primary, String secondary,
-                    Component suffix) {
+    public ListItem(Component prefix, String primary, String secondary, Component suffix) {
         this(primary, secondary);
         setPrefix(prefix);
         setSuffix(suffix);

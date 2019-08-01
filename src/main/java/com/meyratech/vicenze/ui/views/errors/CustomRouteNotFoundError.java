@@ -2,7 +2,7 @@ package com.meyratech.vicenze.ui.views.errors;
 
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.util.ViewConst;
-import com.meyratech.vicenze.ui.views.HomeView;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;

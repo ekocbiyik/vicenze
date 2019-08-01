@@ -3,8 +3,13 @@ package com.meyratech.vicenze.backend.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.util.Random;
 
 /**
  * ekocbiyik on 4/28/19
@@ -14,15 +19,40 @@ import javax.validation.constraints.Size;
 public class Project extends AbstractEntity {
 
     @NotBlank
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "company", nullable = false)
+    private String company;
+
+    @NotBlank
+    @Column(name = "project_name", nullable = false)
     private String projectName;
 
+    @NotEmpty
+    @Email
     @Size(max = 255)
-    @Column(name = "password")
+    @Column(name = "email")
+    private String email;
+
+    @NotEmpty
+    @Column(name = "phone")
+    private String phone;
+
+    @Size(max = 255)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true; // aktivate-deactivate
+
+    @Transient
+    private BigDecimal totalAmount;
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
 
     public String getProjectName() {
         return projectName;
@@ -30,6 +60,22 @@ public class Project extends AbstractEntity {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getDescription() {
@@ -48,4 +94,12 @@ public class Project extends AbstractEntity {
         isActive = active;
     }
 
+    public BigDecimal getTotalAmount() {
+//        return totalAmount; todo
+        return BigDecimal.valueOf(new Random().nextDouble() * 99999);
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 }

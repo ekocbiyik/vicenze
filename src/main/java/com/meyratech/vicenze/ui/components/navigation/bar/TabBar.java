@@ -17,7 +17,7 @@ import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.navigation.tab.NaviTabs;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.views.HomeView;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 
 public class TabBar extends Composite<FlexLayout> {
 

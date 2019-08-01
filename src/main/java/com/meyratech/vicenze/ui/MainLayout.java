@@ -11,16 +11,15 @@ import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
 import com.meyratech.vicenze.ui.util.css.Overflow;
-import com.meyratech.vicenze.ui.views.HomeView;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.meyratech.vicenze.ui.views.Payments;
-import com.meyratech.vicenze.ui.views.personnel.Accountants;
-import com.meyratech.vicenze.ui.views.personnel.Managers;
+import com.meyratech.vicenze.ui.views.Accountants;
+import com.meyratech.vicenze.ui.views.Managers;
 import com.meyratech.vicenze.ui.views.personnel.PersonelView;
 import com.meyratech.vicenze.ui.views.projects.ProjectsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.applayout.AppLayoutMenuItem;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -112,7 +111,7 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
 
         menu.addNaviItem(VaadinIcon.HOME, ViewConst.TITLE_HOME, HomeView.class);
         if (SecurityUtils.isAccessGranted(PersonelView.class)) {
-            menu.addNaviItem(VaadinIcon.USERS, "Personnel", PersonelView.class);
+            menu.addNaviItem(VaadinIcon.USERS, ViewConst.TITLE_PERSONNELS, PersonelView.class);
         }
 
         if (SecurityUtils.isAccessGranted(ProjectsView.class)) {
@@ -120,6 +119,8 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
         }
 
         menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
+        menu.addNaviItem(VaadinIcon.ACCESSIBILITY, "Accounts", Accountants.class);
+        menu.addNaviItem(VaadinIcon.MAGNET, "Managers", Managers.class);
 
 //        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
 //        menu.addNaviItem(personnel, "Accountants", Accountants.class);

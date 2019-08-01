@@ -1,4 +1,4 @@
-package com.meyratech.vicenze.ui.views.personnel;
+package com.meyratech.vicenze.ui.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.combobox.ComboBox;

@@ -14,6 +14,7 @@ public class ViewConst {
     public static final String PAGE_PROJECTS_DETAILS = "projects-details";
 
     public static final String TITLE_HOME = "Home";
+    public static final String TITLE_PERSONNELS = "Personnels";
     public static final String TITLE_PROJECTS = "Projects";
     public static final String TITLE_PROJECTS_DETAILS = "Project Detail";
 

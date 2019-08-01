@@ -1,6 +1,6 @@
 package com.meyratech.vicenze.ui.components.navigation.tab;
 
-import com.meyratech.vicenze.ui.views.HomeView;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;

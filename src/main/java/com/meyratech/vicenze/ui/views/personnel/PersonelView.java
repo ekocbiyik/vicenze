@@ -5,16 +5,13 @@ import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
-import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawer;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
-import com.meyratech.vicenze.ui.layout.size.Horizontal;
-import com.meyratech.vicenze.ui.layout.size.Right;
-import com.meyratech.vicenze.ui.layout.size.Vertical;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.util.ViewConst;
 import com.meyratech.vicenze.ui.views.SplitViewFrame;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -23,12 +20,14 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -52,7 +51,7 @@ import java.time.LocalDate;
  * ekocbiyik on 12.05.2019
  */
 @Route(value = "personnels", layout = MainLayout.class)
-@PageTitle("Personnels")
+@PageTitle(ViewConst.TITLE_PERSONNELS)
 @Secured(Role.ADMIN)
 public class PersonelView extends SplitViewFrame {
 
@@ -85,48 +84,51 @@ public class PersonelView extends SplitViewFrame {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
 
-        setViewHeader(createSearchBar());
         setViewContent(createContent());
         setViewDetails(createDetailsDrawer());
-        setViewFooter(createFooter());
-    }
-
-    private Component createSearchBar() {
-        searchField = new TextField();
-        searchField.setPlaceholder("Search");
-        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchField.setValueChangeMode(ValueChangeMode.EAGER);
-        searchField.addValueChangeListener(e -> userDataProvider.addFilter(user -> StringUtils.containsIgnoreCase(user.getFullName(), searchField.getValue())));
-
-        FlexBoxLayout container = new FlexBoxLayout(searchField);
-        container.addClassName("app-bar__container");
-        container.setAlignItems(FlexComponent.Alignment.CENTER);
-        container.setFlexGrow(1, searchField);
-        return container;
     }
 
     private Component createContent() {
-        Div content = new Div(createGrid());
+        userGrid = new Grid<>();
+        userDataProvider = DataProvider.ofCollection(userService.findAll());
+        userGrid.setDataProvider(userDataProvider);
+        userGrid.setSizeFull();
+
+        Grid.Column<User> col1 = userGrid.addColumn(User::getId).setFlexGrow(0).setFrozen(true).setHeader("ID").setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XS);
+        Grid.Column<User> col2 = userGrid.addColumn(new ComponentRenderer<>(this::createUserInfo)).setFlexGrow(1).setHeader("Name").setSortable(true).setComparator(User::getFullName).setWidth(UIUtils.COLUMN_WIDTH_XL);
+        Grid.Column<User> col3 = userGrid.addColumn(new ComponentRenderer<>(this::createActive)).setFlexGrow(0).setHeader("Active/Deactive").setSortable(true).setComparator(User::isActive).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<User> col4 = userGrid.addColumn(new ComponentRenderer<>(this::createLocked)).setFlexGrow(0).setHeader("Is Locked").setWidth(UIUtils.COLUMN_WIDTH_S).setTextAlign(ColumnTextAlign.START);
+        Grid.Column<User> col5 = userGrid.addColumn(User::getCreatedBy).setHeader("Created By").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_M).setTextAlign(ColumnTextAlign.START);
+        Grid.Column<User> col6 = userGrid.addColumn(new ComponentRenderer<>(this::lastLogin)).setFlexGrow(0).setHeader("Last Login").setWidth(UIUtils.COLUMN_WIDTH_L).setTextAlign(ColumnTextAlign.START);
+        Grid.Column<User> col7 = userGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setFlexGrow(0).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L).setTextAlign(ColumnTextAlign.START);
+
+        userGrid.addSelectionListener(event -> event.getFirstSelectedItem().ifPresent(this::showDetails));
+
+        HeaderRow topRow = userGrid.prependHeaderRow();
+        HeaderRow.HeaderCell buttonsCell = topRow.join(col1, col2, col3, col4, col5, col6, col7);
+        buttonsCell.setComponent(getGridHeader());
+        userGrid.appendFooterRow().getCell(userGrid.getColumns().get(1)).setComponent(new Label("Total: " + userDataProvider.getItems().size() + " personnels"));
+
+        Div content = new Div(userGrid);
         content.addClassName("grid-view");
         return content;
     }
 
-    private Grid createGrid() {
-        userGrid = new Grid<>();
-        userDataProvider = DataProvider.ofCollection(userService.findAll());
-        userGrid.setDataProvider(userDataProvider);
-        userGrid.setHeight("100%");
+    private Component getGridHeader() {
+        searchField = new TextField();
+        searchField.setPlaceholder("Search personnels");
+        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+        searchField.setSizeFull();
+        searchField.addValueChangeListener(e -> userDataProvider.addFilter(user -> StringUtils.containsIgnoreCase(user.getFullName(), searchField.getValue())));
 
-        userGrid.addColumn(User::getId).setFlexGrow(0).setFrozen(true).setHeader("ID").setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XS);
-        userGrid.addColumn(new ComponentRenderer<>(this::createUserInfo)).setFlexGrow(1).setHeader("Name").setSortable(true).setComparator(User::getFullName).setWidth(UIUtils.COLUMN_WIDTH_XL);
-        userGrid.addColumn(new ComponentRenderer<>(this::createActive)).setFlexGrow(0).setHeader("Active/Deactive").setSortable(true).setComparator(User::isActive).setWidth(UIUtils.COLUMN_WIDTH_L);
-        userGrid.addColumn(new ComponentRenderer<>(this::createLocked)).setFlexGrow(0).setHeader("Is Locked").setWidth(UIUtils.COLUMN_WIDTH_S).setTextAlign(ColumnTextAlign.START);
-        userGrid.addColumn(User::getCreatedBy).setHeader("Created By").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_M).setTextAlign(ColumnTextAlign.START);
-        userGrid.addColumn(new ComponentRenderer<>(this::lastLogin)).setFlexGrow(0).setHeader("Last Login").setWidth(UIUtils.COLUMN_WIDTH_L).setTextAlign(ColumnTextAlign.START);
-        userGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setFlexGrow(0).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L).setTextAlign(ColumnTextAlign.START);
+        btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
+        btnCreate.addClickListener(e -> showDetails(null));
 
-        userGrid.addSelectionListener(event -> event.getFirstSelectedItem().ifPresent(this::showDetails));
-        return userGrid;
+        HorizontalLayout container = new HorizontalLayout(btnCreate, searchField);
+        container.setSpacing(true);
+        container.setSizeFull();
+        return container;
     }
 
     private DetailsDrawer createDetailsDrawer() {
@@ -142,18 +144,6 @@ public class PersonelView extends SplitViewFrame {
         });
         detailedFooter.addSaveListener(e -> saveDetailedUser());
         return detailsDrawer;
-    }
-
-    private Component createFooter() {
-        FlexBoxLayout footer = new FlexBoxLayout();
-        footer.setBackgroundColor(LumoStyles.Color.Contrast._5);
-        footer.setPadding(Horizontal.RESPONSIVE_L, Vertical.S);
-        footer.setSpacing(Right.S);
-        footer.setWidth("100%");
-        btnCreate = UIUtils.createPrimaryButton("New Personnel");
-        btnCreate.addClickListener(e -> showDetails(null));
-        footer.add(btnCreate);
-        return footer;
     }
 
     private void showDetails(User user) {

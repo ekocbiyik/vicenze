@@ -1,7 +1,7 @@
 package com.meyratech.vicenze.backend.security;
 
 import com.meyratech.vicenze.backend.exceptions.AccessDeniedException;
-import com.meyratech.vicenze.ui.views.LoginView;
+import com.meyratech.vicenze.ui.views.login.LoginView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;

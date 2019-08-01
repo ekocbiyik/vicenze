@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 
 @Route(value = ViewConst.PAGE_PROJECTS_DETAILS, layout = MainLayout.class)
-@PageTitle(ViewConst.PAGE_PROJECTS_DETAILS)
+@PageTitle(ViewConst.TITLE_PROJECTS_DETAILS)
 public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> {
 
     public int RECENT_TRANSACTIONS = 4;

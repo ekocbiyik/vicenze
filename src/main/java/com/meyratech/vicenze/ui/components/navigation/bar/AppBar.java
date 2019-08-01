@@ -2,7 +2,7 @@ package com.meyratech.vicenze.ui.components.navigation.bar;
 
 import static com.meyratech.vicenze.ui.util.UIUtils.IMG_PATH;
 
-import com.meyratech.vicenze.ui.views.HomeView;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

@@ -188,7 +188,6 @@ public class UIUtils {
     }
 
     // Text
-
     public static Button createButton(String text, ButtonVariant... variants) {
         Button button = new Button(text);
         button.addThemeVariants(variants);
@@ -197,7 +196,6 @@ public class UIUtils {
     }
 
     // Icon
-
     public static Button createButton(VaadinIcon icon, ButtonVariant... variants) {
         Button button = new Button(new Icon(icon));
         button.addThemeVariants(variants);
@@ -205,7 +203,6 @@ public class UIUtils {
     }
 
     // Text and icon
-
     public static Button createButton(String text, VaadinIcon icon, ButtonVariant... variants) {
         Button button = new Button(text, new Icon(icon));
         button.addThemeVariants(variants);
@@ -213,7 +210,6 @@ public class UIUtils {
     }
 
     /* ==== TEXTFIELDS ==== */
-
     public static TextField createSmallTextField() {
         TextField textField = new TextField();
         textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -221,7 +217,6 @@ public class UIUtils {
     }
 
     /* ==== LABELS ==== */
-
     public static Label createLabel(FontSize size, TextColor color, String text) {
         Label label = new Label(text);
         setFontSize(size, label);
@@ -409,9 +404,8 @@ public class UIUtils {
     }
 
     /* === NOTIFICATIONS === */
-
     public static void showNotification(String text) {
-        Notification.show(text, 3000, Notification.Position.BOTTOM_CENTER);
+        Notification.show(text, 3000, Notification.Position.TOP_END);
     }
 
     /* === CSS UTILITIES === */

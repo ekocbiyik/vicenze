@@ -137,8 +137,7 @@ public class AccountDetails extends ViewFrame implements HasUrlParameter<Long> {
         Label title = UIUtils.createH3Label("Recent Transactions");
 
         Button viewAll = UIUtils.createSmallButton("View All");
-        viewAll.addClickListener(
-                e -> UIUtils.showNotification("Not implemented yet."));
+        viewAll.addClickListener(e -> UIUtils.showNotification("Not implemented yet."));
         viewAll.addClassName(LumoStyles.Margin.Left.AUTO);
 
         FlexBoxLayout header = new FlexBoxLayout(title, viewAll);

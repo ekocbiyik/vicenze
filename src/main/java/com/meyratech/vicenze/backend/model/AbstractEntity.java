@@ -22,6 +22,7 @@ public abstract class AbstractEntity<U> implements Serializable {
     private String createdBy;
 
     @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
 
     public Long getId() {

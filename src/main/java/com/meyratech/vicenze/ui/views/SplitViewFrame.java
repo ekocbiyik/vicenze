@@ -35,13 +35,11 @@ public class SplitViewFrame extends Composite<Div> implements HasStyle {
 
     public SplitViewFrame() {
         setClassName(CLASS_NAME);
-
         header.setClassName(CLASS_NAME + "__header");
         wrapper.setClassName(CLASS_NAME + "__wrapper");
         content.setClassName(CLASS_NAME + "__content");
         details.setClassName(CLASS_NAME + "__details");
         footer.setClassName(CLASS_NAME + "__footer");
-
         wrapper.add(content, details);
         getContent().add(header, wrapper, footer);
     }
@@ -73,7 +71,6 @@ public class SplitViewFrame extends Composite<Div> implements HasStyle {
     public void setViewDetailsPosition(Position position) {
         if (position.equals(Position.RIGHT)) {
             wrapper.setFlexDirection(FlexDirection.ROW);
-
         } else if (position.equals(Position.BOTTOM)) {
             wrapper.setFlexDirection(FlexDirection.COLUMN);
         }

@@ -1,8 +1,10 @@
-package com.meyratech.vicenze.ui.views;
+package com.meyratech.vicenze.ui.views.login;
 
 import com.meyratech.vicenze.backend.security.HasLogger;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.views.home.HomeView;
+import com.meyratech.vicenze.ui.views.ViewFrame;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.login.LoginI18n;

@@ -1,4 +1,4 @@
-package com.meyratech.vicenze.ui.views.personnel;
+package com.meyratech.vicenze.ui.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -44,7 +44,6 @@ public class Managers extends SplitViewFrame {
         setViewContent(createContent());
         setViewDetails(createDetailsDrawer());
         setViewDetailsPosition(Position.BOTTOM);
-
         filter();
     }
 
@@ -89,8 +88,7 @@ public class Managers extends SplitViewFrame {
     }
 
     private Component createApprovalLimit(Person person) {
-        int amount = person.getRandomInteger() > 0 ? person.getRandomInteger()
-                : 0;
+        int amount = person.getRandomInteger() > 0 ? person.getRandomInteger() : 0;
         return UIUtils.createAmountLabel(amount);
     }
 

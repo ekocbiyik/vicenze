@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.util.Random;
 
 @SpringComponent
@@ -66,7 +67,14 @@ public class DataGenerator implements HasLogger {
         }
         getLogger().info("Generating project data");
         for (int i = 0; i < 8; i++) {
-            projectService.save(null, createProject("Proje1_" + i, "desciption_" + i, true));
+            projectService.save(
+                    null,
+                    createProject("Proje1_" + i,
+                            "descipafdadftion adfdafadsfads sdfg rhertyerthb adfsdfret5434g wregerg6g  f f " + i,
+                            "project" + i + "@mail.com",
+                            "+90 212 754 43 21",
+                            new BigDecimal(Math.random())
+                    ));
         }
         getLogger().info("Generated project data");
     }
@@ -85,8 +93,12 @@ public class DataGenerator implements HasLogger {
         return user;
     }
 
-    private Project createProject(String projectName, String description, boolean isActive) {
+    private Project createProject(String projectName, String description, String email, String phone, BigDecimal totalAmount) {
         Project project = new Project();
+        project.setCompany("My Company");
+        project.setEmail(email);
+        project.setPhone(phone);
+        project.setTotalAmount(totalAmount);
         project.setProjectName(projectName);
         project.setDescription(description);
         project.setActive(new Random().nextBoolean());
