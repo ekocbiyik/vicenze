@@ -1,5 +1,14 @@
 package com.meyratech.vicenze.ui.views;
 
+import com.meyratech.vicenze.backend.DummyData;
+import com.meyratech.vicenze.backend.Person;
+import com.meyratech.vicenze.ui.MainLayout;
+import com.meyratech.vicenze.ui.components.ListItem;
+import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawer;
+import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
+import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
+import com.meyratech.vicenze.ui.util.LumoStyles;
+import com.meyratech.vicenze.ui.util.UIUtils;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -19,16 +28,6 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.meyratech.vicenze.backend.DummyData;
-import com.meyratech.vicenze.backend.Person;
-import com.meyratech.vicenze.ui.MainLayout;
-import com.meyratech.vicenze.ui.components.ListItem;
-import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawer;
-import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
-import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
-import com.meyratech.vicenze.ui.util.LumoStyles;
-import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.views.SplitViewFrame;
 
 @Route(value = "managers", layout = MainLayout.class)
 @PageTitle("Managers")

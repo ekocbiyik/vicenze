@@ -10,7 +10,6 @@ import com.meyratech.vicenze.ui.components.navigation.bar.AppBar;
 import com.meyratech.vicenze.ui.layout.size.*;
 import com.meyratech.vicenze.ui.util.*;
 import com.meyratech.vicenze.ui.util.css.*;
-import com.meyratech.vicenze.ui.views.Accounts;
 import com.meyratech.vicenze.ui.views.ViewFrame;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
@@ -41,8 +40,8 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     public int RECENT_TRANSACTIONS = 4;
 
     private ListItem availability;
-    private ListItem bankAccount;
-    private ListItem updated;
+    private ListItem companyLabel;
+    private ListItem creationInfo;
     private Project project;
     private ProjectServiceImpl projectService;
 
@@ -52,23 +51,16 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     }
 
     @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-
-        AppBar appBar = initAppBar();
-        appBar.setTitle(project.getProjectName());
-//        UI.getCurrent().getPage().setTitle(account.getOwner());
-
-        availability.setPrimaryText("burası primary text");
-        bankAccount.setPrimaryText("burası 2");
-        bankAccount.setSecondaryText("burası 3");
-        updated.setPrimaryText(UIUtils.formatDatetime(project.getCreationDate()));
+    public void setParameter(BeforeEvent beforeEvent, Long id) {
+        project = projectService.findById(id);
+        setViewContent(createContent());
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, Long id) {
-        setViewContent(createContent());
-        project = projectService.findById(id);
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        AppBar appBar = initAppBar();
+        appBar.setTitle(project.getProjectName());
     }
 
     private AppBar initAppBar() {
@@ -79,11 +71,13 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     }
 
     private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout(createLogoSection(),
+        FlexBoxLayout content = new FlexBoxLayout(
+                createLogoSection(),
                 createRecentTransactionsHeader(),
                 createRecentTransactionsList(),
                 createMonthlyOverviewHeader(),
-                createMonthlyOverviewChart());
+                createMonthlyOverviewChart()
+        );
         content.setFlexDirection(FlexDirection.COLUMN);
         content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
         content.setMaxWidth("840px");
@@ -97,23 +91,25 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
         image.setHeight("200px");
         image.setWidth("200px");
 
-        availability = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.DOLLAR), "", "Availability");
-        availability.setId("availability");
-        availability.getPrimary().addClassName(LumoStyles.Heading.H2);
+        companyLabel = new ListItem(
+                UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION),
+                project.getCompany(),
+                String.format("Project number: %s", project.getProjectNumber())
+        );
+        companyLabel.getPrimary().addClassName(LumoStyles.Heading.H2);
+        companyLabel.setDividerVisible(true);
+        companyLabel.setWhiteSpace(WhiteSpace.PRE_LINE);
+
+        availability = new ListItem(
+                UIUtils.createTertiaryIcon(VaadinIcon.INFO_CIRCLE),
+                project.getEmail(),
+                project.getPhone()
+        );
         availability.setDividerVisible(true);
-        availability.setReverse(true);
 
-        bankAccount = new ListItem(
-                UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION), "", "");
-        bankAccount.setId("bankAccount");
-        bankAccount.setDividerVisible(true);
-        bankAccount.setReverse(true);
-        bankAccount.setWhiteSpace(WhiteSpace.PRE_LINE);
+        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy(), UIUtils.formatDatetime(project.getCreationDate()));
 
-        updated = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), "", "Updated");
-        updated.setReverse(true);
-
-        FlexBoxLayout listItems = new FlexBoxLayout(availability, bankAccount, updated);
+        FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
         listItems.setFlexDirection(FlexDirection.COLUMN);
 
         FlexBoxLayout section = new FlexBoxLayout(image, listItems);
@@ -153,10 +149,12 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
                 UIUtils.setTextColor(TextColor.ERROR, amountLabel);
             }
 
-            ListItem item = new ListItem(DummyData.getLogo(),
+            ListItem item = new ListItem(
+                    DummyData.getLogo(),
                     DummyData.getCompany(),
                     UIUtils.formatDate(LocalDate.now().minusDays(i)),
-                    amountLabel);
+                    amountLabel
+            );
 
             // Dividers for all but the last item
             item.setDividerVisible(i < RECENT_TRANSACTIONS - 1);

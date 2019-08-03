@@ -46,6 +46,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * ekocbiyik on 12.05.2019
@@ -76,7 +77,7 @@ public class PersonelView extends SplitViewFrame {
     private RadioButtonGroup<Boolean> rdActive;
     private RadioButtonGroup<Boolean> rdLock;
     private TextField txtCreatedBy;
-    private DatePicker creationDate;
+    private TextField creationDate;
 
 
     @Autowired
@@ -134,10 +135,8 @@ public class PersonelView extends SplitViewFrame {
     private DetailsDrawer createDetailsDrawer() {
         detailsDrawer = new DetailsDrawer(DetailsDrawer.Position.RIGHT);
         detailsDrawer.setHeader(new DetailsDrawerHeader("User Info"));
-
         detailedFooter = new DetailsDrawerFooter();
         detailsDrawer.setFooter(detailedFooter);
-
         detailedFooter.addCancelListener(e -> {
             detailedUser = null;
             detailsDrawer.hide();
@@ -152,7 +151,6 @@ public class PersonelView extends SplitViewFrame {
         initializeValidators();
         if (user != null) {
             initializeUserDetails();
-            cbxRole.setEnabled(false);
         }
         detailsDrawer.show();
     }
@@ -186,9 +184,9 @@ public class PersonelView extends SplitViewFrame {
         rdLock = new RadioButtonGroup<>();
         rdLock.setItems(true, false);
 
-        creationDate = new DatePicker();
+        creationDate = new TextField();
         creationDate.setEnabled(false);
-        creationDate.setValue(LocalDate.now());
+        creationDate.setValue(UIUtils.formatDatetime(LocalDateTime.now()));
 
         txtCreatedBy = new TextField();
         txtCreatedBy.setEnabled(false);
@@ -266,11 +264,10 @@ public class PersonelView extends SplitViewFrame {
         rdActive.setValue(detailedUser.isActive());
         rdLock.setValue(detailedUser.isLocked());
         txtCreatedBy.setValue(detailedUser.getCreatedBy());
-        creationDate.setValue(LocalDate.from(detailedUser.getCreationDate()));
+        creationDate.setValue(UIUtils.formatDatetime(detailedUser.getCreationDate()));
     }
 
     private void saveDetailedUser() {
-
         binder.validate();
         if (!binder.isValid()) {
             detailedFooter.getSaveButton().setEnabled(false);
@@ -294,7 +291,13 @@ public class PersonelView extends SplitViewFrame {
         detailedUser.setRole(cbxRole.getValue());
         detailedUser.setActive(rdActive.getValue());
         detailedUser.setLocked(rdLock.getValue());
-        userService.save(detailedUser);
+
+        try {
+            userService.save(detailedUser);
+        } catch (Exception e) {
+            Notification.show("Opps! Please check your fields!", 3000, Notification.Position.TOP_END);
+            return;
+        }
 
         Notification.show("Successfull", 6000, Notification.Position.TOP_END);
         detailsDrawer.hide();

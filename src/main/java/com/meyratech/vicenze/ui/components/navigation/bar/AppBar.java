@@ -82,7 +82,7 @@ public class AppBar extends Composite<FlexLayout> {
     }
 
     private void initContextIcon() {
-        contextIcon = UIUtils.createTertiaryInlineButton(VaadinIcon.ARROW_LEFT);
+        contextIcon = UIUtils.createTertiaryInlineButton(VaadinIcon.REPLY_ALL);
         contextIcon.removeThemeVariants(ButtonVariant.LUMO_ICON);
         contextIcon.addClassNames(CLASS_NAME + "__context-icon");
         contextIcon.setVisible(false);

@@ -20,6 +20,7 @@ public class ListItem extends FlexLayout implements HasStyle {
     private Div suffix;
     private Label primary;
     private Label secondary;
+    private Label lblStatus;
     private Div divider;
     private FlexBoxLayout content;
 
@@ -73,7 +74,6 @@ public class ListItem extends FlexLayout implements HasStyle {
     }
 
     /* === MISC === */
-
     public FlexBoxLayout getContent() {
         return content;
     }
@@ -126,8 +126,7 @@ public class ListItem extends FlexLayout implements HasStyle {
         if (suffix == null) {
             suffix = new Div();
             suffix.addClassName(CLASS_NAME + "__suffix");
-            getElement().insertChild(getElement().getChildCount(),
-                    suffix.getElement());
+            getElement().insertChild(getElement().getChildCount(), suffix.getElement());
         }
         suffix.removeAll();
         suffix.add(components);

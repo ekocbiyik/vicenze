@@ -6,7 +6,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -18,6 +20,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.data.renderer.ClickableRenderer;
 import com.vaadin.flow.theme.lumo.Lumo;
 import com.meyratech.vicenze.backend.Address;
 import com.meyratech.vicenze.backend.DummyData;
@@ -47,7 +50,8 @@ public class UIUtils {
      */
     private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,###.00"));
     private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("MMM dd, YYYY"));
-    private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("MMM dd, YYYY HH:mm:ss"));
+    private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd MMM YYYY HH:mm:ss"));
+    private static final ThreadLocal<DateTimeFormatter> idFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyMMddHHmmss"));
 
     /* ==== BUTTONS ==== */
 
@@ -202,6 +206,10 @@ public class UIUtils {
         return button;
     }
 
+    public static Button createButton(VaadinIcon icon, ComponentEventListener<ClickEvent<Button>> clickListener) {
+        return new Button(new Icon(icon), clickListener);
+    }
+
     // Text and icon
     public static Button createButton(String text, VaadinIcon icon, ButtonVariant... variants) {
         Button button = new Button(text, new Icon(icon));
@@ -296,12 +304,9 @@ public class UIUtils {
 
     public static FlexLayout createPhoneLayout() {
         TextField prefix = new TextField();
-        prefix.setValue("+358");
         prefix.setWidth("80px");
 
         TextField number = new TextField();
-        number.setValue(DummyData.getPhoneNumber());
-
         FlexBoxLayout layout = new FlexBoxLayout(prefix, number);
         layout.setFlexGrow(1, number);
         layout.setSpacing(Right.S);
@@ -401,6 +406,10 @@ public class UIUtils {
 
     public static String formatDatetime(LocalDateTime date) {
         return date == null ? "" : dateTimeFormat.get().format(date);
+    }
+
+    public static String formatId(LocalDateTime date) {
+        return idFormat.get().format(date == null ? LocalDateTime.now() : date);
     }
 
     /* === NOTIFICATIONS === */

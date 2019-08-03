@@ -19,12 +19,16 @@ import java.util.Random;
 public class Project extends AbstractEntity {
 
     @NotBlank
-    @Column(name = "company", nullable = false)
-    private String company;
+    @Column(name = "project_number", nullable = false)
+    private String projectNumber;
 
     @NotBlank
     @Column(name = "project_name", nullable = false)
     private String projectName;
+
+    @NotBlank
+    @Column(name = "company", nullable = false)
+    private String company;
 
     @NotEmpty
     @Email
@@ -43,8 +47,13 @@ public class Project extends AbstractEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true; // aktivate-deactivate
 
-    @Transient
-    private BigDecimal totalAmount;
+    public String getProjectNumber() {
+        return projectNumber;
+    }
+
+    public void setProjectNumber(String projectNumber) {
+        this.projectNumber = projectNumber;
+    }
 
     public String getCompany() {
         return company;
@@ -94,12 +103,4 @@ public class Project extends AbstractEntity {
         isActive = active;
     }
 
-    public BigDecimal getTotalAmount() {
-//        return totalAmount; todo
-        return BigDecimal.valueOf(new Random().nextDouble() * 99999);
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
 }
