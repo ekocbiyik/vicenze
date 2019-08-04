@@ -19,7 +19,7 @@ public class DummyData {
     private static final Map<Long, Payment> PAYMENTS = new HashMap<>();
     private static final Map<Long, Item> ITEMS = new HashMap<>();
     private static final Map<Long, Order> ORDERS = new HashMap<>();
-    private static final Map<Long, Invoice> INVOICES = new HashMap<>();
+    private static final Map<Long, InvoiceState> INVOICES = new HashMap<>();
 
     private static final Random random = new Random(1);
 
@@ -356,10 +356,10 @@ public class DummyData {
                     getOrderItems(), getCompany(), getDate());
             ORDERS.put(i, order);
 
-            Invoice invoice = new Invoice(i + getRandomInt(0, 9999),
+            InvoiceState invoiceState = new InvoiceState(i + getRandomInt(0, 9999),
                     getInvoiceStatus(), order, getPastDate(30),
                     getFutureDate(30));
-            INVOICES.put(i, invoice);
+            INVOICES.put(i, invoiceState);
         }
 
         /* === ADDRESSES === */
@@ -623,12 +623,12 @@ public class DummyData {
 
     /* === INVOICE === */
 
-    public static Invoice.Status getInvoiceStatus() {
-        return Invoice.Status.values()[random
-                .nextInt(Invoice.Status.values().length)];
+    public static InvoiceState.Status getInvoiceStatus() {
+        return InvoiceState.Status.values()[random
+                .nextInt(InvoiceState.Status.values().length)];
     }
 
-    public static Collection<Invoice> getInvoices() {
+    public static Collection<InvoiceState> getInvoices() {
         return INVOICES.values();
     }
 

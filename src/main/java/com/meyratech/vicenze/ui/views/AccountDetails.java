@@ -2,6 +2,7 @@ package com.meyratech.vicenze.ui.views;
 
 import java.time.LocalDate;
 
+import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;

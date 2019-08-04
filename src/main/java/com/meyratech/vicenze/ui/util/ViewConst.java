@@ -11,12 +11,16 @@ public class ViewConst {
     public static final String PAGE_ROOT = "";
     public static final String PAGE_HOME = "home";
     public static final String PAGE_PROJECTS = "projects";
-    public static final String PAGE_PROJECTS_DETAILS = "projects-details";
+    public static final String PAGE_PROJECTS_DETAILS = "project-details";
+    public static final String PAGE_INVOICE = "invoices";
+    public static final String PAGE_INVOICE_DETAILS = "invoice-details";
 
     public static final String TITLE_HOME = "Home";
     public static final String TITLE_PERSONNELS = "Personnels";
     public static final String TITLE_PROJECTS = "Projects";
-    public static final String TITLE_PROJECTS_DETAILS = "Project Detail";
+    public static final String TITLE_PROJECTS_DETAILS = "Project Details";
+    public static final String TITLE_INVOICE = "Invoices";
+    public static final String TITLE_INVOICE_DETAILS = "InvoiceState Details";
 
 
     public static final String PAGE_STOREFRONT = "storefront";

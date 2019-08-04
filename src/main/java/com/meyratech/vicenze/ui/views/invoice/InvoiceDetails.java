@@ -1,16 +1,16 @@
-package com.meyratech.vicenze.ui.views.projects;
+package com.meyratech.vicenze.ui.views.invoice;
 
 import com.meyratech.vicenze.backend.DummyData;
-import com.meyratech.vicenze.backend.model.Project;
-import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
+import com.meyratech.vicenze.backend.model.Invoice;
+import com.meyratech.vicenze.backend.repository.service.InvoiceServiceImpl;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
+import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.meyratech.vicenze.ui.components.navigation.bar.AppBar;
 import com.meyratech.vicenze.ui.layout.size.*;
 import com.meyratech.vicenze.ui.util.*;
 import com.meyratech.vicenze.ui.util.css.*;
-import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -33,26 +33,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-@Route(value = ViewConst.PAGE_PROJECTS_DETAILS, layout = MainLayout.class)
-@PageTitle(ViewConst.TITLE_PROJECTS_DETAILS)
-public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> {
+@Route(value = ViewConst.PAGE_INVOICE_DETAILS, layout = MainLayout.class)
+@PageTitle(ViewConst.TITLE_INVOICE_DETAILS)
+public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
 
     public int RECENT_TRANSACTIONS = 4;
 
     private ListItem availability;
     private ListItem companyLabel;
     private ListItem creationInfo;
-    private Project project;
-    private ProjectServiceImpl projectService;
+    private Invoice invoice;
+    private InvoiceServiceImpl invoiceService;
 
     @Autowired
-    public ProjectsDetails(ProjectServiceImpl projectService) {
-        this.projectService = projectService;
+    public InvoiceDetails(InvoiceServiceImpl invoiceService) {
+        this.invoiceService = invoiceService;
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long id) {
-        project = projectService.findById(id);
+        invoice = invoiceService.findById(id);
         setViewContent(createContent());
     }
 
@@ -60,13 +60,13 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         AppBar appBar = initAppBar();
-        appBar.setTitle(project.getProjectName());
+        appBar.setTitle(invoice.getProject().getProjectName());
     }
 
     private AppBar initAppBar() {
         AppBar appBar = MainLayout.get().getAppBar();
         appBar.setNaviMode(AppBar.NaviMode.CONTEXTUAL);
-        appBar.getContextIcon().addClickListener(e -> UI.getCurrent().navigate(ProjectsView.class));
+        appBar.getContextIcon().addClickListener(e -> UI.getCurrent().navigate(InvoiceView.class));
         return appBar;
     }
 
@@ -93,8 +93,8 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
 
         companyLabel = new ListItem(
                 UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION),
-                project.getCompany(),
-                String.format("Project no: %s", project.getId())
+                invoice.getProject().getCompany(),
+                String.format("Project no: %s", invoice.getProject().getId())
         );
         companyLabel.getPrimary().addClassName(LumoStyles.Heading.H2);
         companyLabel.setDividerVisible(true);
@@ -102,12 +102,12 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
 
         availability = new ListItem(
                 UIUtils.createTertiaryIcon(VaadinIcon.INFO_CIRCLE),
-                project.getEmail(),
-                project.getPhone()
+                invoice.getEventType(),
+                invoice.getMainItem()
         );
         availability.setDividerVisible(true);
 
-        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy(), UIUtils.formatDatetime(project.getCreationDate()));
+        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), invoice.getCreatedBy(), UIUtils.formatDatetime(invoice.getCreationDate()));
 
         FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
         listItems.setFlexDirection(FlexDirection.COLUMN);

@@ -1,4 +1,4 @@
-package com.meyratech.vicenze.ui.views;
+package com.meyratech.vicenze.ui.components;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;

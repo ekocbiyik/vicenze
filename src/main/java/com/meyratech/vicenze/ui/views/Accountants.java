@@ -27,7 +27,7 @@ import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.views.SplitViewFrame;
+import com.meyratech.vicenze.ui.components.SplitViewFrame;
 
 @Route(value = "accountants", layout = MainLayout.class)
 @PageTitle("Accountants")

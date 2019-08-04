@@ -11,10 +11,11 @@ import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
 import com.meyratech.vicenze.ui.util.css.Overflow;
-import com.meyratech.vicenze.ui.views.home.HomeView;
-import com.meyratech.vicenze.ui.views.Payments;
 import com.meyratech.vicenze.ui.views.Accountants;
 import com.meyratech.vicenze.ui.views.Managers;
+import com.meyratech.vicenze.ui.views.Payments;
+import com.meyratech.vicenze.ui.views.home.HomeView;
+import com.meyratech.vicenze.ui.views.invoice.InvoiceView;
 import com.meyratech.vicenze.ui.views.personnel.PersonelView;
 import com.meyratech.vicenze.ui.views.projects.ProjectsView;
 import com.vaadin.flow.component.Component;
@@ -118,23 +119,16 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
             menu.addNaviItem(VaadinIcon.INSTITUTION, ViewConst.TITLE_PROJECTS, ProjectsView.class);
         }
 
-        menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
-//        menu.addNaviItem(VaadinIcon.ACCESSIBILITY, "Accounts", Accountants.class);
-//        menu.addNaviItem(VaadinIcon.MAGNET, "Managers", Managers.class);
-
-//        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
-//        menu.addNaviItem(personnel, "Accountants", Accountants.class);
-//        menu.addNaviItem(personnel, "Managers", Managers.class);
+        NaviItem personnel = menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Invoice", null);
+        menu.addNaviItem(personnel, "Invoice List", InvoiceView.class);
+        menu.addNaviItem(personnel, "Pending Invoice", PersonelView.class);
+        menu.addNaviItem(personnel, "Invoice Import", ProjectsView.class);
     }
 
     /**
      * Configure the app's inner and outer headers and footers.
      */
     private void initHeadersAndFooters() {
-        // With tabs:
-        // the title, avatar and menu button (small screens) go into the TabBar
-        // Without:
-        // all of them go into the AppBar
 
         appBar = new AppBar("");
 

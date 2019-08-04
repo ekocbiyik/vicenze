@@ -12,11 +12,10 @@ import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.util.ViewConst;
-import com.meyratech.vicenze.ui.views.SplitViewFrame;
+import com.meyratech.vicenze.ui.components.SplitViewFrame;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -45,7 +44,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -95,7 +93,7 @@ public class PersonelView extends SplitViewFrame {
         userGrid.setDataProvider(userDataProvider);
         userGrid.setSizeFull();
 
-        Grid.Column<User> col1 = userGrid.addColumn(User::getId).setFlexGrow(0).setFrozen(true).setHeader("ID").setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XS);
+        Grid.Column<User> col1 = userGrid.addColumn(User::getId).setFlexGrow(0).setFrozen(true).setHeader("No").setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_S);
         Grid.Column<User> col2 = userGrid.addColumn(new ComponentRenderer<>(this::createUserInfo)).setFlexGrow(1).setHeader("Name").setSortable(true).setComparator(User::getFullName).setWidth(UIUtils.COLUMN_WIDTH_XL);
         Grid.Column<User> col3 = userGrid.addColumn(new ComponentRenderer<>(this::createActive)).setFlexGrow(0).setHeader("Active/Deactive").setSortable(true).setComparator(User::isActive).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<User> col4 = userGrid.addColumn(new ComponentRenderer<>(this::createLocked)).setFlexGrow(0).setHeader("Is Locked").setWidth(UIUtils.COLUMN_WIDTH_S).setTextAlign(ColumnTextAlign.START);
@@ -108,7 +106,7 @@ public class PersonelView extends SplitViewFrame {
         HeaderRow topRow = userGrid.prependHeaderRow();
         HeaderRow.HeaderCell buttonsCell = topRow.join(col1, col2, col3, col4, col5, col6, col7);
         buttonsCell.setComponent(getGridHeader());
-        userGrid.appendFooterRow().getCell(userGrid.getColumns().get(1)).setComponent(new Label("Total: " + userDataProvider.getItems().size() + " personnels"));
+        userGrid.appendFooterRow().getCell(userGrid.getColumns().get(0)).setComponent(new Label(String.valueOf(userDataProvider.getItems().size())));
 
         Div content = new Div(userGrid);
         content.addClassName("grid-view");

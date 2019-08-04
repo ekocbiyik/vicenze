@@ -2,7 +2,7 @@ package com.meyratech.vicenze.backend;
 
 import java.time.LocalDate;
 
-public class Invoice {
+public class InvoiceState {
 
     private final Long id;
     private final Status status;
@@ -25,8 +25,8 @@ public class Invoice {
         }
     }
 
-    public Invoice(Long id, Status status, Order order, LocalDate invoiceDate,
-            LocalDate dueDate) {
+    public InvoiceState(Long id, Status status, Order order, LocalDate invoiceDate,
+                        LocalDate dueDate) {
         this.id = id;
         this.status = status;
         this.order = order;

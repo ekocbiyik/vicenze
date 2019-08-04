@@ -4,6 +4,7 @@ import com.meyratech.vicenze.backend.DummyData;
 import com.meyratech.vicenze.backend.Person;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
+import com.meyratech.vicenze.ui.components.SplitViewFrame;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawer;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;

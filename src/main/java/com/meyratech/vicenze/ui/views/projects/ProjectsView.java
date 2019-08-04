@@ -1,6 +1,7 @@
 package com.meyratech.vicenze.ui.views.projects;
 
 import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
@@ -11,7 +12,7 @@ import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.util.ViewConst;
-import com.meyratech.vicenze.ui.views.SplitViewFrame;
+import com.meyratech.vicenze.ui.components.SplitViewFrame;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -24,6 +25,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -90,12 +92,12 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         projectDataProvider = DataProvider.ofCollection(projectService.findAll());
         projectGrid.setDataProvider(projectDataProvider);
 
-        Grid.Column<Project> col0 = projectGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setHeader("Details").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
-        Grid.Column<Project> col1 = projectGrid.addColumn(Project::getProjectNumber).setFlexGrow(0).setFrozen(true).setHeader("Project Number").setSortable(true).setComparator(Project::getProjectNumber).setWidth(UIUtils.COLUMN_WIDTH_M);
+        Grid.Column<Project> col0 = projectGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Details").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
+        Grid.Column<Project> col1 = projectGrid.addColumn(Project::getId).setFlexGrow(0).setHeader("Project No").setSortable(true).setComparator(Project::getId).setWidth(UIUtils.COLUMN_WIDTH_M);
         Grid.Column<Project> col2 = projectGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setFlexGrow(1).setHeader("Project Name").setSortable(true).setComparator(Project::getProjectName).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Project> col3 = projectGrid.addColumn(new ComponentRenderer<>(this::createContactInfo)).setFlexGrow(1).setHeader("Contact").setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Project> col4 = projectGrid.addColumn(new ComponentRenderer<>(this::createDescription)).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_L).setResizable(true);
-        Grid.Column<Project> col5 = projectGrid.addColumn(new LocalDateTimeRenderer<>(Project::getCreationDate, DateTimeFormatter.ofPattern("dd MMM YYYY HH:mm:ss"))).setComparator(Project::getCreationDate).setFlexGrow(0).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<Project> col4 = projectGrid.addColumn(new ComponentRenderer<>(this::createDescription)).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_XL).setResizable(true);
+        Grid.Column<Project> col5 = projectGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setComparator(Project::getCreationDate).setFlexGrow(0).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Project> col6 = projectGrid.addColumn(Project::getCreatedBy).setHeader("Created By").setWidth(UIUtils.COLUMN_WIDTH_S).setTextAlign(ColumnTextAlign.START);
 
         projectGrid.addSelectionListener(event -> event.getFirstSelectedItem().ifPresent(this::showDetails));
@@ -103,7 +105,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         HeaderRow topRow = projectGrid.prependHeaderRow();
         HeaderRow.HeaderCell buttonsCell = topRow.join(col0, col1, col2, col3, col4, col5, col6);
         buttonsCell.setComponent(getGridHeader());
-        projectGrid.appendFooterRow().getCell(projectGrid.getColumns().get(1)).setComponent(new Label("Total: " + projectDataProvider.getItems().size() + " projects"));
+        projectGrid.appendFooterRow().getCell(projectGrid.getColumns().get(0)).setComponent(new Label(String.valueOf(projectDataProvider.getItems().size())));
 
         Div content = new Div(projectGrid);
         content.addClassName("grid-view");
@@ -119,7 +121,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         searchField.addValueChangeListener(e -> {
             projectDataProvider.addFilter((item) ->
                     StringUtils.containsIgnoreCase(item.getProjectName(), searchField.getValue())
-                            || StringUtils.containsIgnoreCase(item.getProjectNumber(), searchField.getValue()));
+                            || StringUtils.containsIgnoreCase(item.getId().toString(), searchField.getValue()));
         });
 
         btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
@@ -247,7 +249,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
     }
 
     private void initializeProjectDetails() {
-        txtProjectNumber.setValue(detailedProject.getProjectNumber());
+        txtProjectNumber.setValue(detailedProject.getId().toString());
         txtProjectName.setValue(detailedProject.getProjectName().toUpperCase());
         cbxCompany.setValue(detailedProject.getCompany());
         rdActive.setValue(detailedProject.isActive());
@@ -267,7 +269,6 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
 
         if (detailedProject == null) {
             detailedProject = new Project();
-            detailedProject.setProjectNumber(txtProjectNumber.getValue());
             detailedProject.setCreatedBy(SecurityUtils.getCurrentUser().getFullName());
         }
 
@@ -317,15 +318,16 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         return label;
     }
 
-//    private Component createApprovalLimit(Project project) {
-//        return UIUtils.createAmountLabel(project.getTotalAmount().doubleValue());
-//    }
-
     private Component viewDetails(Project project) {
         return UIUtils.createButton(
                 VaadinIcon.LINE_BAR_CHART,
                 (ComponentEventListener<ClickEvent<Button>>) e -> UI.getCurrent().navigate(ProjectsDetails.class, project.getId())
         );
     }
+
+    private Component creationDate(Project project) {
+        return new Span(UIUtils.formatDatetime(project.getCreationDate()));
+    }
+
 
 }

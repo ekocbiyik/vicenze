@@ -2,6 +2,7 @@ package com.meyratech.vicenze.ui.views;
 
 import java.time.format.DateTimeFormatter;
 
+import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.grid.ColumnTextAlign;

@@ -19,10 +19,6 @@ import java.util.Random;
 public class Project extends AbstractEntity {
 
     @NotBlank
-    @Column(name = "project_number", nullable = false)
-    private String projectNumber;
-
-    @NotBlank
     @Column(name = "project_name", nullable = false)
     private String projectName;
 
@@ -36,7 +32,6 @@ public class Project extends AbstractEntity {
     @Column(name = "email")
     private String email;
 
-    @NotEmpty
     @Column(name = "phone")
     private String phone;
 
@@ -46,14 +41,6 @@ public class Project extends AbstractEntity {
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true; // aktivate-deactivate
-
-    public String getProjectNumber() {
-        return projectNumber;
-    }
-
-    public void setProjectNumber(String projectNumber) {
-        this.projectNumber = projectNumber;
-    }
 
     public String getCompany() {
         return company;

@@ -4,7 +4,7 @@ import com.meyratech.vicenze.backend.security.HasLogger;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.views.home.HomeView;
-import com.meyratech.vicenze.ui.views.ViewFrame;
+import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -33,13 +33,11 @@ public class LoginView extends ViewFrame implements AfterNavigationObserver, Bef
 
         LoginI18n i18n = LoginI18n.createDefault();
         i18n.setHeader(new LoginI18n.Header());
-//        i18n.getHeader().setTitle("Vicenze");
-//        i18n.getHeader().setDescription("description");
         i18n.setAdditionalInformation(null);
 
         i18n.setForm(new LoginI18n.Form());
-        i18n.getForm().setSubmit("Sign in");
-        i18n.getForm().setTitle("Sign in");
+        i18n.getForm().setSubmit("Login");
+        i18n.getForm().setTitle("Login");
         i18n.getForm().setUsername("Email");
         i18n.getForm().setPassword("Password");
 
