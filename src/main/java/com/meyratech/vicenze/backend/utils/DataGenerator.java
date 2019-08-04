@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -115,10 +114,14 @@ public class DataGenerator implements HasLogger {
         }
 
         List<Invoice> invList = new ArrayList<>();
-        String path = this.getClass().getClassLoader().getResource("vicenze.csv").getPath();
-        Reader reader = Files.newBufferedReader(Paths.get(path));
 
-        CSVParser csvParser = new CSVParser(reader, CSVFormat.EXCEL
+        InputStream in = getClass().getClassLoader().getResourceAsStream("vicenze.csv");
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+
+//        String path = this.getClass().getClassLoader().getResource("vicenze.csv").getPath();
+//        Reader reader = Files.newBufferedReader(Paths.get(path));
+
+        CSVParser csvParser = new CSVParser(br, CSVFormat.EXCEL
                 .withFirstRecordAsHeader()
                 .withIgnoreHeaderCase()
                 .withIgnoreEmptyLines()
