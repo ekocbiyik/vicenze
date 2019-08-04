@@ -48,11 +48,11 @@ public class DataGenerator implements HasLogger {
     public void loadData() {
         generateUser();
         generateProjects();
-//        try {
-//            generateInvoice();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            generateInvoice();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void generateUser() {
@@ -102,6 +102,7 @@ public class DataGenerator implements HasLogger {
 
 
     private void generateInvoice() throws IOException {
+        getLogger().info("Generating invoice data");
 
         if (invoiceService.findAll().size() > 0) {
             return;
@@ -167,6 +168,7 @@ public class DataGenerator implements HasLogger {
         });
 
         invList.forEach(invoice -> invoiceService.save(invoice));
+        getLogger().info("Generated invoice data");
     }
 
     private User createUser(String email, String passwordHash, String role, String firstName, String lastName, boolean locked, boolean isActive) {
