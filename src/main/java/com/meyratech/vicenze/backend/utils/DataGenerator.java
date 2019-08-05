@@ -11,18 +11,18 @@ import com.meyratech.vicenze.backend.security.HasLogger;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SpringComponent
 public class DataGenerator implements HasLogger {
@@ -113,13 +113,9 @@ public class DataGenerator implements HasLogger {
             projectList.put("", p);
         }
 
-        List<Invoice> invList = new ArrayList<>();
 
         InputStream in = getClass().getClassLoader().getResourceAsStream("vicenze.csv");
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-
-//        String path = this.getClass().getClassLoader().getResource("vicenze.csv").getPath();
-//        Reader reader = Files.newBufferedReader(Paths.get(path));
 
         CSVParser csvParser = new CSVParser(br, CSVFormat.EXCEL
                 .withFirstRecordAsHeader()
@@ -129,8 +125,11 @@ public class DataGenerator implements HasLogger {
                 .withTrim()
         );
 
-        csvParser.forEach(l -> {
+        List<Invoice> invList = new ArrayList<>();
+        Long rndNumber = 123_658_901L;
+        Long rndCode = 826_680_001L;
 
+        for (CSVRecord l : csvParser.getRecords()) {
             String project = l.get("PROJECT");
             String vendor = l.get("VENDOR");
             String number = l.get("NUMBER");
@@ -151,8 +150,8 @@ public class DataGenerator implements HasLogger {
                     i.setProject(projectList.get("ATHINON"));
                 }
                 i.setVendor(vendor);
-                i.setInvoiceNumber(number);
-                i.setInvoiceCode(code);
+                i.setInvoiceNumber(number.isEmpty() ? String.valueOf(++rndNumber) : number);
+                i.setInvoiceCode(code.isEmpty() ? String.valueOf(++rndCode) : code);
                 i.setEventType(eventType);
                 i.setMainItem(mainItem);
                 i.setBook(book);
@@ -168,7 +167,7 @@ public class DataGenerator implements HasLogger {
             } catch (Exception e) {
                 System.out.println("hata ama sorun yok");
             }
-        });
+        }
 
         invList.forEach(invoice -> invoiceService.save(invoice));
         getLogger().info("Generated invoice data");
