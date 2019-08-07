@@ -13,6 +13,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Div;
@@ -24,6 +25,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
@@ -37,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Route(value = ViewConst.PAGE_INVOICE, layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
@@ -75,10 +78,19 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         Grid.Column<Invoice> col11 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createUnitPriceInfo)).setHeader("Unit Price").setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col12 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createTotalAmount)).setHeader("Total Amount").setSortable(true).setComparator(Invoice::getTotalAmount).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col13 = invoiceGrid.addColumn(new ComponentRenderer<>(this::invoiceDate)).setComparator(Invoice::getDate).setHeader("Date").setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Invoice> col14 = invoiceGrid.addColumn(Invoice::getCreatedBy).setHeader("Created By").setComparator(Invoice::getCreatedBy).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<Invoice> col14 = invoiceGrid.addColumn(Invoice::getCreatedBy).setHeader("Created By").setComparator(Invoice::getCreatedBy).setTextAlign(ColumnTextAlign.CENTER).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col15 = invoiceGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setComparator(Invoice::getCreationDate).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L);
 
-        invoiceGrid.appendFooterRow().getCell(invoiceGrid.getColumns().get(0)).setComponent(new Label(String.valueOf(invoiceDataProvider.getItems().size())));
+
+        // TODO: 8/7/19 burada kaldık, bayramdan sonra filtre ile kayıtların getirilmesi ve combobox ile filtre uygulanmasını halledelim.
+        Label itemSize = new Label(invoiceDataProvider.getItems().size() + "");
+        invoiceGrid.appendFooterRow().getCell(invoiceGrid.getColumns().get(0)).setComponent(itemSize);
+
+        invoiceGrid.getDataProvider().addDataProviderListener(e -> {
+            int size = invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
+            itemSize.setText(String.valueOf(size));
+        });
+
         HeaderRow headerRow = invoiceGrid.appendHeaderRow();
 
         //filters...
