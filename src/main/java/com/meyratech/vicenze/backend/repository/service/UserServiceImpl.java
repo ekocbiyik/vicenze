@@ -1,5 +1,6 @@
 package com.meyratech.vicenze.backend.repository.service;
 
+import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.dao.IUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public List<User> findAll() {
         return userDao.findAll();
+    }
+
+    @Transactional
+    @Override
+    public List<User> findAllAdmins() {
+        return userDao.findAllByRole(Role.ADMIN);
     }
 
     @Transactional

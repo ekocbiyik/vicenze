@@ -107,7 +107,7 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         );
         availability.setDividerVisible(true);
 
-        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), invoice.getCreatedBy(), UIUtils.formatDatetime(invoice.getCreationDate()));
+        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), invoice.getCreatedBy().getFullName(), UIUtils.formatDatetime(invoice.getCreationDate()));
 
         FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
         listItems.setFlexDirection(FlexDirection.COLUMN);

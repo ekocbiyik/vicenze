@@ -2,8 +2,10 @@ package com.meyratech.vicenze.it;
 
 import com.meyratech.vicenze.backend.model.Invoice;
 import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
+import com.meyratech.vicenze.backend.repository.service.IUserService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.junit.Test;
@@ -36,10 +38,15 @@ public class CsvImportTest {
     private IProjectService projectService;
 
     @Autowired
+    private IUserService userService;
+
+    @Autowired
     private IInvoiceService invoiceService;
 
     @Test
     public void csvReadTest() throws IOException {
+
+        User adminUser = userService.findAllAdmins().get(0);
 
         Map<String, Project> projectList = new HashMap<>();
         for (Project p : projectService.findAll()) {
@@ -92,7 +99,7 @@ public class CsvImportTest {
                 i.setAmount(new BigDecimal(amount.isEmpty() ? "0" : amount));
                 i.setUnitPrice(new BigDecimal(unitPrice));
                 i.setDate(LocalDateTime.from(LocalDate.parse(date, DateTimeFormatter.ofPattern("M/d/yyyy")).atStartOfDay()));
-                i.setCreatedBy("System");
+                i.setCreatedBy(adminUser);
                 i.setCreationDate(LocalDateTime.now());
 
                 invList.add(i);

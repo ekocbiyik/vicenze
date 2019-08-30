@@ -1,18 +1,17 @@
 package com.meyratech.vicenze.ui.views.projects;
 
 import com.meyratech.vicenze.backend.model.Project;
-import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
+import com.meyratech.vicenze.ui.components.SplitViewFrame;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawer;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerHeader;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.util.ViewConst;
-import com.meyratech.vicenze.ui.components.SplitViewFrame;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -38,7 +37,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
@@ -49,7 +47,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 @Route(value = ViewConst.PAGE_PROJECTS, layout = MainLayout.class)
@@ -98,7 +95,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         Grid.Column<Project> col3 = projectGrid.addColumn(new ComponentRenderer<>(this::createContactInfo)).setFlexGrow(1).setHeader("Contact").setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Project> col4 = projectGrid.addColumn(new ComponentRenderer<>(this::createDescription)).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_XL).setResizable(true);
         Grid.Column<Project> col5 = projectGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setComparator(Project::getCreationDate).setFlexGrow(0).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Project> col6 = projectGrid.addColumn(Project::getCreatedBy).setHeader("Created By").setWidth(UIUtils.COLUMN_WIDTH_S).setTextAlign(ColumnTextAlign.START);
+        Grid.Column<Project> col6 = projectGrid.addColumn(new ComponentRenderer<>(this::createdByInfo)).setHeader("Created By").setWidth(UIUtils.COLUMN_WIDTH_S).setTextAlign(ColumnTextAlign.START);
 
         projectGrid.addSelectionListener(event -> event.getFirstSelectedItem().ifPresent(this::showDetails));
 
@@ -256,7 +253,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         txtPhone.setValue(detailedProject.getPhone());
         txtEmail.setValue(detailedProject.getEmail());
         txtDescription.setValue(detailedProject.getDescription());
-        txtCreatedBy.setValue(detailedProject.getCreatedBy());
+        txtCreatedBy.setValue(detailedProject.getCreatedBy().getFullName());
         creationDate.setValue(UIUtils.formatDatetime(detailedProject.getCreationDate()));
     }
 
@@ -269,7 +266,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
 
         if (detailedProject == null) {
             detailedProject = new Project();
-            detailedProject.setCreatedBy(SecurityUtils.getCurrentUser().getFullName());
+            detailedProject.setCreatedBy(SecurityUtils.getCurrentUser());
         }
 
         detailedProject.setProjectName(txtProjectName.getValue());
@@ -316,6 +313,10 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         Label label = new Label(project.getDescription());
         label.getElement().getStyle().set("white-space", "pre-wrap");
         return label;
+    }
+
+    private Component createdByInfo(Project project) {
+        return new Label(project.getCreatedBy().getFullName());
     }
 
     private Component viewDetails(Project project) {

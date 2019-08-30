@@ -1,10 +1,16 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
+import com.meyratech.vicenze.backend.exporter.Exporter;
 import com.meyratech.vicenze.backend.model.Invoice;
-import com.meyratech.vicenze.backend.repository.service.InvoiceServiceImpl;
+import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.User;
+import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
+import com.meyratech.vicenze.backend.repository.service.IProjectService;
+import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.SplitViewFrame;
+import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.TextColor;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.util.ViewConst;
@@ -13,13 +19,15 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -28,17 +36,19 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.StreamResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Route(value = ViewConst.PAGE_INVOICE, layout = MainLayout.class)
@@ -46,50 +56,115 @@ import java.util.stream.Collectors;
 @PageTitle(ViewConst.TITLE_INVOICE)
 public class InvoiceView extends SplitViewFrame implements RouterLayout {
 
-    private final InvoiceServiceImpl invoiceService;
+    private final IInvoiceService invoiceService;
+    private final IProjectService projectService;
+    private final IUserService userService;
+
     private Grid<Invoice> invoiceGrid;
+    private Label lblItemSize;
     private ListDataProvider<Invoice> invoiceDataProvider;
-    private Button btnCreate;
-    private TextField searchField;
+
+    private ComboBox<Project> cbxPorject;
+    private ComboBox<User> cbxUser;
+    private DatePicker dpSDate;
+    private DatePicker dpEDate;
 
     @Autowired
-    public InvoiceView(InvoiceServiceImpl invoiceService) {
+    public InvoiceView(IInvoiceService invoiceService, IProjectService projectService, IUserService userService) {
         this.invoiceService = invoiceService;
+        this.projectService = projectService;
+        this.userService = userService;
         setViewContent(createContent());
+        setViewHeader(createHeader());
+        setViewFooter(new Label());
+    }
+
+    private Component createHeader() {
+
+        // add
+        Button btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
+        btnCreate.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
+            UIUtils.showNotification("Not implemented yet!");
+        });
+
+
+        // list
+        Button btnSearch = UIUtils.createSuccessPrimaryButton("SEARCH", VaadinIcon.SEARCH);
+        btnSearch.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> searchBtnClick());
+
+        // export
+        Button btnExport = UIUtils.createErrorPrimaryButton("EXPORT", VaadinIcon.PRINT);
+        btnExport.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
+            UIUtils.showNotification("Not implemented yet!");
+        });
+
+        //project
+        cbxPorject = new ComboBox<>();
+        cbxPorject.setWidth(UIUtils.COLUMN_WIDTH_XL);
+        cbxPorject.setPlaceholder("Project name");
+        cbxPorject.setItemLabelGenerator(Project::getProjectName);
+        cbxPorject.setItems(projectService.findAll());
+
+        //created by
+        cbxUser = new ComboBox<>();
+        cbxUser.setWidth(UIUtils.COLUMN_WIDTH_XL);
+        cbxUser.setPlaceholder("Created by");
+        cbxUser.setItemLabelGenerator(User::getFullName);
+        cbxUser.setItems(userService.findAll());
+
+        //dpSDate
+        dpSDate = new DatePicker();
+        dpSDate.setPlaceholder("Start date");
+        dpSDate.setLocale(Locale.UK);
+        dpSDate.setWidth(UIUtils.COLUMN_WIDTH_XL);
+        dpSDate.setValue(LocalDate.now().minusDays(1));
+        dpSDate.setRequired(true);
+
+        //dpEDate
+        dpEDate = new DatePicker();
+        dpEDate.setPlaceholder("End date");
+        dpEDate.setLocale(Locale.UK);
+        dpEDate.setWidth(UIUtils.COLUMN_WIDTH_XL);
+        dpEDate.setValue(LocalDate.now());
+        dpEDate.setRequired(true);
+
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setSpacing(true);
+        layout.setPadding(true);
+        layout.setWidthFull();
+        layout.setHeight("65px");
+        layout.getStyle().set("background-color", LumoStyles.Color.BASE_COLOR);
+        layout.add(btnCreate, cbxPorject, cbxUser, dpSDate, dpEDate, btnSearch, btnExport);
+
+        return layout;
     }
 
     private Component createContent() {
         invoiceGrid = new Grid<>();
         invoiceGrid.setSizeFull();
-        invoiceDataProvider = DataProvider.ofCollection(invoiceService.findAll());
+        invoiceDataProvider = DataProvider.ofCollection(invoiceService.getLastInvoices(100));
         invoiceGrid.setDataProvider(invoiceDataProvider);
 
         Grid.Column<Invoice> col0 = invoiceGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Details").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
         Grid.Column<Invoice> col1 = invoiceGrid.addColumn(Invoice::getInvoiceNumber).setFlexGrow(0).setHeader("Number").setSortable(true).setComparator(Invoice::getInvoiceNumber).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Invoice> col2 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setFlexGrow(1).setHeader("Project").setWidth(UIUtils.COLUMN_WIDTH_XL);
+        Grid.Column<Invoice> col2 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setKey("project").setFlexGrow(1).setHeader("Project").setWidth(UIUtils.COLUMN_WIDTH_XL);
         Grid.Column<Invoice> col3 = invoiceGrid.addColumn(Invoice::getVendor).setHeader("Vendor").setSortable(true).setComparator(Invoice::getVendor).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col4 = invoiceGrid.addColumn(Invoice::getInvoiceCode).setHeader("Code").setSortable(true).setComparator(Invoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col5 = invoiceGrid.addColumn(Invoice::getEventType).setHeader("Event Type").setSortable(true).setComparator(Invoice::getEventType).setWidth(UIUtils.COLUMN_WIDTH_S);
         Grid.Column<Invoice> col6 = invoiceGrid.addColumn(Invoice::getMainItem).setHeader("Main Item").setSortable(true).setComparator(Invoice::getMainItem).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col7 = invoiceGrid.addColumn(Invoice::getBook).setHeader("Book").setSortable(true).setComparator(Invoice::getBook).setWidth(UIUtils.COLUMN_WIDTH_M);
         Grid.Column<Invoice> col8 = invoiceGrid.addColumn(Invoice::getTransaction).setHeader("Transaction").setSortable(true).setComparator(Invoice::getTransaction).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Invoice> col9 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createExplanation)).setHeader("Explanation").setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<Invoice> col9 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createExplanation)).setHeader("Explanation").setWidth(UIUtils.COLUMN_WIDTH_XL);
         Grid.Column<Invoice> col10 = invoiceGrid.addColumn(Invoice::getAmount).setHeader("Amount").setSortable(true).setComparator(Invoice::getAmount).setWidth(UIUtils.COLUMN_WIDTH_S);
         Grid.Column<Invoice> col11 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createUnitPriceInfo)).setHeader("Unit Price").setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col12 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createTotalAmount)).setHeader("Total Amount").setSortable(true).setComparator(Invoice::getTotalAmount).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col13 = invoiceGrid.addColumn(new ComponentRenderer<>(this::invoiceDate)).setComparator(Invoice::getDate).setHeader("Date").setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Invoice> col14 = invoiceGrid.addColumn(Invoice::getCreatedBy).setHeader("Created By").setComparator(Invoice::getCreatedBy).setTextAlign(ColumnTextAlign.CENTER).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<Invoice> col14 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createdByInfo)).setHeader("Created By").setComparator(Comparator.comparing(u -> u.getCreatedBy().getFullName())).setTextAlign(ColumnTextAlign.CENTER).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col15 = invoiceGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setComparator(Invoice::getCreationDate).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L);
 
-
-        // TODO: 8/7/19 burada kaldık, bayramdan sonra filtre ile kayıtların getirilmesi ve combobox ile filtre uygulanmasını halledelim.
-        Label itemSize = new Label(invoiceDataProvider.getItems().size() + "");
-        invoiceGrid.appendFooterRow().getCell(invoiceGrid.getColumns().get(0)).setComponent(itemSize);
-
-        invoiceGrid.getDataProvider().addDataProviderListener(e -> {
-            int size = invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
-            itemSize.setText(String.valueOf(size));
-        });
+        lblItemSize = new Label(invoiceDataProvider.getItems().size() + "");
+        invoiceGrid.appendFooterRow().getCell(invoiceGrid.getColumns().get(0)).setComponent(lblItemSize);
+        initializeItemListener();
 
         HeaderRow headerRow = invoiceGrid.appendHeaderRow();
 
@@ -147,7 +222,7 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         headerRow.getCell(col13).setComponent(fCol13);
 
         TextField fCol14 = createFilterField();
-        fCol14.addValueChangeListener(event -> invoiceDataProvider.addFilter(i -> StringUtils.containsIgnoreCase(i.getCreatedBy(), fCol14.getValue())));
+        fCol14.addValueChangeListener(event -> invoiceDataProvider.addFilter(i -> StringUtils.containsIgnoreCase(i.getCreatedBy().getFullName(), fCol14.getValue())));
         headerRow.getCell(col14).setComponent(fCol14);
 
         TextField fCol15 = createFilterField();
@@ -164,27 +239,6 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         filter.setSizeFull();
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         return filter;
-    }
-
-    private Component getGridHeader() {
-        searchField = new TextField();
-        searchField.setPlaceholder("Search projects...");
-        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        searchField.setValueChangeMode(ValueChangeMode.EAGER);
-        searchField.setSizeFull();
-        searchField.addValueChangeListener(e -> {
-            invoiceDataProvider.addFilter((item) ->
-                    StringUtils.containsIgnoreCase(item.getInvoiceNumber(), searchField.getValue())
-                            || StringUtils.containsIgnoreCase(item.getProject().getProjectName(), searchField.getValue()));
-        });
-
-        btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
-        btnCreate.addClickListener(e -> UIUtils.showNotification("Not implemented!"));
-
-        HorizontalLayout container = new HorizontalLayout(btnCreate, searchField);
-        container.setSpacing(true);
-        container.setSizeFull();
-        return container;
     }
 
     private Component createProjectInfo(Invoice invoice) {
@@ -223,15 +277,55 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         return new Span(UIUtils.formatDatetime(invoice.getDate()));
     }
 
+    private Component createdByInfo(Invoice invoice) {
+        return new Span(invoice.getCreatedBy().getFullName());
+    }
+
     private Component creationDate(Invoice invoice) {
         return new Span(UIUtils.formatDatetime(invoice.getCreationDate()));
     }
 
     private Component viewDetails(Invoice invoice) {
         return UIUtils.createButton(
-                VaadinIcon.INVOICE,
+                VaadinIcon.LINE_BAR_CHART,
                 (ComponentEventListener<ClickEvent<Button>>) e -> UI.getCurrent().navigate(InvoiceDetails.class, invoice.getId())
         );
+    }
+
+    private void initializeItemListener() {
+        invoiceGrid.getDataProvider().addDataProviderListener(e -> {
+            int size = invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
+            lblItemSize.setText(String.valueOf(size));
+        });
+
+    }
+
+    private void searchBtnClick() {
+        if (dpSDate.getValue() == null || dpEDate.getValue() == null) {
+            UIUtils.showNotification("Date ranges are required!");
+            return;
+        }
+
+        List<Invoice> invoiceList;
+        LocalDateTime startDate = dpSDate.getValue().atStartOfDay();
+        LocalDateTime endDate = dpEDate.getValue().plusDays(1).atStartOfDay();
+
+        if (cbxPorject.getValue() != null && cbxUser.getValue() != null) {
+            invoiceList = invoiceService.getInvoicesByProjectAndUserAndDate(cbxPorject.getValue(), cbxUser.getValue(), startDate, endDate);
+
+        } else if (cbxPorject.getValue() != null) {
+            invoiceList = invoiceService.getInvoicesByProjectAndDate(cbxPorject.getValue(), startDate, endDate);
+
+        } else if (cbxUser.getValue() != null) {
+            invoiceList = invoiceService.getInvoicesByUserAndDate(cbxUser.getValue(), startDate, endDate);
+        } else {
+            invoiceList = invoiceService.getInvoicesByDate(startDate, endDate);
+        }
+
+        invoiceDataProvider = DataProvider.ofCollection(invoiceList);
+        invoiceGrid.setDataProvider(invoiceDataProvider);
+        lblItemSize.setText(String.valueOf(invoiceList.size()));
+        initializeItemListener();
     }
 
 }

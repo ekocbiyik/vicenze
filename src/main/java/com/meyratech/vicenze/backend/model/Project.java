@@ -1,22 +1,24 @@
 package com.meyratech.vicenze.backend.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.math.BigDecimal;
-import java.util.Random;
+import java.time.LocalDateTime;
 
 /**
  * ekocbiyik on 4/28/19
  */
 @Entity
 @Table(name = "t_project")
-public class Project extends AbstractEntity {
+public class Project {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @NotBlank
     @Column(name = "project_name", nullable = false)
@@ -42,12 +44,20 @@ public class Project extends AbstractEntity {
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true; // aktivate-deactivate
 
-    public String getCompany() {
-        return company;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
+    public Long getId() {
+        return id;
     }
 
-    public void setCompany(String company) {
-        this.company = company;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getProjectName() {
@@ -56,6 +66,14 @@ public class Project extends AbstractEntity {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 
     public String getEmail() {
@@ -90,4 +108,19 @@ public class Project extends AbstractEntity {
         isActive = active;
     }
 
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
 }

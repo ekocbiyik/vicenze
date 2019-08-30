@@ -1,16 +1,20 @@
 package com.meyratech.vicenze.backend.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 /**
  * ekocbiyik on 12.05.2019
  */
 @Entity
 @Table(name = "t_incorrect_invoice")
-public class IncorrectInvoice extends AbstractEntity {
+public class IncorrectInvoice {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @OneToOne
     private Invoice invoice;
@@ -26,6 +30,22 @@ public class IncorrectInvoice extends AbstractEntity {
 
     @Column(name = "description")
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Invoice getInvoice() {
         return invoice;
@@ -65,5 +85,21 @@ public class IncorrectInvoice extends AbstractEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 }

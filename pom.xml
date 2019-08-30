@@ -107,6 +107,12 @@
             <version>1.6</version>
         </dependency>
 
+        <!--  Excel exporter  -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.9</version>
+        </dependency>
 
     </dependencies>
 

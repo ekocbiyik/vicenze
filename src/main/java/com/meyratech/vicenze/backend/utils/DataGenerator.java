@@ -16,13 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.PostConstruct;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SpringComponent
 public class DataGenerator implements HasLogger {
@@ -31,6 +33,7 @@ public class DataGenerator implements HasLogger {
     private ProjectServiceImpl projectService;
     private InvoiceServiceImpl invoiceService;
     private PasswordEncoder passwordEncoder;
+    private User systemUser;
 
     @Autowired
     public DataGenerator(UserServiceImpl userService,
@@ -46,6 +49,12 @@ public class DataGenerator implements HasLogger {
     @PostConstruct
     public void loadData() {
         generateUser();
+        userService.findAll().forEach(u -> {
+            if (u.getEmail().equals("admin@mail.com")) {
+                systemUser = u;
+                return;
+            }
+        });
         generateProjects();
         try {
             generateInvoice();
@@ -61,19 +70,23 @@ public class DataGenerator implements HasLogger {
         }
         getLogger().info("Generating user data");
 
+        User adminUser = new User();
+        adminUser.setFirstName("SYSTEM");
+        adminUser.setLastName("");
+
         // admin
-        userService.save(createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Malin", "Castro", false, true));
+        userService.save(createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Malin", "Castro", false, true, adminUser));
 
         // barista
-        userService.save(createUser("barista@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista", "Nikola", false, true));
-        userService.save(createUser("barista2@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista2", "Nikola", false, true));
-        userService.save(createUser("barista3@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista3", "Nikola", false, true));
+        userService.save(createUser("barista@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista", "Nikola", false, true, adminUser));
+        userService.save(createUser("barista2@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista2", "Nikola", false, true, adminUser));
+        userService.save(createUser("barista3@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista3", "Nikola", false, true, adminUser));
 
         // customer
-        userService.save(createUser("customer@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank", "Riberry", false, true));
-        userService.save(createUser("customer2@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank2", "Riberry", false, true));
-        userService.save(createUser("customer3@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank3", "Riberry", false, true));
-        userService.save(createUser("customer4@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank4", "Riberry", false, true));
+        userService.save(createUser("customer@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank", "Riberry", false, true, adminUser));
+        userService.save(createUser("customer2@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank2", "Riberry", false, true, adminUser));
+        userService.save(createUser("customer3@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank3", "Riberry", false, true, adminUser));
+        userService.save(createUser("customer4@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank4", "Riberry", false, true, adminUser));
 
         getLogger().info("Generated user data");
     }
@@ -160,7 +173,7 @@ public class DataGenerator implements HasLogger {
                 i.setAmount(new BigDecimal(amount.isEmpty() ? "0" : amount));
                 i.setUnitPrice(new BigDecimal(unitPrice));
                 i.setDate(LocalDateTime.from(LocalDate.parse(date, DateTimeFormatter.ofPattern("M/d/yyyy")).atStartOfDay()));
-                i.setCreatedBy("System");
+                i.setCreatedBy(systemUser);
                 i.setCreationDate(LocalDateTime.now());
 
                 invList.add(i);
@@ -173,7 +186,7 @@ public class DataGenerator implements HasLogger {
         getLogger().info("Generated invoice data");
     }
 
-    private User createUser(String email, String passwordHash, String role, String firstName, String lastName, boolean locked, boolean isActive) {
+    private User createUser(String email, String passwordHash, String role, String firstName, String lastName, boolean locked, boolean isActive, User createdBy) {
         User user = new User();
         user.setEmail(email);
         user.setFirstName(firstName);
@@ -182,7 +195,7 @@ public class DataGenerator implements HasLogger {
         user.setRole(role);
         user.setLocked(locked);
         user.setActive(isActive);
-        user.setCreatedBy("System");
+        user.setCreatedBy(createdBy.getFullName());
         return user;
     }
 
@@ -194,7 +207,7 @@ public class DataGenerator implements HasLogger {
         project.setProjectName(projectName);
         project.setDescription(description);
         project.setActive(new Random().nextBoolean());
-        project.setCreatedBy("System");
+        project.setCreatedBy(systemUser);
         return project;
     }
 

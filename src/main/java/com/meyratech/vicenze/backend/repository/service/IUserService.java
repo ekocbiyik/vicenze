@@ -9,7 +9,6 @@ import java.util.List;
 /**
  * ekocbiyik on 12.05.2019
  */
-@Service
 public interface IUserService {
 
     User save(User user);
@@ -17,6 +16,8 @@ public interface IUserService {
     User findById(Long id);
 
     List<User> findAll();
+
+    List<User> findAllAdmins();
 
     void setLastLogin(String email, LocalDateTime loginTime);
 

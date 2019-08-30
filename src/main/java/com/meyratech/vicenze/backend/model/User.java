@@ -1,9 +1,9 @@
 package com.meyratech.vicenze.backend.model;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -12,7 +12,11 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "t_user")
-public class User extends AbstractEntity {
+public class User {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @NotEmpty
     @Email
@@ -44,8 +48,23 @@ public class User extends AbstractEntity {
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
     public String getFullName() {
         return String.format("%s %s", getFirstName(), getLastName());
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -93,7 +112,7 @@ public class User extends AbstractEntity {
     }
 
     public void setActive(boolean active) {
-        this.isActive = active;
+        isActive = active;
     }
 
     public boolean isLocked() {
@@ -110,5 +129,21 @@ public class User extends AbstractEntity {
 
     public void setLastLogin(LocalDateTime lastLogin) {
         this.lastLogin = lastLogin;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 }

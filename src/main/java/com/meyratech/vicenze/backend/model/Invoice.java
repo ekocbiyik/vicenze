@@ -1,5 +1,6 @@
 package com.meyratech.vicenze.backend.model;
 
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.Transient;
 
 import javax.persistence.*;
@@ -12,7 +13,11 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "t_invoice")
-public class Invoice extends AbstractEntity {
+public class Invoice {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
@@ -52,8 +57,24 @@ public class Invoice extends AbstractEntity {
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
     @Transient
     private BigDecimal totalAmount;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Project getProject() {
         return project;
@@ -149,6 +170,22 @@ public class Invoice extends AbstractEntity {
 
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 
     public BigDecimal getTotalAmount() {

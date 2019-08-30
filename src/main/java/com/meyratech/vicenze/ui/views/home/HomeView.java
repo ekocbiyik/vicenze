@@ -1,6 +1,5 @@
 package com.meyratech.vicenze.ui.views.home;
 
-import com.meyratech.vicenze.backend.Payment;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.DataSeriesItemWithRadius;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
@@ -78,38 +77,38 @@ public class HomeView extends ViewFrame {
         UIUtils.setBorderRadius(BorderRadius.S, charts);
         UIUtils.setShadow(Shadow.S, charts);
 
-        for (Payment.Status status : Payment.Status.values()) {
-            charts.add(createPaymentChart(status));
-        }
+//        for (Payment.Status status : Payment.Status.values()) {
+//            charts.add(createPaymentChart(status));
+//        }
         return charts;
     }
 
-    private Component createPaymentChart(Payment.Status status) {
+    private Component createPaymentChart() {
         int value;
-        switch (status) {
-            case PENDING:
-                value = 24;
-                break;
+//        switch (status) {
+//            case PENDING:
+//                value = 24;
+//                break;
+//
+//            case SUBMITTED:
+//                value = 40;
+//                break;
+//
+//            case CONFIRMED:
+//                value = 32;
+//                break;
+//
+//            default:
+//                value = 4;
+//                break;
+//        }
 
-            case SUBMITTED:
-                value = 40;
-                break;
-
-            case CONFIRMED:
-                value = 32;
-                break;
-
-            default:
-                value = 4;
-                break;
-        }
-
-        FlexBoxLayout textContainer = new FlexBoxLayout(UIUtils.createH2Label(Integer.toString(value)), UIUtils.createLabel(FontSize.S, "%"));
+        FlexBoxLayout textContainer = new FlexBoxLayout(UIUtils.createH2Label(Integer.toString(61)), UIUtils.createLabel(FontSize.S, "%"));
         textContainer.setAlignItems(FlexComponent.Alignment.BASELINE);
         textContainer.setPosition(Position.ABSOLUTE);
         textContainer.setSpacing(Right.XS);
 
-        Chart chart = createProgressChart(status, value);
+        Chart chart = createProgressChart(61);
         FlexBoxLayout chartContainer = new FlexBoxLayout(chart, textContainer);
         chartContainer.setAlignItems(FlexComponent.Alignment.CENTER);
         chartContainer.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -117,7 +116,7 @@ public class HomeView extends ViewFrame {
         chartContainer.setHeight("120px");
         chartContainer.setWidth("120px");
 
-        FlexBoxLayout paymentChart = new FlexBoxLayout(new Label(status.getName()), chartContainer);
+        FlexBoxLayout paymentChart = new FlexBoxLayout(new Label("enbiya"), chartContainer);
         paymentChart.addClassName(CLASS_NAME + "__payment-chart");
         paymentChart.setAlignItems(FlexComponent.Alignment.CENTER);
         paymentChart.setFlexDirection(FlexDirection.COLUMN);
@@ -125,9 +124,9 @@ public class HomeView extends ViewFrame {
         return paymentChart;
     }
 
-    private Chart createProgressChart(Payment.Status status, int value) {
+    private Chart createProgressChart(int value) {
         Chart chart = new Chart();
-        chart.addClassName(status.getName().toLowerCase());
+//        chart.addClassName(status.getName().toLowerCase());
         chart.setSizeFull();
 
         Configuration configuration = chart.getConfiguration();

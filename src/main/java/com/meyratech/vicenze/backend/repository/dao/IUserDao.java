@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface IUserDao extends JpaRepository<User, Long> {
@@ -19,5 +20,7 @@ public interface IUserDao extends JpaRepository<User, Long> {
     @Modifying
     @Query("update User u set u.lastLogin = :lastLogin where u.email = :email")
     void setLastLogin(@Param("email") String email, @Param("lastLogin") LocalDateTime lastLogin);
+
+    List<User> findAllByRole(String role);
 
 }

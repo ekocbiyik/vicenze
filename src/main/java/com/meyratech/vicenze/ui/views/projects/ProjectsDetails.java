@@ -107,7 +107,7 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
         );
         availability.setDividerVisible(true);
 
-        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy(), UIUtils.formatDatetime(project.getCreationDate()));
+        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy().getFullName(), UIUtils.formatDatetime(project.getCreationDate()));
 
         FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
         listItems.setFlexDirection(FlexDirection.COLUMN);

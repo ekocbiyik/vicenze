@@ -1,11 +1,8 @@
 package com.meyratech.vicenze.ui.util;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+import com.meyratech.vicenze.ui.components.FlexBoxLayout;
+import com.meyratech.vicenze.ui.layout.size.Right;
+import com.meyratech.vicenze.ui.util.css.*;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -20,19 +17,13 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
-import com.vaadin.flow.data.renderer.ClickableRenderer;
 import com.vaadin.flow.theme.lumo.Lumo;
-import com.meyratech.vicenze.backend.Address;
-import com.meyratech.vicenze.backend.DummyData;
-import com.meyratech.vicenze.ui.components.FlexBoxLayout;
-import com.meyratech.vicenze.ui.layout.size.Right;
-import com.meyratech.vicenze.ui.util.css.AlignSelf;
-import com.meyratech.vicenze.ui.util.css.BorderRadius;
-import com.meyratech.vicenze.ui.util.css.BoxSizing;
-import com.meyratech.vicenze.ui.util.css.Overflow;
-import com.meyratech.vicenze.ui.util.css.Shadow;
-import com.meyratech.vicenze.ui.util.css.TextAlign;
-import com.meyratech.vicenze.ui.util.css.WhiteSpace;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class UIUtils {
 
@@ -42,21 +33,18 @@ public class UIUtils {
     public static final String COLUMN_WIDTH_S = "120px";
     public static final String COLUMN_WIDTH_M = "160px";
     public static final String COLUMN_WIDTH_L = "200px";
-    public static final String COLUMN_WIDTH_XL = "240px";
+    public static final String COLUMN_WIDTH_XL = "250px";
     public static final String COLUMN_WIDTH_FULL = "100%";
 
     /**
      * Thread-unsafe formatters.
      */
     private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,###.00"));
-    private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-    private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
+    private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     private static final ThreadLocal<DateTimeFormatter> idFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyMMddHHmmss"));
 
     /* ==== BUTTONS ==== */
-
-    // Styles
-
     public static Button createPrimaryButton(String text) {
         return createButton(text, ButtonVariant.LUMO_PRIMARY);
     }
@@ -290,10 +278,6 @@ public class UIUtils {
         layout.setHeight(LumoStyles.Size.M);
         layout.setWidth(LumoStyles.Size.M);
         return layout;
-    }
-
-    public static String formatAddress(Address address) {
-        return address.getStreet() + "\n" + address.getCity() + ", " + address.getCity() + " " + address.getZip();
     }
 
     public static Button createFloatingActionButton(VaadinIcon icon) {
