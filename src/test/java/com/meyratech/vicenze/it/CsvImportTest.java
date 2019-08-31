@@ -22,10 +22,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ekocbiyik on 04.08.2019
@@ -115,6 +112,36 @@ public class CsvImportTest {
                 e.printStackTrace();
             }
         }
+
+    }
+
+    @Test
+    public void invoiceParameterTest() {
+
+        List<Invoice> invoiceList = invoiceService.findAll();
+        Set<String> eventType = new HashSet<>();
+        Set<String> mainItem = new HashSet<>();
+        Set<String> book = new HashSet<>();
+        Set<String> transaction = new HashSet<>();
+
+        invoiceList.forEach(invoice -> {
+            eventType.add(invoice.getEventType());
+            mainItem.add(invoice.getMainItem());
+            book.add(invoice.getBook());
+            transaction.add(invoice.getTransaction());
+        });
+
+        System.out.println("EVENT TYPE");
+        eventType.forEach(e -> System.out.println(e));
+
+        System.out.println("MAIN ITEM");
+        mainItem.forEach(e -> System.out.println(e));
+
+        System.out.println("BOOK");
+        book.forEach(e -> System.out.println(e));
+
+        System.out.println("TRANSACTION");
+        transaction.forEach(e -> System.out.println(e));
 
     }
 

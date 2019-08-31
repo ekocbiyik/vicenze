@@ -208,8 +208,7 @@ public class DummyData {
     }
 
     public static String getImageSource() {
-        return UIUtils.IMG_PATH + "logo-" + DummyData.getRandomInt(1, 40)
-                + ".png";
+        return UIUtils.IMG_PATH + "logo-" + DummyData.getRandomInt(1, 40) + ".png";
     }
 
     /* === NUMBERS === */

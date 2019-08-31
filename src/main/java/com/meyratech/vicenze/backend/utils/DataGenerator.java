@@ -162,7 +162,7 @@ public class DataGenerator implements HasLogger {
                 if (i.getProject() == null) {
                     i.setProject(projectList.get("ATHINON"));
                 }
-                i.setVendor(vendor);
+                i.setVendor(vendor.isEmpty() ? "OTHER" : vendor);
                 i.setInvoiceNumber(number.isEmpty() ? String.valueOf(++rndNumber) : number);
                 i.setInvoiceCode(code.isEmpty() ? String.valueOf(++rndCode) : code);
                 i.setEventType(eventType);

@@ -1,66 +1,109 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
-import com.meyratech.vicenze.backend.DummyData;
 import com.meyratech.vicenze.backend.model.Invoice;
+import com.meyratech.vicenze.backend.model.ItemDetails;
+import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.repository.service.IProjectService;
 import com.meyratech.vicenze.backend.repository.service.InvoiceServiceImpl;
+import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.ViewFrame;
+import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.navigation.bar.AppBar;
-import com.meyratech.vicenze.ui.layout.size.*;
+import com.meyratech.vicenze.ui.layout.size.Bottom;
+import com.meyratech.vicenze.ui.layout.size.Horizontal;
+import com.meyratech.vicenze.ui.layout.size.Top;
+import com.meyratech.vicenze.ui.layout.size.Vertical;
 import com.meyratech.vicenze.ui.util.*;
-import com.meyratech.vicenze.ui.util.css.*;
+import com.meyratech.vicenze.ui.util.css.BorderRadius;
+import com.meyratech.vicenze.ui.util.css.FlexDirection;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.charts.Chart;
-import com.vaadin.flow.component.charts.model.ChartType;
-import com.vaadin.flow.component.charts.model.Configuration;
-import com.vaadin.flow.component.charts.model.ListSeries;
-import com.vaadin.flow.component.charts.model.XAxis;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.timepicker.TimePicker;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Currency;
+import java.util.Locale;
 
 @Route(value = ViewConst.PAGE_INVOICE_DETAILS, layout = MainLayout.class)
 @PageTitle(ViewConst.TITLE_INVOICE_DETAILS)
 public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
 
-    public int RECENT_TRANSACTIONS = 4;
-
-    private ListItem availability;
-    private ListItem companyLabel;
-    private ListItem creationInfo;
-    private Invoice invoice;
+    private Invoice detailedInvoice;
     private InvoiceServiceImpl invoiceService;
+    private IProjectService projectService;
+
+    private DetailsDrawerFooter detailedFooter;
+
+    //fields
+    private ComboBox<Project> cbxProject;
+    private ComboBox<String> cbxVendor;
+    private ComboBox<String> cbxEventType;
+    private ComboBox<String> cbxMainItem;
+    private ComboBox<String> cbxbook;
+    private ComboBox<String> cbxTransaction;
+    private TextField txtInvoiceNumber;
+    private TextField txtInvoiceCode;
+    private TextField txtAmount;
+    private TextField txtUnitPrize;
+    private Label lblTotalAmount;
+    private DatePicker invoiceDate;
+    private TimePicker invoiceTime;
+    private TextArea txtExplanation;
+    private Label lblCreatedBy;
+    private Label lblCreationDate;
+    private Binder<Invoice> binder;
 
     @Autowired
-    public InvoiceDetails(InvoiceServiceImpl invoiceService) {
+    public InvoiceDetails(InvoiceServiceImpl invoiceService, IProjectService projectService) {
         this.invoiceService = invoiceService;
+        this.projectService = projectService;
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long id) {
-        invoice = invoiceService.findById(id);
         setViewContent(createContent());
+        setViewFooter(createFooter());
+
+        if (id != null && id != -1) {
+            detailedInvoice = invoiceService.findById(id);
+        }
+        initializeVariables();
+        initializeValidators();
     }
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);
         AppBar appBar = initAppBar();
-        appBar.setTitle(invoice.getProject().getProjectName());
+        appBar.setTitle(detailedInvoice == null ? "New Invoice" : detailedInvoice.getProject().getProjectName());
     }
 
     private AppBar initAppBar() {
@@ -71,138 +114,302 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
     }
 
     private Component createContent() {
+
         FlexBoxLayout content = new FlexBoxLayout(
-                createLogoSection(),
-                createRecentTransactionsHeader(),
-                createRecentTransactionsList(),
-                createMonthlyOverviewHeader(),
-                createMonthlyOverviewChart()
+                getDetailHeader(String.format("%s%s", UIUtils.IMG_PATH, "logo-6.png"), "Project Details"),
+                getProjectDetail(),
+                getDetailHeader(String.format("%s%s", UIUtils.IMG_PATH, "logo-38.png"), "Item Details"),
+                getItemDetail(),
+                getDetailHeader(String.format("%s%s", UIUtils.IMG_PATH, "logo-20.png"), "Invoice Details"),
+                getInvoiceDetail()
         );
+
         content.setFlexDirection(FlexDirection.COLUMN);
-        content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
+        content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_X);
         content.setMaxWidth("840px");
+        content.setBorderRadius(BorderRadius.S);
+        content.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
         return content;
     }
 
-    private FlexBoxLayout createLogoSection() {
-        Image image = DummyData.getLogo();
+    private Component getDetailHeader(String iconPath, String title) {
+        Image image = new Image(iconPath, "");
         image.addClassName(LumoStyles.Margin.Horizontal.L);
         UIUtils.setBorderRadius(BorderRadius._50, image);
-        image.setHeight("200px");
-        image.setWidth("200px");
+        image.setHeight("50px");
+        image.setWidth("50px");
 
-        companyLabel = new ListItem(
-                UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION),
-                invoice.getProject().getCompany(),
-                String.format("Project no: %s", invoice.getProject().getId())
-        );
-        companyLabel.getPrimary().addClassName(LumoStyles.Heading.H2);
-        companyLabel.setDividerVisible(true);
-        companyLabel.setWhiteSpace(WhiteSpace.PRE_LINE);
+        ListItem titleLabel = new ListItem(image, title);
+        titleLabel.getPrimary().addClassName(LumoStyles.Heading.H2);
 
-        availability = new ListItem(
-                UIUtils.createTertiaryIcon(VaadinIcon.INFO_CIRCLE),
-                invoice.getEventType(),
-                invoice.getMainItem()
-        );
-        availability.setDividerVisible(true);
-
-        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), invoice.getCreatedBy().getFullName(), UIUtils.formatDatetime(invoice.getCreationDate()));
-
-        FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
-        listItems.setFlexDirection(FlexDirection.COLUMN);
-
-        FlexBoxLayout section = new FlexBoxLayout(image, listItems);
-        section.addClassName(BoxShadowBorders.BOTTOM);
-        section.setAlignItems(FlexComponent.Alignment.CENTER);
-        section.setFlex("1", listItems);
-        section.setFlexWrap(FlexWrap.WRAP);
-        section.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        section.setPadding(Bottom.L);
-        return section;
-    }
-
-    private Component createRecentTransactionsHeader() {
-        Label title = UIUtils.createH3Label("Recent Transactions");
-
-        Button viewAll = UIUtils.createSmallButton("View All");
-        viewAll.addClickListener(e -> UIUtils.showNotification("Not implemented yet."));
-        viewAll.addClassName(LumoStyles.Margin.Left.AUTO);
-
-        FlexBoxLayout header = new FlexBoxLayout(title, viewAll);
+        FlexBoxLayout header = new FlexBoxLayout(titleLabel);
         header.setAlignItems(FlexComponent.Alignment.CENTER);
-        header.setMargin(Bottom.M, Horizontal.RESPONSIVE_L, Top.L);
+        header.setMargin(Bottom.XS, Horizontal.RESPONSIVE_L, Top.L);
+        header.setPadding(Bottom.XS);
+        header.addClassName(BoxShadowBorders.BOTTOM);
+        header.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+
         return header;
     }
 
-    private Component createRecentTransactionsList() {
-        Div items = new Div();
-        items.addClassNames(BoxShadowBorders.BOTTOM, LumoStyles.Padding.Bottom.L);
+    private Component getProjectDetail() {
+        cbxProject = new ComboBox<>();
+        cbxProject.setWidthFull();
+        cbxProject.setItemLabelGenerator(Project::getProjectName);
+        cbxProject.setItems(projectService.findAll());
 
-        for (int i = 0; i < RECENT_TRANSACTIONS; i++) {
-            Double amount = DummyData.getAmount();
+        cbxVendor = new ComboBox<>();
+        cbxVendor.setWidthFull();
+        cbxVendor.setAllowCustomValue(true);
+        cbxVendor.setItems(invoiceService.getAllVendorList());
+        cbxVendor.addCustomValueSetListener(e -> cbxVendor.setValue(e.getDetail().toUpperCase()));
 
-            Label amountLabel = UIUtils.createAmountLabel(amount);
-            if (amount > 0) {
-                UIUtils.setTextColor(TextColor.SUCCESS, amountLabel);
-            } else {
-                UIUtils.setTextColor(TextColor.ERROR, amountLabel);
-            }
 
-            ListItem item = new ListItem(
-                    DummyData.getLogo(),
-                    DummyData.getCompany(),
-                    UIUtils.formatDate(LocalDate.now().minusDays(i)),
-                    amountLabel
-            );
+        // Form layout
+        FormLayout form = new FormLayout();
+        form.addClassNames(LumoStyles.Padding.Bottom.L, LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("21em", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
 
-            // Dividers for all but the last item
-            item.setDividerVisible(i < RECENT_TRANSACTIONS - 1);
-            items.add(item);
+        form.addFormItem(cbxProject, "Project");
+        form.addFormItem(cbxVendor, "Vendor");
+        UIUtils.setColSpan(2);
+
+        return form;
+    }
+
+    private Component getItemDetail() {
+        cbxEventType = new ComboBox<>();
+        cbxEventType.setWidthFull();
+        cbxEventType.setItems(ItemDetails.eventTypeList);
+
+        cbxMainItem = new ComboBox<>();
+        cbxMainItem.setWidthFull();
+        cbxMainItem.setItems(ItemDetails.mainItemList);
+
+        cbxbook = new ComboBox<>();
+        cbxbook.setWidthFull();
+        cbxbook.setItems(ItemDetails.bookList);
+
+        cbxTransaction = new ComboBox<>();
+        cbxTransaction.setWidthFull();
+        cbxTransaction.setItems(ItemDetails.transactionList);
+
+        // Form layout
+        FormLayout form = new FormLayout();
+        form.addClassNames(LumoStyles.Padding.Bottom.L, LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("21em", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
+
+        form.addFormItem(cbxEventType, "Event Type");
+        form.addFormItem(cbxMainItem, "Main Item");
+        form.addFormItem(cbxbook, "Book");
+        form.addFormItem(cbxTransaction, "Transaction");
+        UIUtils.setColSpan(2);
+
+        return form;
+    }
+
+    private Component getInvoiceDetail() {
+
+        txtInvoiceNumber = new TextField();
+        txtInvoiceNumber.setWidthFull();
+        txtInvoiceNumber.setClearButtonVisible(true);
+
+        txtInvoiceCode = new TextField();
+        txtInvoiceCode.setWidthFull();
+        txtInvoiceCode.setClearButtonVisible(true);
+
+        txtAmount = new TextField();
+        txtAmount.setWidthFull();
+        txtAmount.setClearButtonVisible(true);
+        txtAmount.setValue("0.0");
+
+        txtUnitPrize = new TextField();
+        txtUnitPrize.setWidthFull();
+        txtUnitPrize.setClearButtonVisible(true);
+
+        lblTotalAmount = UIUtils.createAmountLabel(0);
+        lblTotalAmount.setWidthFull();
+
+        invoiceDate = new DatePicker();
+        invoiceDate.setLocale(Locale.UK);
+        invoiceDate.setValue(LocalDate.now());
+
+        invoiceTime = new TimePicker();
+        invoiceTime.setLocale(Locale.UK);
+        invoiceTime.setValue(LocalTime.now());
+
+        HorizontalLayout wrap = new HorizontalLayout();
+        wrap.add(invoiceDate, invoiceTime);
+        wrap.setSpacing(true);
+
+        txtExplanation = new TextArea();
+        txtExplanation.setWidthFull();
+        txtExplanation.setClearButtonVisible(true);
+        txtExplanation.setHeight(UIUtils.COLUMN_WIDTH_XS);
+        txtExplanation.setValueChangeMode(ValueChangeMode.EAGER);
+        txtExplanation.addValueChangeListener(e -> txtExplanation.setValue(e.getValue().toUpperCase()));
+
+        lblCreatedBy = UIUtils.createH5Label(SecurityUtils.getCurrentUser().getFullName());
+        lblCreatedBy.setWidthFull();
+
+        lblCreationDate = UIUtils.createH5Label(UIUtils.formatDatetime(LocalDateTime.now()));
+        lblCreationDate.setWidthFull();
+
+        // Form layout
+        FormLayout form = new FormLayout();
+        form.addClassNames(LumoStyles.Padding.Bottom.L, LumoStyles.Padding.Horizontal.L, LumoStyles.Padding.Top.S);
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1, FormLayout.ResponsiveStep.LabelsPosition.TOP),
+                new FormLayout.ResponsiveStep("21em", 2, FormLayout.ResponsiveStep.LabelsPosition.TOP)
+        );
+
+        form.addFormItem(txtInvoiceNumber, "Invoice Number");
+        form.addFormItem(txtInvoiceCode, "Invoice Code");
+        form.addFormItem(txtAmount, "Amount");
+        form.addFormItem(txtUnitPrize, "Unit Prize");
+        form.addFormItem(lblTotalAmount, "Total Amount");
+        form.addFormItem(wrap, "Invoice Date");
+        FormLayout.FormItem txtExplanationItem = form.addFormItem(txtExplanation, "Explanation");
+        form.addFormItem(lblCreatedBy, "Created By");
+        form.addFormItem(lblCreationDate, "Creation Date");
+        UIUtils.setColSpan(2, txtExplanationItem);
+
+        return form;
+    }
+
+    private Component createFooter() {
+        detailedFooter = new DetailsDrawerFooter();
+        detailedFooter.getSaveButton().setEnabled(false);
+        detailedFooter.addCancelListener(e -> UI.getCurrent().navigate(InvoiceView.class));
+        detailedFooter.addSaveListener(e -> saveDetailedInvoice());
+        detailedFooter.getContent().setBackgroundColor(LumoStyles.Color.BASE_COLOR);
+        return detailedFooter;
+    }
+
+    private void initializeVariables() {
+
+        if (detailedInvoice != null) {
+            cbxProject.setValue(detailedInvoice.getProject());
+            cbxVendor.setValue(detailedInvoice.getVendor());
+            cbxEventType.setValue(detailedInvoice.getEventType());
+            cbxMainItem.setValue(detailedInvoice.getMainItem());
+            cbxbook.setValue(detailedInvoice.getBook());
+            cbxTransaction.setValue(detailedInvoice.getTransaction());
+            txtInvoiceNumber.setValue(detailedInvoice.getInvoiceNumber());
+            txtInvoiceCode.setValue(detailedInvoice.getInvoiceCode());
+            txtAmount.setValue(detailedInvoice.getAmount().toString());
+            txtUnitPrize.setValue(detailedInvoice.getUnitPrice().toString());
+
+            lblTotalAmount.setText(detailedInvoice.getTotalAmount().toString());
+            UIUtils.setTextColor(detailedInvoice.getTotalAmount().doubleValue() < 0 ? TextColor.ERROR : TextColor.SUCCESS, lblTotalAmount);
+
+            invoiceDate.setValue(detailedInvoice.getDate().toLocalDate());
+            invoiceTime.setValue(detailedInvoice.getDate().toLocalTime());
+            txtExplanation.setValue(detailedInvoice.getExplanation());
+            lblCreatedBy.setText(detailedInvoice.getCreatedBy().getFullName());
+            lblCreationDate.setText(UIUtils.formatDatetime(detailedInvoice.getCreationDate()));
         }
 
-        return items;
     }
 
-    private Component createMonthlyOverviewHeader() {
-        Label header = UIUtils.createH3Label("Monthly Overview");
-        header.addClassNames(LumoStyles.Margin.Vertical.L, LumoStyles.Margin.Responsive.Horizontal.L);
-        return header;
+    private void initializeValidators() {
+        binder = new Binder<>(Invoice.class);
+        binder.forField(cbxProject)
+                .asRequired("Projectis required!")
+                .withValidator(p -> p != null, "Project can not be empty!")
+                .bind(Invoice::getProject, Invoice::setProject);
+
+        binder.forField(cbxVendor)
+                .asRequired("Vendor is required!")
+                .withValidator(v -> v.length() >= 3, "At least 3 characters!")
+                .bind(Invoice::getVendor, Invoice::setVendor);
+
+        binder.forField(cbxEventType)
+                .asRequired("Please select event type!")
+                .withValidator(e -> !e.isEmpty(), "Can not be empty!")
+                .bind(Invoice::getEventType, Invoice::setEventType);
+
+        binder.forField(cbxMainItem)
+                .asRequired("Please select main item!")
+                .bind(Invoice::getMainItem, Invoice::setMainItem);
+
+        binder.forField(cbxbook)
+                .asRequired("Please select book item!")
+                .bind(Invoice::getBook, Invoice::setBook);
+
+        binder.forField(cbxTransaction)
+                .asRequired("Please select transaction item!")
+                .bind(Invoice::getTransaction, Invoice::setTransaction);
+
+        binder.forField(txtInvoiceNumber)
+                .asRequired("Invoice number is required!")
+                .withValidator(v -> v.length() >= 3, "At least 3 characters!")
+                .bind(Invoice::getInvoiceNumber, Invoice::setInvoiceNumber);
+
+        binder.forField(txtInvoiceCode)
+                .asRequired("Invoice code is required!")
+                .withValidator(v -> v.length() >= 3, "At least 3 characters!")
+                .bind(Invoice::getInvoiceCode, Invoice::setInvoiceCode);
+
+        binder.forField(txtExplanation)
+                .bind(Invoice::getExplanation, Invoice::setExplanation);
+
+        binder.forField(txtAmount)
+                .asRequired("Amount is required!")
+                .withConverter(new StringToBigDecimalConverter("Must enter a number"))
+                .bind(Invoice::getAmount, Invoice::setAmount);
+
+        binder.forField(txtUnitPrize)
+                .asRequired("Unit prize is required!")
+                .withConverter(new StringToBigDecimalConverter("Must enter a number"))
+                .bind(Invoice::getUnitPrice, Invoice::setUnitPrice);
+
+        detailedFooter.getSaveButton().setEnabled(false);
+        binder.readBean(detailedInvoice == null ? new Invoice() : detailedInvoice);
+        binder.addStatusChangeListener(status -> detailedFooter.getSaveButton().setEnabled(!status.hasValidationErrors()));
     }
 
-    private Component createMonthlyOverviewChart() {
-        Chart chart = new Chart(ChartType.COLUMN);
-
-        Configuration conf = chart.getConfiguration();
-        conf.setTitle("");
-        conf.getLegend().setEnabled(true);
-
-        XAxis xAxis = new XAxis();
-        xAxis.setCategories("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-        conf.addxAxis(xAxis);
-
-        conf.getyAxis().setTitle("Amount ($)");
-
-        // Withdrawals and deposits
-        ListSeries withDrawals = new ListSeries("Withdrawals");
-        ListSeries deposits = new ListSeries("Deposits");
-
-        for (int i = 0; i < 8; i++) {
-            withDrawals.addData(DummyData.getRandomInt(5000, 10000));
-            deposits.addData(DummyData.getRandomInt(5000, 10000));
+    private void saveDetailedInvoice() {
+        binder.validate();
+        if (!binder.isValid()) {
+            detailedFooter.getSaveButton().setEnabled(false);
+            return;
         }
 
-        conf.addSeries(withDrawals);
-        conf.addSeries(deposits);
+        if (detailedInvoice == null) {
+            detailedInvoice = new Invoice();
+            detailedInvoice.setCreatedBy(SecurityUtils.getCurrentUser());
+            detailedInvoice.setCreationDate(LocalDateTime.now());
+        }
 
-        FlexBoxLayout card = new FlexBoxLayout(chart);
-        card.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
-        card.setBorderRadius(BorderRadius.S);
-        card.setBoxSizing(BoxSizing.BORDER_BOX);
-        card.setFlexWrap(FlexWrap.WRAP);
-        card.setHeight("400px");
-        card.setPadding(Uniform.M);
-        card.setShadow(Shadow.S);
-        return card;
+        detailedInvoice.setProject(cbxProject.getValue());
+        detailedInvoice.setVendor(cbxVendor.getValue());
+        detailedInvoice.setEventType(cbxEventType.getValue());
+        detailedInvoice.setMainItem(cbxMainItem.getValue());
+        detailedInvoice.setBook(cbxbook.getValue());
+        detailedInvoice.setTransaction(cbxTransaction.getValue());
+        detailedInvoice.setInvoiceNumber(txtInvoiceNumber.getValue());
+        detailedInvoice.setInvoiceCode(txtInvoiceCode.getValue());
+        detailedInvoice.setExplanation(txtExplanation.getValue());
+        detailedInvoice.setAmount(new BigDecimal(txtAmount.getValue()));
+        detailedInvoice.setUnitPrice(new BigDecimal(txtUnitPrize.getValue()));
+        detailedInvoice.setDate(LocalDateTime.of(invoiceDate.getValue(), invoiceTime.getValue()));
+
+        try {
+            invoiceService.save(detailedInvoice);
+        } catch (Exception e) {
+            Notification.show("Opps! Please check your fields!", 3000, Notification.Position.TOP_END);
+            return;
+        }
+
+        Notification.show("Successfull", 6000, Notification.Position.TOP_END);
+        UI.getCurrent().navigate(InvoiceView.class);
     }
+
 }

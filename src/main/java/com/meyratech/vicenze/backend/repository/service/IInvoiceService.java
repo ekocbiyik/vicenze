@@ -28,4 +28,5 @@ public interface IInvoiceService {
 
     List<Invoice> getInvoicesByProjectAndUserAndDate(Project project, User user, LocalDateTime sDate, LocalDateTime eDate);
 
+    List<String> getAllVendorList();
 }

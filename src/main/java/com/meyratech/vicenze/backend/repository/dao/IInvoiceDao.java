@@ -33,4 +33,7 @@ public interface IInvoiceDao extends JpaRepository<Invoice, Long> {
     @Query(value = "from Invoice i where i.project = :project and i.createdBy = :user and i.date >= :sDate and i.date <= :eDate")
     List<Invoice> getInvoicesByProjectAndUserAndDate(@Param("project") Project project, @Param("user") User user, @Param("sDate") LocalDateTime sDate, @Param("eDate") LocalDateTime eDate);
 
+    @Query(value = "select distinct i.vendor from Invoice i ")
+    List<String> getDistinctVendorList();
+
 }

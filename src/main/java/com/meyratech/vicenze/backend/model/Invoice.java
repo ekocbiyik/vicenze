@@ -26,12 +26,6 @@ public class Invoice {
     @Column(name = "vendor")
     private String vendor;
 
-    @Column(name = "invoice_number")
-    private String invoiceNumber; // fatura numarası
-
-    @Column(name = "invoice_code")
-    private String invoiceCode; // vergino şeklinde olan kısım
-
     @Column(name = "event_type", nullable = false)
     private String eventType;
 
@@ -44,6 +38,12 @@ public class Invoice {
     @Column(name = "transaction", nullable = false)
     private String transaction;
 
+    @Column(name = "invoice_number")
+    private String invoiceNumber; // fatura numarası
+
+    @Column(name = "invoice_code")
+    private String invoiceCode; // vergino şeklinde olan kısım
+
     @Size(max = 255)
     @Column(name = "explanation")
     private String explanation;
@@ -53,6 +53,9 @@ public class Invoice {
 
     @Column(name = "unit_price", nullable = false)
     private BigDecimal unitPrice;
+
+    @Transient
+    private BigDecimal totalAmount;
 
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
@@ -64,9 +67,6 @@ public class Invoice {
     @CreationTimestamp
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate;
-
-    @Transient
-    private BigDecimal totalAmount;
 
     public Long getId() {
         return id;
@@ -149,7 +149,7 @@ public class Invoice {
     }
 
     public BigDecimal getAmount() {
-        return amount;
+        return amount == null ? BigDecimal.ZERO : amount;
     }
 
     public void setAmount(BigDecimal amount) {
@@ -157,7 +157,7 @@ public class Invoice {
     }
 
     public BigDecimal getUnitPrice() {
-        return unitPrice;
+        return unitPrice == null ? BigDecimal.ZERO : unitPrice;
     }
 
     public void setUnitPrice(BigDecimal unitPrice) {
@@ -192,4 +192,7 @@ public class Invoice {
         return unitPrice.multiply(amount);
     }
 
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 }

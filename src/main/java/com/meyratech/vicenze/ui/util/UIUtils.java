@@ -39,7 +39,7 @@ public class UIUtils {
     /**
      * Thread-unsafe formatters.
      */
-    private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,###.00"));
+    private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,##0.00"));
     private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     private static final ThreadLocal<DateTimeFormatter> idFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyMMddHHmmss"));
@@ -212,6 +212,16 @@ public class UIUtils {
         return textField;
     }
 
+    public static TextField createCurrencyTextField(String value) {
+        TextField textField = new TextField();
+        textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        textField.setPrefixComponent(new Icon(VaadinIcon.EURO));
+        textField.setValue(value);
+        textField.setReadOnly(true);
+        textField.setClearButtonVisible(true);
+        return textField;
+    }
+
     /* ==== LABELS ==== */
     public static Label createLabel(FontSize size, TextColor color, String text) {
         Label label = new Label(text);
@@ -308,7 +318,14 @@ public class UIUtils {
     }
 
     public static Label createAmountLabel(double amount) {
+//        Label label = createH5Label(formatAmount(amount));
+//        label.addClassName(LumoStyles.FontFamily.MONOSPACE);
+        return createAmountLabel("", amount);
+    }
+
+    public static Label createAmountLabel(String title, double amount) {
         Label label = createH5Label(formatAmount(amount));
+        if (!title.isEmpty()) label.setTitle(title);
         label.addClassName(LumoStyles.FontFamily.MONOSPACE);
         return label;
     }

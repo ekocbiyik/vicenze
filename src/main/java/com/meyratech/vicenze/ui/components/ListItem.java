@@ -1,16 +1,16 @@
 package com.meyratech.vicenze.ui.components;
 
+import com.meyratech.vicenze.ui.util.FontSize;
+import com.meyratech.vicenze.ui.util.TextColor;
+import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.util.css.FlexDirection;
+import com.meyratech.vicenze.ui.util.css.WhiteSpace;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.meyratech.vicenze.ui.util.FontSize;
-import com.meyratech.vicenze.ui.util.TextColor;
-import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.util.css.FlexDirection;
-import com.meyratech.vicenze.ui.util.css.WhiteSpace;
 
 public class ListItem extends FlexLayout implements HasStyle {
 

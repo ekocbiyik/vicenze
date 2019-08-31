@@ -1,6 +1,5 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
-import com.meyratech.vicenze.backend.exporter.Exporter;
 import com.meyratech.vicenze.backend.model.Invoice;
 import com.meyratech.vicenze.backend.model.Project;
 import com.meyratech.vicenze.backend.model.User;
@@ -24,7 +23,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
@@ -40,7 +38,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
-import com.vaadin.flow.server.StreamResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -64,7 +61,7 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
     private Label lblItemSize;
     private ListDataProvider<Invoice> invoiceDataProvider;
 
-    private ComboBox<Project> cbxPorject;
+    private ComboBox<Project> cbxProject;
     private ComboBox<User> cbxUser;
     private DatePicker dpSDate;
     private DatePicker dpEDate;
@@ -84,9 +81,12 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         // add
         Button btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
         btnCreate.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
-            UIUtils.showNotification("Not implemented yet!");
+            // yeni invoice eklemek için url yönlendirmesinde id olmak zorunda
+            // çözümü böyle ürettim
+            Invoice invoice = new Invoice();
+            invoice.setId(-1L);
+            UI.getCurrent().navigate(InvoiceDetails.class, invoice.getId());
         });
-
 
         // list
         Button btnSearch = UIUtils.createSuccessPrimaryButton("SEARCH", VaadinIcon.SEARCH);
@@ -99,11 +99,11 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         });
 
         //project
-        cbxPorject = new ComboBox<>();
-        cbxPorject.setWidth(UIUtils.COLUMN_WIDTH_XL);
-        cbxPorject.setPlaceholder("Project name");
-        cbxPorject.setItemLabelGenerator(Project::getProjectName);
-        cbxPorject.setItems(projectService.findAll());
+        cbxProject = new ComboBox<>();
+        cbxProject.setWidth(UIUtils.COLUMN_WIDTH_XL);
+        cbxProject.setPlaceholder("Project name");
+        cbxProject.setItemLabelGenerator(Project::getProjectName);
+        cbxProject.setItems(projectService.findAll());
 
         //created by
         cbxUser = new ComboBox<>();
@@ -134,7 +134,7 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         layout.setWidthFull();
         layout.setHeight("65px");
         layout.getStyle().set("background-color", LumoStyles.Color.BASE_COLOR);
-        layout.add(btnCreate, cbxPorject, cbxUser, dpSDate, dpEDate, btnSearch, btnExport);
+        layout.add(btnCreate, cbxProject, cbxUser, dpSDate, dpEDate, btnSearch, btnExport);
 
         return layout;
     }
@@ -310,11 +310,11 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         LocalDateTime startDate = dpSDate.getValue().atStartOfDay();
         LocalDateTime endDate = dpEDate.getValue().plusDays(1).atStartOfDay();
 
-        if (cbxPorject.getValue() != null && cbxUser.getValue() != null) {
-            invoiceList = invoiceService.getInvoicesByProjectAndUserAndDate(cbxPorject.getValue(), cbxUser.getValue(), startDate, endDate);
+        if (cbxProject.getValue() != null && cbxUser.getValue() != null) {
+            invoiceList = invoiceService.getInvoicesByProjectAndUserAndDate(cbxProject.getValue(), cbxUser.getValue(), startDate, endDate);
 
-        } else if (cbxPorject.getValue() != null) {
-            invoiceList = invoiceService.getInvoicesByProjectAndDate(cbxPorject.getValue(), startDate, endDate);
+        } else if (cbxProject.getValue() != null) {
+            invoiceList = invoiceService.getInvoicesByProjectAndDate(cbxProject.getValue(), startDate, endDate);
 
         } else if (cbxUser.getValue() != null) {
             invoiceList = invoiceService.getInvoicesByUserAndDate(cbxUser.getValue(), startDate, endDate);

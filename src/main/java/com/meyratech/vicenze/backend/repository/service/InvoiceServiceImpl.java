@@ -69,4 +69,10 @@ public class InvoiceServiceImpl implements IInvoiceService {
     public List<Invoice> getInvoicesByProjectAndUserAndDate(Project project, User user, LocalDateTime sDate, LocalDateTime eDate) {
         return invoiceDao.getInvoicesByProjectAndUserAndDate(project, user, sDate, eDate);
     }
+
+    @Transactional
+    @Override
+    public List<String> getAllVendorList() {
+        return invoiceDao.getDistinctVendorList();
+    }
 }
