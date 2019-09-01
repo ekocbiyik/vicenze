@@ -1,4 +1,4 @@
-package com.meyratech.vicenze.it;
+package com.meyratech.vicenze;
 
 import com.meyratech.vicenze.backend.model.Invoice;
 import com.meyratech.vicenze.backend.model.Project;

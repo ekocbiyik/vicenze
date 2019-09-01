@@ -42,6 +42,7 @@ public class UIUtils {
     private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,##0.00"));
     private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    private static final ThreadLocal<DateTimeFormatter> fileNamedateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
     private static final ThreadLocal<DateTimeFormatter> idFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyMMddHHmmss"));
 
     /* ==== BUTTONS ==== */
@@ -152,8 +153,6 @@ public class UIUtils {
     public static Button createContrastPrimaryButton(String text, VaadinIcon icon) {
         return createButton(text, icon, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_PRIMARY);
     }
-
-    // Size
 
     public static Button createSmallButton(String text) {
         return createButton(text, ButtonVariant.LUMO_SMALL);
@@ -318,8 +317,6 @@ public class UIUtils {
     }
 
     public static Label createAmountLabel(double amount) {
-//        Label label = createH5Label(formatAmount(amount));
-//        label.addClassName(LumoStyles.FontFamily.MONOSPACE);
         return createAmountLabel("", amount);
     }
 
@@ -341,7 +338,6 @@ public class UIUtils {
     }
 
     /* === ICONS === */
-
     public static Icon createPrimaryIcon(VaadinIcon icon) {
         Icon i = new Icon(icon);
         setTextColor(TextColor.PRIMARY, i);
@@ -407,6 +403,10 @@ public class UIUtils {
 
     public static String formatDatetime(LocalDateTime date) {
         return date == null ? "" : dateTimeFormat.get().format(date);
+    }
+
+    public static String formatFileNameDatetime(LocalDateTime date) {
+        return date == null ? "" : fileNamedateTimeFormat.get().format(date);
     }
 
     public static String formatId(LocalDateTime date) {

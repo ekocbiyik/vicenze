@@ -1,17 +1,17 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
+import com.meyratech.vicenze.backend.exporter.InvoiceExcelExporter;
 import com.meyratech.vicenze.backend.model.Invoice;
 import com.meyratech.vicenze.backend.model.Project;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
 import com.meyratech.vicenze.backend.repository.service.IUserService;
+import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
-import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.SplitViewFrame;
 import com.meyratech.vicenze.ui.components.dialog.InvoiceDialog;
-import com.meyratech.vicenze.ui.layout.size.Left;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.TextColor;
 import com.meyratech.vicenze.ui.util.UIUtils;
@@ -30,6 +30,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -42,11 +43,18 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.server.StreamRegistration;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.StreamResourceWriter;
+import com.vaadin.flow.server.VaadinSession;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -128,7 +136,7 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
 
         // export
         Button btnExport = UIUtils.createErrorPrimaryButton("EXPORT", VaadinIcon.PRINT);
-        btnExport.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> UIUtils.showNotification("Not implemented yet!"));
+        btnExport.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> exportToExcel());
 
         HorizontalLayout box = new HorizontalLayout();
         box.setWidthFull();
@@ -246,6 +254,7 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
 
     private TextField createFilterField() {
         TextField filter = new TextField();
+        filter.setClearButtonVisible(true);
         filter.setSizeFull();
         filter.setValueChangeMode(ValueChangeMode.EAGER);
         return filter;
@@ -340,6 +349,48 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         invoiceGrid.setDataProvider(invoiceDataProvider);
         lblItemSize.setText(String.valueOf(invoiceList.size()));
         initializeItemListener();
+    }
+
+    private void exportToExcel() {
+
+        if (invoiceDataProvider.getItems().size() < 1) {
+            UIUtils.showNotification("Empyty list!");
+            return;
+        }
+
+        // bu sıra önemli, excel dosyası da bu sırada oluşturuluyor...
+        List<String> columnHeaders = Arrays.asList(
+                "Project", "Vendor", "Event Type", "Main Item",
+                "Book", "Transaction", "Invoice Number", "Invoice Code",
+                "Explanation", "Amount", "Unit Prize", "Total Amount",
+                "Date", "Created By", "Creation Date"
+        );
+
+        try {
+            String fileName = String.format(
+                    "%s_%s",
+                    SecurityUtils.getCurrentUser().getFullName().toLowerCase().replaceAll(" ", "_"),
+                    UIUtils.formatFileNameDatetime(LocalDateTime.now())
+            );
+            File excelFile = new InvoiceExcelExporter(
+                    invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()),
+                    columnHeaders,
+                    fileName
+            ).build();
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(excelFile));
+            StreamResource resource = new StreamResource(String.format("%s.xls", fileName), () -> byteArrayInputStream);
+            StreamRegistration registration = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
+            UI.getCurrent().getPage().executeJavaScript("window.open($0, $1)", registration.getResourceUri().toString(), "_blank");
+
+            // delete tmp
+            FileUtils.forceDelete(excelFile);
+        } catch (Exception e) {
+            UIUtils.showNotification("An error occured while creating excel!");
+            e.printStackTrace();
+        }
+
+        UIUtils.showNotification("Downloaded successfully!");
     }
 
 }
