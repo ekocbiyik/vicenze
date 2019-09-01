@@ -11,10 +11,7 @@ import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.navigation.bar.AppBar;
-import com.meyratech.vicenze.ui.layout.size.Bottom;
-import com.meyratech.vicenze.ui.layout.size.Horizontal;
-import com.meyratech.vicenze.ui.layout.size.Top;
-import com.meyratech.vicenze.ui.layout.size.Vertical;
+import com.meyratech.vicenze.ui.layout.size.*;
 import com.meyratech.vicenze.ui.util.*;
 import com.meyratech.vicenze.ui.util.css.BorderRadius;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
@@ -155,9 +152,7 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         titleLabel.getPrimary().addClassName(LumoStyles.Heading.H2);
 
         FlexBoxLayout header = new FlexBoxLayout(titleLabel);
-        header.setAlignItems(FlexComponent.Alignment.CENTER);
-        header.setMargin(Bottom.XS, Horizontal.RESPONSIVE_L, Top.L);
-        header.setPadding(Bottom.XS);
+        header.setMargin(Left.S, Horizontal.RESPONSIVE_L, Top.XS);
         header.addClassName(BoxShadowBorders.BOTTOM);
         header.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
         return header;
