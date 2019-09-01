@@ -77,7 +77,7 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
 
         Grid.Column<IncorrectInvoice> col0 = incorrectGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Edit").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
         Grid.Column<IncorrectInvoice> col1 = incorrectGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setFlexGrow(1).setHeader("Project").setWidth(UIUtils.COLUMN_WIDTH_XL);
-        Grid.Column<IncorrectInvoice> col2 = incorrectGrid.addColumn(new ComponentRenderer<>(this::createActive)).setFlexGrow(0).setHeader("Edited").setSortable(true).setComparator(IncorrectInvoice::isActive).setWidth(UIUtils.COLUMN_WIDTH_S);
+        Grid.Column<IncorrectInvoice> col2 = incorrectGrid.addColumn(new ComponentRenderer<>(this::createActive)).setFlexGrow(0).setHeader("Active").setSortable(true).setComparator(IncorrectInvoice::isActive).setWidth(UIUtils.COLUMN_WIDTH_S);
         Grid.Column<IncorrectInvoice> col3 = incorrectGrid.addColumn(IncorrectInvoice::getInvoiceNumber).setFlexGrow(0).setHeader("Invoice Number").setSortable(true).setComparator(IncorrectInvoice::getInvoiceNumber).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<IncorrectInvoice> col4 = incorrectGrid.addColumn(IncorrectInvoice::getInvoiceCode).setHeader("Invoice Code").setSortable(true).setComparator(IncorrectInvoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<IncorrectInvoice> col5 = incorrectGrid.addColumn(IncorrectInvoice::getVendor).setHeader("Vendor").setSortable(true).setComparator(IncorrectInvoice::getVendor).setWidth(UIUtils.COLUMN_WIDTH_M);
