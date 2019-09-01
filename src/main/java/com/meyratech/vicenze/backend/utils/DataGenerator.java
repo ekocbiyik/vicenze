@@ -78,15 +78,10 @@ public class DataGenerator implements HasLogger {
         userService.save(createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Malin", "Castro", false, true, adminUser));
 
         // barista
+        userService.save(createUser("user@mail.com", passwordEncoder.encode("user"), Role.ACCOUNTANT, "User", "Test", false, true, adminUser));
         userService.save(createUser("barista@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista", "Nikola", false, true, adminUser));
         userService.save(createUser("barista2@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista2", "Nikola", false, true, adminUser));
         userService.save(createUser("barista3@mail.com", passwordEncoder.encode("barista"), Role.ACCOUNTANT, "Barista3", "Nikola", false, true, adminUser));
-
-        // customer
-        userService.save(createUser("customer@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank", "Riberry", false, true, adminUser));
-        userService.save(createUser("customer2@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank2", "Riberry", false, true, adminUser));
-        userService.save(createUser("customer3@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank3", "Riberry", false, true, adminUser));
-        userService.save(createUser("customer4@mail.com", passwordEncoder.encode("customer"), Role.CUSTOMER, "Frank4", "Riberry", false, true, adminUser));
 
         getLogger().info("Generated user data");
     }

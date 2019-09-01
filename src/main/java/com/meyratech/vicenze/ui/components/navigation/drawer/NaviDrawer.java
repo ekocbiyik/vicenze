@@ -2,7 +2,7 @@ package com.meyratech.vicenze.ui.components.navigation.drawer;
 
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
-import com.meyratech.vicenze.ui.components.UserDialog;
+import com.meyratech.vicenze.ui.components.dialog.UserDialog;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ClientCallable;

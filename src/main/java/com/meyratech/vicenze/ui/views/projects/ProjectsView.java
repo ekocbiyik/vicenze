@@ -1,6 +1,7 @@
 package com.meyratech.vicenze.ui.views.projects;
 
 import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
@@ -45,6 +46,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -52,6 +54,7 @@ import java.util.stream.Collectors;
 @Route(value = ViewConst.PAGE_PROJECTS, layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
 @PageTitle(ViewConst.TITLE_PROJECTS)
+@Secured(Role.ADMIN)
 public class ProjectsView extends SplitViewFrame implements RouterLayout {
 
     private final ProjectServiceImpl projectService;
@@ -167,7 +170,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         cbxCompany.setWidthFull();
         cbxCompany.setAllowCustomValue(true);
         cbxCompany.setItems(projectDataProvider.getItems().stream().map(p -> p.getCompany()).collect(Collectors.toSet()));
-        cbxCompany.addCustomValueSetListener(e -> cbxCompany.setValue(e.getDetail().toUpperCase()));
+        cbxCompany.addCustomValueSetListener(e -> cbxCompany.setValue(e.getSource().getValue() == null ? e.getDetail().toUpperCase() : e.getSource().getValue()));
 
         txtEmail = new EmailField();
         txtEmail.setWidthFull();

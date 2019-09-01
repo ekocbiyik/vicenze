@@ -1,10 +1,11 @@
-package com.meyratech.vicenze.ui.components;
+package com.meyratech.vicenze.ui.components.dialog;
 
 import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.backend.security.UtilsForSpring;
+import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.layout.size.Horizontal;
 import com.meyratech.vicenze.ui.layout.size.Right;
 import com.meyratech.vicenze.ui.layout.size.Vertical;
@@ -18,7 +19,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -26,7 +26,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.management.Notification;
 import java.time.LocalDate;
 
 /**

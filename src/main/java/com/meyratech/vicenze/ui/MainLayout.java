@@ -12,6 +12,7 @@ import com.meyratech.vicenze.ui.util.ViewConst;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
 import com.meyratech.vicenze.ui.util.css.Overflow;
 import com.meyratech.vicenze.ui.views.home.HomeView;
+import com.meyratech.vicenze.ui.views.invoice.IncorrectInvoiceView;
 import com.meyratech.vicenze.ui.views.invoice.InvoiceView;
 import com.meyratech.vicenze.ui.views.personnel.PersonelView;
 import com.meyratech.vicenze.ui.views.projects.ProjectsView;
@@ -118,8 +119,7 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
 
         NaviItem personnel = menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Invoice", null);
         menu.addNaviItem(personnel, "Invoice List", InvoiceView.class);
-        menu.addNaviItem(personnel, "Pending Invoice", PersonelView.class);
-        menu.addNaviItem(personnel, "Invoice Import", ProjectsView.class);
+        menu.addNaviItem(personnel, "Incorrect List", IncorrectInvoiceView.class);
     }
 
     /**

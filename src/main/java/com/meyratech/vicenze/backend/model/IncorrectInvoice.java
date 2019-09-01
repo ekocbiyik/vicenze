@@ -31,6 +31,9 @@ public class IncorrectInvoice {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true; // aktivate-deactivate
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User createdBy;
@@ -85,6 +88,14 @@ public class IncorrectInvoice {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public User getCreatedBy() {

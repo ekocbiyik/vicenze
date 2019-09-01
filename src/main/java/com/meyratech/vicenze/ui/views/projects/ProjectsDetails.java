@@ -2,6 +2,7 @@ package com.meyratech.vicenze.ui.views.projects;
 
 import com.meyratech.vicenze.backend.DummyData;
 import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
@@ -30,11 +31,13 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDate;
 
 @Route(value = ViewConst.PAGE_PROJECTS_DETAILS, layout = MainLayout.class)
 @PageTitle(ViewConst.TITLE_PROJECTS_DETAILS)
+@Secured(Role.ADMIN)
 public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> {
 
     public int RECENT_TRANSACTIONS = 4;
@@ -52,8 +55,13 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long id) {
-        project = projectService.findById(id);
-        setViewContent(createContent());
+        try {
+            project = projectService.findById(id);
+            setViewContent(createContent());
+        } catch (Exception e) {
+            UI.getCurrent().navigate(ProjectsView.class);
+            return;
+        }
     }
 
     @Override

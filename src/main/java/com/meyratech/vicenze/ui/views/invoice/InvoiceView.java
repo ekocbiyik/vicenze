@@ -7,8 +7,11 @@ import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
 import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.ui.MainLayout;
+import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.SplitViewFrame;
+import com.meyratech.vicenze.ui.components.dialog.InvoiceDialog;
+import com.meyratech.vicenze.ui.layout.size.Left;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.TextColor;
 import com.meyratech.vicenze.ui.util.UIUtils;
@@ -27,6 +30,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -88,16 +92,6 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
             UI.getCurrent().navigate(InvoiceDetails.class, invoice.getId());
         });
 
-        // list
-        Button btnSearch = UIUtils.createSuccessPrimaryButton("SEARCH", VaadinIcon.SEARCH);
-        btnSearch.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> searchBtnClick());
-
-        // export
-        Button btnExport = UIUtils.createErrorPrimaryButton("EXPORT", VaadinIcon.PRINT);
-        btnExport.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> {
-            UIUtils.showNotification("Not implemented yet!");
-        });
-
         //project
         cbxProject = new ComboBox<>();
         cbxProject.setWidth(UIUtils.COLUMN_WIDTH_XL);
@@ -128,13 +122,27 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         dpEDate.setValue(LocalDate.now());
         dpEDate.setRequired(true);
 
+        // list
+        Button btnSearch = UIUtils.createSuccessPrimaryButton("SEARCH", VaadinIcon.SEARCH);
+        btnSearch.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> searchBtnClick());
+
+        // export
+        Button btnExport = UIUtils.createErrorPrimaryButton("EXPORT", VaadinIcon.PRINT);
+        btnExport.addClickListener((ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> UIUtils.showNotification("Not implemented yet!"));
+
+        HorizontalLayout box = new HorizontalLayout();
+        box.setWidthFull();
+        box.setSpacing(true);
+        box.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        box.add(btnSearch, btnExport);
+
         HorizontalLayout layout = new HorizontalLayout();
         layout.setSpacing(true);
         layout.setPadding(true);
         layout.setWidthFull();
         layout.setHeight("65px");
         layout.getStyle().set("background-color", LumoStyles.Color.BASE_COLOR);
-        layout.add(btnCreate, cbxProject, cbxUser, dpSDate, dpEDate, btnSearch, btnExport);
+        layout.add(btnCreate, cbxProject, cbxUser, dpSDate, dpEDate, box);
 
         return layout;
     }
@@ -147,7 +155,7 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
 
         Grid.Column<Invoice> col0 = invoiceGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Details").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
         Grid.Column<Invoice> col1 = invoiceGrid.addColumn(Invoice::getInvoiceNumber).setFlexGrow(0).setHeader("Number").setSortable(true).setComparator(Invoice::getInvoiceNumber).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<Invoice> col2 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setKey("project").setFlexGrow(1).setHeader("Project").setWidth(UIUtils.COLUMN_WIDTH_XL);
+        Grid.Column<Invoice> col2 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setFlexGrow(1).setHeader("Project").setWidth(UIUtils.COLUMN_WIDTH_XL);
         Grid.Column<Invoice> col3 = invoiceGrid.addColumn(Invoice::getVendor).setHeader("Vendor").setSortable(true).setComparator(Invoice::getVendor).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col4 = invoiceGrid.addColumn(Invoice::getInvoiceCode).setHeader("Code").setSortable(true).setComparator(Invoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col5 = invoiceGrid.addColumn(Invoice::getEventType).setHeader("Event Type").setSortable(true).setComparator(Invoice::getEventType).setWidth(UIUtils.COLUMN_WIDTH_S);
@@ -161,6 +169,8 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
         Grid.Column<Invoice> col13 = invoiceGrid.addColumn(new ComponentRenderer<>(this::invoiceDate)).setComparator(Invoice::getDate).setHeader("Date").setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col14 = invoiceGrid.addColumn(new ComponentRenderer<>(this::createdByInfo)).setHeader("Created By").setComparator(Comparator.comparing(u -> u.getCreatedBy().getFullName())).setTextAlign(ColumnTextAlign.CENTER).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col15 = invoiceGrid.addColumn(new ComponentRenderer<>(this::creationDate)).setComparator(Invoice::getCreationDate).setHeader("Creation Date").setWidth(UIUtils.COLUMN_WIDTH_L);
+
+        invoiceGrid.addItemDoubleClickListener(e -> viewEditPopup(e.getItem()));
 
         lblItemSize = new Label(invoiceDataProvider.getItems().size() + "");
         invoiceGrid.appendFooterRow().getCell(invoiceGrid.getColumns().get(0)).setComponent(lblItemSize);
@@ -290,6 +300,10 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
                 VaadinIcon.LINE_BAR_CHART,
                 (ComponentEventListener<ClickEvent<Button>>) e -> UI.getCurrent().navigate(InvoiceDetails.class, invoice.getId())
         );
+    }
+
+    private void viewEditPopup(Invoice invoice) {
+        new InvoiceDialog(invoice).open();
     }
 
     private void initializeItemListener() {

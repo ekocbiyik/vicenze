@@ -1,10 +1,9 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
-import com.meyratech.vicenze.backend.model.Invoice;
-import com.meyratech.vicenze.backend.model.ItemDetails;
-import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.*;
+import com.meyratech.vicenze.backend.repository.service.IIncorrectInvoiceService;
+import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
-import com.meyratech.vicenze.backend.repository.service.InvoiceServiceImpl;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
@@ -27,8 +26,6 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -37,7 +34,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
-import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
@@ -49,7 +45,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Currency;
 import java.util.Locale;
 
 @Route(value = ViewConst.PAGE_INVOICE_DETAILS, layout = MainLayout.class)
@@ -57,8 +52,11 @@ import java.util.Locale;
 public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
 
     private Invoice detailedInvoice;
-    private InvoiceServiceImpl invoiceService;
+    private IncorrectInvoice incorrectInvoice;
+    private IIncorrectInvoiceService incorrectInvoiceService;
+    private IInvoiceService invoiceService;
     private IProjectService projectService;
+
 
     private DetailsDrawerFooter detailedFooter;
 
@@ -82,21 +80,36 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
     private Binder<Invoice> binder;
 
     @Autowired
-    public InvoiceDetails(InvoiceServiceImpl invoiceService, IProjectService projectService) {
+    public InvoiceDetails(IIncorrectInvoiceService incorrectInvoiceService, IInvoiceService invoiceService, IProjectService projectService) {
+        this.incorrectInvoiceService = incorrectInvoiceService;
         this.invoiceService = invoiceService;
         this.projectService = projectService;
     }
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, Long id) {
-        setViewContent(createContent());
-        setViewFooter(createFooter());
+        try {
+            setViewContent(createContent());
+            setViewFooter(createFooter());
+            if (id > 0) { // invoice show
+                detailedInvoice = invoiceService.findById(id);
+            } else if (id < -1) { // incorrect invoice
+                incorrectInvoice = incorrectInvoiceService.findById(-1 * id);
+                detailedInvoice = incorrectInvoice.getInvoice();
+            } else { // new invoice
+                System.out.println("new invoice..");
+            }
+            initializeVariables();
+            initializeValidators();
 
-        if (id != null && id != -1) {
-            detailedInvoice = invoiceService.findById(id);
+            if (!SecurityUtils.getCurrentUser().getRole().equalsIgnoreCase(Role.ADMIN)) {
+                disableComponents();
+            }
+
+        } catch (Exception e) {
+            UI.getCurrent().navigate(InvoiceView.class); // hata alınırsa..
+            return;
         }
-        initializeVariables();
-        initializeValidators();
     }
 
     @Override
@@ -114,7 +127,6 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
     }
 
     private Component createContent() {
-
         FlexBoxLayout content = new FlexBoxLayout(
                 getDetailHeader(String.format("%s%s", UIUtils.IMG_PATH, "logo-6.png"), "Project Details"),
                 getProjectDetail(),
@@ -148,7 +160,6 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         header.setPadding(Bottom.XS);
         header.addClassName(BoxShadowBorders.BOTTOM);
         header.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
-
         return header;
     }
 
@@ -162,8 +173,7 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         cbxVendor.setWidthFull();
         cbxVendor.setAllowCustomValue(true);
         cbxVendor.setItems(invoiceService.getAllVendorList());
-        cbxVendor.addCustomValueSetListener(e -> cbxVendor.setValue(e.getDetail().toUpperCase()));
-
+        cbxVendor.addCustomValueSetListener(e -> cbxVendor.setValue(e.getSource().getValue() == null ? e.getDetail().toUpperCase() : e.getSource().getValue()));
 
         // Form layout
         FormLayout form = new FormLayout();
@@ -176,7 +186,6 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         form.addFormItem(cbxProject, "Project");
         form.addFormItem(cbxVendor, "Vendor");
         UIUtils.setColSpan(2);
-
         return form;
     }
 
@@ -226,15 +235,41 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
 
         txtAmount = new TextField();
         txtAmount.setWidthFull();
-        txtAmount.setClearButtonVisible(true);
         txtAmount.setValue("0.0");
+        txtAmount.setValueChangeMode(ValueChangeMode.EAGER);
+        txtAmount.setClearButtonVisible(true);
 
         txtUnitPrize = new TextField();
         txtUnitPrize.setWidthFull();
+        txtUnitPrize.setValue("0.0");
+        txtUnitPrize.setValueChangeMode(ValueChangeMode.EAGER);
         txtUnitPrize.setClearButtonVisible(true);
 
         lblTotalAmount = UIUtils.createAmountLabel(0);
         lblTotalAmount.setWidthFull();
+
+        //
+        txtAmount.addValueChangeListener(e -> {
+            try {
+                String val = e.getValue().replaceAll("[^\\d.]", "");
+                lblTotalAmount.setText(new BigDecimal(val).multiply(new BigDecimal(txtUnitPrize.getValue())).toString());
+                txtAmount.setValue(val);
+            } catch (Exception ex) {
+                txtAmount.setValue(e.getOldValue());
+                ex.printStackTrace();
+            }
+        });
+
+        txtUnitPrize.addValueChangeListener(e -> {
+            try {
+                String val = e.getValue().replaceAll("[^\\d.]", "");
+                lblTotalAmount.setText(new BigDecimal(val).multiply(new BigDecimal(txtAmount.getValue())).toString());
+                txtUnitPrize.setValue(val);
+            } catch (Exception ex) {
+                txtUnitPrize.setValue(e.getOldValue());
+                ex.printStackTrace();
+            }
+        });
 
         invoiceDate = new DatePicker();
         invoiceDate.setLocale(Locale.UK);
@@ -252,7 +287,7 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         txtExplanation.setWidthFull();
         txtExplanation.setClearButtonVisible(true);
         txtExplanation.setHeight(UIUtils.COLUMN_WIDTH_XS);
-        txtExplanation.setValueChangeMode(ValueChangeMode.EAGER);
+        txtExplanation.setValueChangeMode(ValueChangeMode.ON_CHANGE);
         txtExplanation.addValueChangeListener(e -> txtExplanation.setValue(e.getValue().toUpperCase()));
 
         lblCreatedBy = UIUtils.createH5Label(SecurityUtils.getCurrentUser().getFullName());
@@ -403,6 +438,10 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
 
         try {
             invoiceService.save(detailedInvoice);
+            if (incorrectInvoice != null) {
+                incorrectInvoice.setActive(false);
+                incorrectInvoiceService.save(incorrectInvoice);
+            }
         } catch (Exception e) {
             Notification.show("Opps! Please check your fields!", 3000, Notification.Position.TOP_END);
             return;
@@ -410,6 +449,24 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
 
         Notification.show("Successfull", 6000, Notification.Position.TOP_END);
         UI.getCurrent().navigate(InvoiceView.class);
+    }
+
+    private void disableComponents() {
+        cbxProject.setEnabled(false);
+        cbxVendor.setEnabled(false);
+        cbxEventType.setEnabled(false);
+        cbxMainItem.setEnabled(false);
+        cbxbook.setEnabled(false);
+        cbxTransaction.setEnabled(false);
+        txtInvoiceNumber.setEnabled(false);
+        txtInvoiceCode.setEnabled(false);
+        txtAmount.setEnabled(false);
+        txtUnitPrize.setEnabled(false);
+        invoiceDate.setEnabled(false);
+        invoiceTime.setEnabled(false);
+        txtExplanation.setEnabled(false);
+        lblCreatedBy.setEnabled(false);
+        lblCreationDate.setEnabled(false);
     }
 
 }
