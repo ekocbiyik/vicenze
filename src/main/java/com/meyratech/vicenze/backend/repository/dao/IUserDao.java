@@ -23,4 +23,6 @@ public interface IUserDao extends JpaRepository<User, Long> {
 
     List<User> findAllByRole(String role);
 
+    List<User> findAllByOrderByLastLoginDesc();
+
 }

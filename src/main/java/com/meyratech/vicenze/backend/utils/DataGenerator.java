@@ -75,7 +75,8 @@ public class DataGenerator implements HasLogger {
         adminUser.setLastName("");
 
         // admin
-        userService.save(createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Malin", "Castro", false, true, adminUser));
+        userService.save(createUser("admin@mail.com", passwordEncoder.encode("admin"), Role.ADMIN, "Admin", "Test", false, true, adminUser));
+        userService.save(createUser("enbiya@mail.com", passwordEncoder.encode("enbiya"), Role.ADMIN, "Enbiya", "Test", false, true, adminUser));
 
         // barista
         userService.save(createUser("user@mail.com", passwordEncoder.encode("user"), Role.ACCOUNTANT, "User", "Test", false, true, adminUser));

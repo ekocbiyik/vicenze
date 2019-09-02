@@ -32,6 +32,6 @@ public class IncorrectInvoiceServiceImpl implements IIncorrectInvoiceService {
     @Transactional
     @Override
     public List<IncorrectInvoice> findAll() {
-        return incorrectInvoiceDao.findAll();
+        return incorrectInvoiceDao.findByOrderByIsActiveDescCreationDateDesc();
     }
 }

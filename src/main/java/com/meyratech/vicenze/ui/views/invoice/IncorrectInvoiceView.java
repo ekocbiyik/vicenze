@@ -1,15 +1,10 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
 import com.meyratech.vicenze.backend.model.IncorrectInvoice;
-import com.meyratech.vicenze.backend.model.Invoice;
-import com.meyratech.vicenze.backend.model.Project;
-import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.service.IIncorrectInvoiceService;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.SplitViewFrame;
-import com.meyratech.vicenze.ui.components.dialog.InvoiceDialog;
-import com.meyratech.vicenze.ui.util.TextColor;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import com.vaadin.flow.component.ClickEvent;
@@ -39,10 +34,7 @@ import com.vaadin.flow.router.RouterLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Route(value = ViewConst.PAGE_INCORRECT_INVOICE, layout = MainLayout.class)
@@ -68,11 +60,7 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
         incorrectGrid = new Grid<>();
         incorrectGrid.setSizeFull();
 
-        List<IncorrectInvoice> all = incorrectService.findAll();
-        all.stream().sorted(Comparator.comparing(IncorrectInvoice::isActive, Comparator.reverseOrder()));
-        Collections.reverse(all);
-
-        incorrectDataProvider = DataProvider.ofCollection(all);
+        incorrectDataProvider = DataProvider.ofCollection(incorrectService.findAll());
         incorrectGrid.setDataProvider(incorrectDataProvider);
 
         Grid.Column<IncorrectInvoice> col0 = incorrectGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Edit").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);

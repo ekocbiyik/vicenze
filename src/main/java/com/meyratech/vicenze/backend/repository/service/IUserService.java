@@ -1,7 +1,6 @@
 package com.meyratech.vicenze.backend.repository.service;
 
 import com.meyratech.vicenze.backend.model.User;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;

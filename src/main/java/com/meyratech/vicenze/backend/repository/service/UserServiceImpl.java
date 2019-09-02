@@ -13,14 +13,8 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements IUserService {
 
-    public static final String MODIFY_LOCKED_USER_NOT_PERMITTED = "User has been locked and cannot be modified or deleted";
-    private static final String DELETING_SELF_NOT_PERMITTED = "You cannot delete your own account";
-    private final IUserDao userDao;
-
     @Autowired
-    public UserServiceImpl(IUserDao userDao) {
-        this.userDao = userDao;
-    }
+    private IUserDao userDao;
 
     @Transactional
     @Override
@@ -36,7 +30,7 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     @Override
     public List<User> findAll() {
-        return userDao.findAll();
+        return userDao.findAllByOrderByLastLoginDesc();
     }
 
     @Transactional

@@ -14,12 +14,8 @@ import java.util.List;
 @Service
 public class ProjectServiceImpl implements IProjectService {
 
-    private final IProjectDao projectDao;
-
     @Autowired
-    public ProjectServiceImpl(IProjectDao projectDao) {
-        this.projectDao = projectDao;
-    }
+    private IProjectDao projectDao;
 
     @Transactional
     @Override
@@ -36,6 +32,7 @@ public class ProjectServiceImpl implements IProjectService {
     @Transactional
     @Override
     public List<Project> findAll() {
-        return projectDao.findAll();
+        return projectDao.findAllByOrderByCreationDateDesc();
     }
+
 }
