@@ -1,13 +1,16 @@
 package com.meyratech.vicenze.ui.components.dialog;
 
-import com.meyratech.vicenze.backend.model.*;
+import com.meyratech.vicenze.backend.model.IncorrectInvoice;
+import com.meyratech.vicenze.backend.model.Invoice;
+import com.meyratech.vicenze.backend.model.Project;
 import com.meyratech.vicenze.backend.repository.service.IIncorrectInvoiceService;
-import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.backend.security.UtilsForSpring;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
-import com.meyratech.vicenze.ui.layout.size.*;
+import com.meyratech.vicenze.ui.layout.size.Horizontal;
+import com.meyratech.vicenze.ui.layout.size.Right;
+import com.meyratech.vicenze.ui.layout.size.Vertical;
 import com.meyratech.vicenze.ui.util.BoxShadowBorders;
 import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
@@ -20,20 +23,13 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Locale;
 
 /**

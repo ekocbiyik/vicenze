@@ -11,6 +11,7 @@ public class ViewConst {
     public static final String PAGE_INVOICE = "invoices";
     public static final String PAGE_INVOICE_DETAILS = "invoice-details";
     public static final String PAGE_INCORRECT_INVOICE = "incorrect-invoices";
+    public static final String PAGE_INVOICE_IMPORT = "invoice-import";
 
     public static final String TITLE_HOME = "Home";
     public static final String TITLE_PERSONNELS = "Personnels";
@@ -19,6 +20,7 @@ public class ViewConst {
     public static final String TITLE_INVOICE = "Invoices";
     public static final String TITLE_INVOICE_DETAILS = "InvoiceState Details";
     public static final String TITLE_INCORRECT_INVOICE = "Incorrect Invoices";
+    public static final String TITLE_INVOICE_IMPORT = "Invoice Import";
 
     public static final String TITLE_NOT_FOUND = "Page was not found";
     public static final String TITLE_ACCESS_DENIED = "Access denied";
