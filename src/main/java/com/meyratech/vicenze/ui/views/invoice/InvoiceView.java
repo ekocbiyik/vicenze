@@ -320,7 +320,6 @@ public class InvoiceView extends SplitViewFrame implements RouterLayout {
             int size = invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
             lblItemSize.setText(String.valueOf(size));
         });
-
     }
 
     private void searchBtnClick() {

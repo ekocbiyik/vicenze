@@ -11,13 +11,13 @@ public class CsvModel {
     private String MAIN_ITEM;
     private String BOOK;
     private String TRANSACTION;
-    private String DATE;
     private String NUMBER;
     private String CODE;
     private String EXPLANATION;
     private String AMOUNT;
     private String UNIT_PRICE;
     private String TOTAL_AMOUNT;
+    private String DATE;
 
     public String getPROJECT() {
         return PROJECT;

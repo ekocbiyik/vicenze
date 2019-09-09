@@ -1,7 +1,9 @@
 package com.meyratech.vicenze.ui.views.invoice;
 
+import com.meyratech.vicenze.backend.model.CsvModel;
 import com.meyratech.vicenze.backend.model.Invoice;
 import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
+import com.meyratech.vicenze.backend.utils.CsvImportUtils;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.layout.size.Bottom;
@@ -12,16 +14,33 @@ import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.UIUtils;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.Query;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.stream.Collectors;
 
 
 @Route(value = ViewConst.PAGE_INVOICE_IMPORT, layout = MainLayout.class)
@@ -30,8 +49,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class InvoiceImportView extends SplitLayout implements RouterLayout {
 
     private static final String CLASS_NAME = "details-drawer";
-
     private IInvoiceService invoiceService;
+
+    private Grid<CsvModel> csvGrid;
+    private Label csvItemSize = new Label("0");
+    private ListDataProvider<CsvModel> csvDataProvider;
+
 
     @Autowired
     public InvoiceImportView(IInvoiceService invoiceService) {
@@ -47,28 +70,30 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
 
     private Component getPrimaryContent() {
 
-        Grid<Invoice> invoiceGrid = new Grid<>();
-        invoiceGrid.setSizeFull();
-        invoiceGrid.setDataProvider(DataProvider.ofCollection(invoiceService.findAll()));
+        csvGrid = new Grid<>();
+        csvGrid.setSizeFull();
 
-        invoiceGrid.addColumn(Invoice::getInvoiceNumber).setFlexGrow(0).setHeader("Invoice Number").setSortable(true).setComparator(Invoice::getInvoiceNumber).setWidth(UIUtils.COLUMN_WIDTH_L);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_S);
-        invoiceGrid.addColumn(Invoice::getInvoiceCode).setHeader("Invoice Code").setSortable(true).setComparator(Invoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
-        invoiceGrid.addColumn(Invoice::getVendor).setHeader("Vendor").setSortable(true).setComparator(Invoice::getVendor).setWidth(UIUtils.COLUMN_WIDTH_M);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_S);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_S);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_S);
-        invoiceGrid.addColumn(Invoice::getInvoiceCode).setHeader("Invoice Code").setSortable(true).setComparator(Invoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_M);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_L);
-        invoiceGrid.addColumn(Invoice::getInvoiceCode).setHeader("Invoice Code").setSortable(true).setComparator(Invoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
-        invoiceGrid.addColumn(Invoice::getDate).setHeader("Description").setWidth(UIUtils.COLUMN_WIDTH_XL);
+        Grid.Column<CsvModel> col0 = csvGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Edit").setWidth(UIUtils.COLUMN_WIDTH_XS);
+        Grid.Column<CsvModel> col1 = csvGrid.addColumn(CsvModel::getPROJECT).setHeader("Project Name").setSortable(true).setComparator(CsvModel::getPROJECT).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col2 = csvGrid.addColumn(CsvModel::getVENDOR).setHeader("Vendor").setSortable(true).setComparator(CsvModel::getVENDOR).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col3 = csvGrid.addColumn(CsvModel::getEVENT_TYPE).setHeader("Event Type").setSortable(true).setComparator(CsvModel::getEVENT_TYPE).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col4 = csvGrid.addColumn(CsvModel::getMAIN_ITEM).setHeader("Main Item").setSortable(true).setComparator(CsvModel::getMAIN_ITEM).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col5 = csvGrid.addColumn(CsvModel::getBOOK).setHeader("Book").setSortable(true).setComparator(CsvModel::getBOOK).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col6 = csvGrid.addColumn(CsvModel::getTRANSACTION).setHeader("Transaction").setSortable(true).setComparator(CsvModel::getTRANSACTION).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col7 = csvGrid.addColumn(CsvModel::getNUMBER).setHeader("Number").setSortable(true).setComparator(CsvModel::getCODE).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col8 = csvGrid.addColumn(CsvModel::getEXPLANATION).setHeader("Explanation").setSortable(true).setComparator(CsvModel::getEXPLANATION).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col9 = csvGrid.addColumn(CsvModel::getAMOUNT).setHeader("Amount").setSortable(true).setComparator(CsvModel::getAMOUNT).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col10 = csvGrid.addColumn(CsvModel::getUNIT_PRICE).setHeader("Unit Prize").setSortable(true).setComparator(CsvModel::getUNIT_PRICE).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col11 = csvGrid.addColumn(CsvModel::getTOTAL_AMOUNT).setHeader("Total Amount").setSortable(true).setComparator(CsvModel::getTOTAL_AMOUNT).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col12 = csvGrid.addColumn(CsvModel::getDATE).setHeader("Date").setSortable(true).setComparator(CsvModel::getDATE).setWidth(UIUtils.COLUMN_WIDTH_L);
 
+        csvGrid.appendHeaderRow().join(col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12).setComponent(getCsvSearchBar());
+        csvGrid.appendFooterRow().getCell(csvGrid.getColumns().get(0)).setComponent(csvItemSize);
 
         FlexBoxLayout content = new FlexBoxLayout();
         content.setFlexDirection(FlexDirection.COLUMN);
         content.setMargin(Left.S, Top.S, Right.S, Bottom.S);
-        content.add(new Label("Invalid invoice list"), invoiceGrid);
+        content.add(new Label("Invoice csv file"), csvGrid);
         return content;
     }
 
@@ -76,7 +101,6 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
 
         Grid<Invoice> invoiceGrid = new Grid<>();
         invoiceGrid.setSizeFull();
-        invoiceGrid.setDataProvider(DataProvider.ofCollection(invoiceService.findAll()));
 
         Grid.Column<Invoice> col3 = invoiceGrid.addColumn(Invoice::getInvoiceNumber).setFlexGrow(0).setHeader("Invoice Number").setSortable(true).setComparator(Invoice::getInvoiceNumber).setWidth(UIUtils.COLUMN_WIDTH_L);
         Grid.Column<Invoice> col4 = invoiceGrid.addColumn(Invoice::getInvoiceCode).setHeader("Invoice Code").setSortable(true).setComparator(Invoice::getInvoiceCode).setWidth(UIUtils.COLUMN_WIDTH_L);
@@ -89,6 +113,58 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
         content.setMargin(Left.S, Top.S, Right.S, Bottom.S);
         content.add(new Label("Validated invoice list"), invoiceGrid);
         return content;
+    }
+
+    private Component getCsvSearchBar() {
+        TextField searchField = new TextField();
+        searchField.setPlaceholder("Filter invoice");
+        searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
+        searchField.setValueChangeMode(ValueChangeMode.EAGER);
+        searchField.setSizeFull();
+        searchField.addValueChangeListener(e -> csvDataProvider.addFilter(
+                (item) -> StringUtils.containsIgnoreCase(item.getPROJECT(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getVENDOR(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getEVENT_TYPE(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getMAIN_ITEM(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getBOOK(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getTRANSACTION(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getNUMBER(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getEXPLANATION(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getAMOUNT(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getUNIT_PRICE(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getTOTAL_AMOUNT(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getDATE(), searchField.getValue())
+        ));
+
+        Button btnValidate = UIUtils.createPrimaryButton("Validate", VaadinIcon.CHECK);
+        btnValidate.setWidth("200px");
+        btnValidate.addClickListener(e -> UIUtils.showNotification("Not implemented yet!"));
+
+        MemoryBuffer buffer = new MemoryBuffer();
+        Upload upload = new Upload(buffer);
+        upload.setDropAllowed(false);
+        upload.setAutoUpload(true);
+        upload.addSucceededListener(event -> {
+            csvDataProvider = DataProvider.ofCollection(CsvImportUtils.uploadInvoiceCsv(buffer.getInputStream()));
+            csvGrid.setDataProvider(csvDataProvider);
+            csvItemSize.setText(csvDataProvider.getItems().size() + "");
+            csvGrid.getDataProvider().addDataProviderListener(e -> {
+                int size = csvGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
+                csvItemSize.setText(String.valueOf(size));
+            });
+        });
+
+        HorizontalLayout container = new HorizontalLayout(upload, btnValidate, searchField);
+        container.setSpacing(true);
+        container.setSizeFull();
+        return container;
+    }
+
+    private Component viewDetails(CsvModel csvModel) {
+        return UIUtils.createButton(
+                VaadinIcon.LINE_BAR_CHART,
+                (ComponentEventListener<ClickEvent<Button>>) e -> UIUtils.showNotification("Not implemented yet!")
+        );
     }
 
 }
