@@ -18,6 +18,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ListDataProvider;
 
 /**
  * ekocbiyik on 05.05.2019
@@ -29,6 +30,7 @@ public class CsvModelDialog extends Dialog {
     private Button btnSave;
     private Button btnCancel;
     private CsvModel csvModel;
+    private ListDataProvider<CsvModel> csvDataProvider;
     private TextField txtProject;
     private TextField txtVendor;
     private TextField txtEventType;
@@ -42,8 +44,9 @@ public class CsvModelDialog extends Dialog {
     private TextField txtDate;
     private TextArea txtExplanation;
 
-    public CsvModelDialog(CsvModel csvModel) {
+    public CsvModelDialog(CsvModel csvModel, ListDataProvider<CsvModel> csvDataProvider) {
         this.csvModel = csvModel;
+        this.csvDataProvider = csvDataProvider;
         add(createLayout());
         setWidth("calc(50vw - (var(--lumo-space-m) ))");
     }
@@ -145,7 +148,6 @@ public class CsvModelDialog extends Dialog {
 
         UIUtils.setColSpan(2, form.addFormItem(txtExplanation, "Explanation"));
         content.add(form);
-
         return content;
     }
 
@@ -166,20 +168,25 @@ public class CsvModelDialog extends Dialog {
     }
 
     private void saveUser() {
+        CsvModel c = new CsvModel();
+        c.setPROJECT(txtProject.getValue().toUpperCase());
+        c.setVENDOR(txtVendor.getValue().toUpperCase());
+        c.setEVENT_TYPE(txtEventType.getValue().toUpperCase());
+        c.setMAIN_ITEM(txtMainItem.getValue().toUpperCase());
+        c.setBOOK(txtbook.getValue().toUpperCase());
+        c.setTRANSACTION(txtTransaction.getValue().toUpperCase());
+        c.setNUMBER(txtInvoiceNumber.getValue().toUpperCase());
+        c.setCODE(txtInvoiceCode.getValue().toUpperCase());
+        c.setAMOUNT(txtAmount.getValue().toUpperCase());
+        c.setUNIT_PRICE(txtUnitPrize.getValue().toUpperCase());
+        c.setDATE(txtDate.getValue().toUpperCase());
+        c.setEXPLANATION(txtExplanation.getValue().toUpperCase());
 
-//        IncorrectInvoice incorrectInvoice = new IncorrectInvoice();
-//        incorrectInvoice.setInvoice(invoice);
-//        incorrectInvoice.setVendor(invoice.getVendor());
-//        incorrectInvoice.setDescription(txtIncorrectInfo.getValue());
-//        incorrectInvoice.setInvoiceNumber(invoice.getInvoiceNumber());
-//        incorrectInvoice.setCreatedBy(SecurityUtils.getCurrentUser());
-//        incorrectInvoice.setCreationDate(LocalDateTime.now());
-//
-//        IIncorrectInvoiceService incorrectInvoiceService = UtilsForSpring.getSingleBeanOfType(IIncorrectInvoiceService.class);
-//        incorrectInvoiceService.save(incorrectInvoice);
-
-        close();
+        csvDataProvider.getItems().remove(csvModel);
+        csvDataProvider.getItems().add(c);
+        csvDataProvider.refreshAll();
         UIUtils.showNotification("Successfull!");
+        close();
     }
 
 }

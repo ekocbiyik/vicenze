@@ -33,8 +33,7 @@ public class Token extends Composite<FlexBoxLayout> implements HasStyle {
         getContent().setSpacing(Right.XS);
 
         Label label = UIUtils.createLabel(FontSize.S, TextColor.BODY, text);
-        Button button = UIUtils.createButton(VaadinIcon.CLOSE_SMALL,
-                ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE);
+        Button button = UIUtils.createButton(VaadinIcon.CLOSE_SMALL, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY_INLINE);
         button.getThemeNames().remove(LUMO_ICON.getVariantName());
 
         getContent().add(label, button);
