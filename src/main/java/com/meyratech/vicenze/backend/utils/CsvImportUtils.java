@@ -2,6 +2,7 @@ package com.meyratech.vicenze.backend.utils;
 
 import com.meyratech.vicenze.backend.model.CsvModel;
 import com.meyratech.vicenze.backend.model.Invoice;
+import com.meyratech.vicenze.backend.model.Project;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.backend.security.UtilsForSpring;
@@ -9,6 +10,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +28,8 @@ import java.util.List;
  * ekocbiyik on 09.09.2019
  */
 public class CsvImportUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(CsvImportUtils.class);
 
     public static List<CsvModel> uploadInvoiceCsv(InputStream inputStream) {
 
@@ -58,7 +63,7 @@ public class CsvImportUtils {
                 csvList.add(c);
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } finally {
             return csvList;
         }
@@ -66,7 +71,7 @@ public class CsvImportUtils {
 
     public static void validateInvoiceCsv(Grid<CsvModel> csvGrid, Grid<Invoice> invoiceGrid) {
 
-        IProjectService projectService = UtilsForSpring.getSingleBeanOfType(IProjectService.class);
+        List<Project> projectList = UtilsForSpring.getSingleBeanOfType(IProjectService.class).findAll();
         ListDataProvider<CsvModel> csvDataProvider = (ListDataProvider<CsvModel>) csvGrid.getDataProvider();
         ListDataProvider<Invoice> invoiceProvider = (ListDataProvider<Invoice>) invoiceGrid.getDataProvider();
         List<CsvModel> validatedList = new ArrayList<>();
@@ -74,8 +79,8 @@ public class CsvImportUtils {
         for (CsvModel c : csvDataProvider.getItems()) {
             try {
                 Invoice i = new Invoice();
-                i.setProject(projectService.findAll().get(0));
-                i.setVendor(c.getVENDOR());
+                i.setProject(validateProject(c, projectList));
+                i.setVendor(validateVendor(c));
                 i.setInvoiceNumber(c.getNUMBER());
                 i.setInvoiceCode(c.getCODE());
                 i.setEventType(c.getEVENT_TYPE());
@@ -93,11 +98,26 @@ public class CsvImportUtils {
                 invoiceProvider.refreshAll();
                 validatedList.add(c);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
         }
         csvDataProvider.getItems().removeAll(validatedList);
         csvDataProvider.refreshAll();
     }
+
+    private static Project validateProject(CsvModel csvModel, List<Project> projectList) throws Exception {
+        Project project = projectList.stream()
+                .filter(p -> csvModel.getPROJECT().equals(p.getProjectName()))
+                .findAny()
+                .orElse(null);
+        if (project == null) throw new Exception("Project does not exist!");
+        return project;
+    }
+
+    private static String validateVendor(CsvModel csvModel) throws Exception {
+        if (csvModel.getVENDOR().isEmpty()) throw new Exception("Vendor does not exist!");
+        return csvModel.getVENDOR();
+    }
+
 
 }

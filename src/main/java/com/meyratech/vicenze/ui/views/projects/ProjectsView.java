@@ -125,7 +125,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         });
 
         btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
-        btnCreate.addClickListener(e -> showDetails(null));
+        btnCreate.addClickListener(e -> showDetails(null)); // TODO: 9/12/19 burada project name varsa tekrar eklemesin!
 
         HorizontalLayout container = new HorizontalLayout(btnCreate, searchField);
         container.setSpacing(true);

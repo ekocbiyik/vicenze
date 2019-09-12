@@ -77,7 +77,8 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
         addToPrimary(getPrimaryContent());
         addToSecondary(getSecondaryContent());
 
-        // TODO: 9/10/19 csv load ettikten sonra editleme ve validation kısmından devam et..
+        // TODO: 9/10/19 validation kısmında projectName'i sorgu ile getir
+        // TODO: 9/12/19 csvimportutils validator kısmından devam et
     }
 
     private Component getPrimaryContent() {
