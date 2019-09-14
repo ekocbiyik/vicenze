@@ -1,12 +1,12 @@
 package com.meyratech.vicenze.ui.components;
 
+import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.views.login.LoginView;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.Div;
-import com.meyratech.vicenze.ui.MainLayout;
 
 /**
  * A view frame that establishes app design guidelines. It consists of three
@@ -19,19 +19,16 @@ import com.meyratech.vicenze.ui.MainLayout;
  */
 public class ViewFrame extends Composite<Div> implements HasStyle {
 
-    private final String CLASS_NAME = "view-frame";
-
     private final Div header = new Div();
     private final Div content = new Div();
     private final Div footer = new Div();
 
     public ViewFrame() {
+        String CLASS_NAME = "view-frame";
         setClassName(CLASS_NAME);
-
         header.setClassName(CLASS_NAME + "__header");
         content.setClassName(CLASS_NAME + "__content");
         footer.setClassName(CLASS_NAME + "__footer");
-
         getContent().add(header, content, footer);
     }
 

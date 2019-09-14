@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -124,7 +125,7 @@ public class DataGenerator implements HasLogger {
 
 
         InputStream in = getClass().getClassLoader().getResourceAsStream("vicenze.csv");
-        BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
         CSVParser csvParser = new CSVParser(br, CSVFormat.EXCEL
                 .withFirstRecordAsHeader()

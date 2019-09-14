@@ -14,6 +14,8 @@ public interface IUserService {
 
     User findById(Long id);
 
+    User findByEmail(String email);
+
     List<User> findAll();
 
     List<User> findAllAdmins();

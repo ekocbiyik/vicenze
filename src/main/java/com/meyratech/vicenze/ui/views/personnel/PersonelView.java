@@ -203,8 +203,8 @@ public class PersonelView extends SplitViewFrame {
         FormLayout.FormItem emailItem = form.addFormItem(txtEmail, "Email");
         FormLayout.FormItem passwordItem = form.addFormItem(txtPassword, "Password");
         FormLayout.FormItem roleItem = form.addFormItem(cbxRole, "Role");
-        form.addFormItem(rdActive, "User deleted?");
-        form.addFormItem(rdLock, "Login Blocked?");
+        form.addFormItem(rdActive, "Is Active User?");
+        form.addFormItem(rdLock, "Is Login Blocked?");
         FormLayout.FormItem creation = form.addFormItem(creationDate, "Creation Date");
         FormLayout.FormItem created = form.addFormItem(txtCreatedBy, "Created By");
         UIUtils.setColSpan(2, emailItem, passwordItem, roleItem, creation, created);

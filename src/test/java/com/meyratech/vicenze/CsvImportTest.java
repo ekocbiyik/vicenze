@@ -132,16 +132,16 @@ public class CsvImportTest {
         });
 
         System.out.println("EVENT TYPE");
-        eventType.forEach(e -> System.out.println(e));
+        eventType.forEach(System.out::println);
 
         System.out.println("MAIN ITEM");
-        mainItem.forEach(e -> System.out.println(e));
+        mainItem.forEach(System.out::println);
 
         System.out.println("BOOK");
-        book.forEach(e -> System.out.println(e));
+        book.forEach(System.out::println);
 
         System.out.println("TRANSACTION");
-        transaction.forEach(e -> System.out.println(e));
+        transaction.forEach(System.out::println);
 
     }
 

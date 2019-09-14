@@ -29,8 +29,6 @@ public class AppBar extends Composite<FlexLayout> {
 
     private String CLASS_NAME = "app-bar";
 
-    private FlexBoxLayout container;
-
     private Button menuIcon;
     private Button contextIcon;
 
@@ -122,7 +120,7 @@ public class AppBar extends Composite<FlexLayout> {
     }
 
     private void initContainer() {
-        container = new FlexBoxLayout(menuIcon, contextIcon, this.title, search, actionItems, avatar);
+        FlexBoxLayout container = new FlexBoxLayout(menuIcon, contextIcon, this.title, search, actionItems, avatar);
         container.addClassName(CLASS_NAME + "__container");
         container.setAlignItems(FlexComponent.Alignment.CENTER);
         container.setFlexGrow(1, search);

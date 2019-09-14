@@ -3,7 +3,7 @@ package com.meyratech.vicenze.backend.security;
 import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.dao.IUserDao;
-import com.meyratech.vicenze.backend.repository.service.UserServiceImpl;
+import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 /**
  * Configures spring security, doing the following:
@@ -43,7 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserServiceImpl userService;
+    private IUserService userService;
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -101,36 +100,22 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * Allows access to static resources, bypassing Spring security.
      */
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
-                // Vaadin Flow static resources
-                "/VAADIN/**",
-
-                // the standard favicon URI
-                "/favicon.ico",
-
-                // the robots exclusion standard
-                "/robots.txt",
-
-                // web application manifest
-                "/manifest.webmanifest",
+                "/VAADIN/**",   // Vaadin Flow static resources
+                "/favicon.ico",             // the standard favicon URI
+                "/robots.txt",              // the robots exclusion standard
+                "/manifest.webmanifest",    // web application manifest
                 "/sw.js",
                 "/offline-page.html",
-
-                // icons and images
-                "/icons/**",
+                "/icons/**",                // icons and images
                 "/images/**",
-
-                // (development mode) static resources
-                "/frontend/**",
-
-                // (development mode) webjars
-                "/webjars/**",
-
-                // (development mode) H2 debugging console
-                "/h2-console/**",
-
-                // (production mode) static resources
-                "/frontend-es5/**", "/frontend-es6/**");
+                "/frontend/**",             // (development mode) static resources
+                "/webjars/**",              // (development mode) webjars
+                "/h2-console/**",           // (development mode) H2 debugging console
+                "/frontend-es5/**",         // (production mode) static resources
+                "/frontend-es6/**"
+        );
     }
+
 }

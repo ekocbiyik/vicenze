@@ -210,7 +210,7 @@ public class InvoiceDialog extends Dialog {
         footer.setPadding(Horizontal.RESPONSIVE_L, Vertical.S, Vertical.S);
         footer.setSpacing(Right.S);
 
-        btnSave = UIUtils.createPrimaryButton("Save");
+        btnSave = UIUtils.createPrimaryButton("Report");
         btnCancel = UIUtils.createTertiaryButton("Cancel");
         footer.add(btnSave, btnCancel);
 

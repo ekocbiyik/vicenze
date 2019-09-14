@@ -20,9 +20,8 @@ import com.meyratech.vicenze.ui.util.css.Display;
 
 public class Token extends Composite<FlexBoxLayout> implements HasStyle {
 
-    private final String CLASS_NAME = "token";
-
     public Token(String text) {
+        String CLASS_NAME = "token";
         addClassName(CLASS_NAME);
         getContent().setAlignItems(FlexComponent.Alignment.CENTER);
         getContent().setBackgroundColor(LumoStyles.Color.Primary._10);

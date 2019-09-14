@@ -1,7 +1,5 @@
 package com.meyratech.vicenze;
 
-import com.meyratech.vicenze.backend.model.CsvModel;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,9 +22,8 @@ public class DateFormatTest {
     }
 
 
-    private static LocalDateTime validateDate(String dateString) throws Exception {
+    private static LocalDateTime validateDate(String dateString) {
         LocalDateTime date;
-//        String dateString = csvModel.getDATE();
         String exceptFormat = (dateString.contains(" ") && dateString.contains(":")) ? "d/M/yyyy HH:mm:ss" : "d/M/yyyy";
         String errorFormat = (dateString.contains(" ") && dateString.contains(":")) ? "M/d/yyyy HH:mm:ss" : "M/d/yyyy";
 

@@ -45,6 +45,9 @@ public class User {
     @Column(name = "locked", nullable = false)
     private boolean locked = false; // parola yanlış girerse
 
+    @Column(name = "try_count")
+    private int tryCount = 0;
+
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
@@ -121,6 +124,14 @@ public class User {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public int getTryCount() {
+        return tryCount;
+    }
+
+    public void setTryCount(int tryCount) {
+        this.tryCount = tryCount;
     }
 
     public LocalDateTime getLastLogin() {

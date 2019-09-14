@@ -22,9 +22,16 @@ public class UserServiceImpl implements IUserService {
         return userDao.save(user);
     }
 
+    @Transactional
     @Override
     public User findById(Long id) {
         return userDao.getOne(id);
+    }
+
+    @Transactional
+    @Override
+    public User findByEmail(String email) {
+        return userDao.findByEmailIgnoreCase(email);
     }
 
     @Transactional

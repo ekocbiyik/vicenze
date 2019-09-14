@@ -1,13 +1,13 @@
 package com.meyratech.vicenze.ui.components.navigation.tab;
 
+import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.util.css.Overflow;
 import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.util.css.Overflow;
 
 /**
  * NaviTabs supports tabs that can be closed, and that can navigate to a
@@ -15,11 +15,10 @@ import com.meyratech.vicenze.ui.util.css.Overflow;
  */
 public class NaviTabs extends Tabs {
 
-    private ComponentEventListener<SelectedChangeEvent> listener = (ComponentEventListener<SelectedChangeEvent>) selectedChangeEvent -> navigateToSelectedTab();
-
     public NaviTabs() {
         getElement().setAttribute("overflow", "end");
         UIUtils.setOverflow(Overflow.HIDDEN, this);
+        ComponentEventListener<SelectedChangeEvent> listener = (ComponentEventListener<SelectedChangeEvent>) selectedChangeEvent -> navigateToSelectedTab();
         addSelectedChangeListener(listener);
     }
 

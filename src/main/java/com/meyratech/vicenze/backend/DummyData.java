@@ -1,14 +1,12 @@
 package com.meyratech.vicenze.backend;
 
+import com.meyratech.vicenze.ui.util.UIUtils;
+import com.vaadin.flow.component.html.Image;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import com.vaadin.flow.component.html.Image;
-import com.meyratech.vicenze.ui.util.UIUtils;
 
 public class DummyData {
 

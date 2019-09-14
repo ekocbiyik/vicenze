@@ -4,13 +4,13 @@ import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.DataSeriesItemWithRadius;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
-import com.meyratech.vicenze.ui.layout.size.Bottom;
-import com.meyratech.vicenze.ui.layout.size.*;
-import com.meyratech.vicenze.ui.layout.size.Top;
-import com.meyratech.vicenze.ui.util.*;
-import com.meyratech.vicenze.ui.util.css.*;
-import com.meyratech.vicenze.ui.util.css.Position;
 import com.meyratech.vicenze.ui.components.ViewFrame;
+import com.meyratech.vicenze.ui.layout.size.Bottom;
+import com.meyratech.vicenze.ui.layout.size.Top;
+import com.meyratech.vicenze.ui.layout.size.*;
+import com.meyratech.vicenze.ui.util.*;
+import com.meyratech.vicenze.ui.util.css.Position;
+import com.meyratech.vicenze.ui.util.css.*;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.board.Row;
 import com.vaadin.flow.component.button.Button;
@@ -229,13 +229,8 @@ public class HomeView extends ViewFrame {
         conf.setSeries(series);
         chart.setVisibilityTogglingDisabled(true);
 
-        chart.addPointLegendItemClickListener(event -> {
-            UIUtils.showNotification("Legend item click" + " : " + event.getItemIndex() + " : " + event.getItem().getName());
-        });
-
-        FlexBoxLayout pieLayer = new FlexBoxLayout(createHeader(VaadinIcon.MONEY_EXCHANGE, "Transactions"), chart);
-
-        return pieLayer;
+        chart.addPointLegendItemClickListener(event -> UIUtils.showNotification("Legend item click" + " : " + event.getItemIndex() + " : " + event.getItem().getName()));
+        return new FlexBoxLayout(createHeader(VaadinIcon.MONEY_EXCHANGE, "Transactions"), chart);
     }
 
     public Component createMixedChart() {

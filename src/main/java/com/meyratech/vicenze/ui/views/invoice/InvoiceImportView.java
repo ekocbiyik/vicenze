@@ -52,9 +52,6 @@ import java.util.stream.Collectors;
 @PageTitle(ViewConst.TITLE_INVOICE_IMPORT)
 public class InvoiceImportView extends SplitLayout implements RouterLayout {
 
-    private static final String CLASS_NAME = "details-drawer";
-    private IInvoiceService invoiceService;
-
     // csv-import
     private Grid<CsvModel> csvGrid;
     private Label csvItemSize = new Label("0");
@@ -66,14 +63,10 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
     private ListDataProvider<Invoice> invoiceDataProvider = DataProvider.ofCollection(new ArrayList<>());
 
 
-    @Autowired
-    public InvoiceImportView(IInvoiceService invoiceService) {
-        this.invoiceService = invoiceService;
-
+    public InvoiceImportView() {
         setSizeFull();
         setOrientation(Orientation.VERTICAL);
         getElement().getStyle().set("background-color", LumoStyles.Color.BASE_COLOR);
-
         addToPrimary(getPrimaryContent());
         addToSecondary(getSecondaryContent());
     }
@@ -115,7 +108,7 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
         invoiceGrid.setDataProvider(invoiceDataProvider);
 
         invoiceGrid.getDataProvider().addDataProviderListener(e -> {
-            int size = invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
+            int size = (int) invoiceGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).count();
             invoiceItemSize.setText(String.valueOf(size));
         });
 
@@ -179,7 +172,7 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
             csvGrid.setDataProvider(csvDataProvider);
             csvItemSize.setText(csvDataProvider.getItems().size() + "");
             csvGrid.getDataProvider().addDataProviderListener(e -> {
-                int size = csvGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
+                int size = (int) csvGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).count();
                 csvItemSize.setText(String.valueOf(size));
             });
         });

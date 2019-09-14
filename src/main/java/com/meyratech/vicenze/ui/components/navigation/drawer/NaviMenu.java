@@ -1,13 +1,12 @@
 package com.meyratech.vicenze.ui.components.navigation.drawer;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.applayout.AppLayoutMenuItem;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class NaviMenu extends Div {
     private static final String CLASS_NAME = "navi-menu";
@@ -57,7 +56,6 @@ public class NaviMenu extends Div {
     }
 
     public List<NaviItem> getNaviItems() {
-        List<NaviItem> items = (List) getChildren().collect(Collectors.toList());
-        return items;
+        return (List) getChildren().collect(Collectors.toList());
     }
 }

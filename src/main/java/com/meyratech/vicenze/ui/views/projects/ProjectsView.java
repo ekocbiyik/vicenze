@@ -118,11 +118,10 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.setSizeFull();
-        searchField.addValueChangeListener(e -> {
-            projectDataProvider.addFilter((item) ->
-                    StringUtils.containsIgnoreCase(item.getProjectName(), searchField.getValue())
-                            || StringUtils.containsIgnoreCase(item.getId().toString(), searchField.getValue()));
-        });
+        searchField.addValueChangeListener(e ->
+                projectDataProvider.addFilter((item) ->
+                        StringUtils.containsIgnoreCase(item.getProjectName(), searchField.getValue())
+                                || StringUtils.containsIgnoreCase(item.getId().toString(), searchField.getValue())));
 
         btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
         btnCreate.addClickListener(e -> showDetails(null));
@@ -169,7 +168,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         cbxCompany = new ComboBox();
         cbxCompany.setWidthFull();
         cbxCompany.setAllowCustomValue(true);
-        cbxCompany.setItems(projectDataProvider.getItems().stream().map(p -> p.getCompany()).collect(Collectors.toSet()));
+        cbxCompany.setItems(projectDataProvider.getItems().stream().map(Project::getCompany).collect(Collectors.toSet()));
         cbxCompany.addCustomValueSetListener(e -> cbxCompany.setValue(e.getSource().getValue() == null ? e.getDetail().toUpperCase() : e.getSource().getValue()));
 
         txtEmail = new EmailField();

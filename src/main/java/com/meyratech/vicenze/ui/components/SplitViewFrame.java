@@ -1,13 +1,12 @@
 package com.meyratech.vicenze.ui.components;
 
+import com.meyratech.vicenze.ui.MainLayout;
+import com.meyratech.vicenze.ui.util.css.FlexDirection;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Composite;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.Div;
-import com.meyratech.vicenze.ui.MainLayout;
-import com.meyratech.vicenze.ui.components.FlexBoxLayout;
-import com.meyratech.vicenze.ui.util.css.FlexDirection;
 
 /**
  * A view frame that establishes app design guidelines. It consists of four
@@ -21,8 +20,6 @@ import com.meyratech.vicenze.ui.util.css.FlexDirection;
  */
 public class SplitViewFrame extends Composite<Div> implements HasStyle {
 
-    private final String CLASS_NAME = "view-frame";
-
     private final Div header = new Div();
     private final FlexBoxLayout wrapper = new FlexBoxLayout();
     private final Div content = new Div();
@@ -34,6 +31,7 @@ public class SplitViewFrame extends Composite<Div> implements HasStyle {
     }
 
     public SplitViewFrame() {
+        String CLASS_NAME = "view-frame";
         setClassName(CLASS_NAME);
         header.setClassName(CLASS_NAME + "__header");
         wrapper.setClassName(CLASS_NAME + "__wrapper");

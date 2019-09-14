@@ -1,13 +1,6 @@
 package com.meyratech.vicenze.ui.components.navigation.drawer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.io.Charsets;
-import org.apache.commons.io.IOUtils;
-
+import com.meyratech.vicenze.ui.util.UIUtils;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -22,7 +15,13 @@ import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.startup.FakeBrowser;
-import com.meyratech.vicenze.ui.util.UIUtils;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NaviItem extends Div {
 
@@ -41,20 +40,17 @@ public class NaviItem extends Div {
 
     private int level = 0;
 
-    public NaviItem(VaadinIcon icon, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem(VaadinIcon icon, String text, Class<? extends Component> navigationTarget) {
         this(text, navigationTarget);
         link.getElement().insertChild(0, new Icon(icon).getElement());
     }
 
-    public NaviItem(Image image, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem(Image image, String text, Class<? extends Component> navigationTarget) {
         this(text, navigationTarget);
         link.getElement().insertChild(0, image.getElement());
     }
 
-    public NaviItem(String svg, String text,
-            Class<? extends Component> navigationTarget) {
+    public NaviItem(String svg, String text, Class<? extends Component> navigationTarget) {
         this(text, navigationTarget);
         try {
             String content = readFile(svg);
@@ -70,11 +66,9 @@ public class NaviItem extends Div {
         this.text = text;
         this.navigationTarget = navigationTarget;
 
-        expandCollapse = UIUtils.createButton(up, ButtonVariant.LUMO_SMALL,
-                ButtonVariant.LUMO_TERTIARY);
+        expandCollapse = UIUtils.createButton(up, ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
         expandCollapse.setVisible(false);
-        expandCollapse.addClickListener(
-                event -> setSubItemsVisible(!subItemsVisible));
+        expandCollapse.addClickListener(event -> setSubItemsVisible(!subItemsVisible));
         add(expandCollapse);
         subItemsVisible = true;
         updateAriaLabel();
@@ -85,8 +79,7 @@ public class NaviItem extends Div {
         if (navigationTarget != null) {
             RouterLink routerLink = new RouterLink(null, navigationTarget);
             routerLink.add(new Label(text));
-            routerLink
-                    .setHighlightCondition(HighlightConditions.sameLocation());
+            routerLink.setHighlightCondition(HighlightConditions.sameLocation());
             routerLink.setClassName(CLASS_NAME + "__link");
             this.link = routerLink;
         } else {
@@ -151,9 +144,9 @@ public class NaviItem extends Div {
     }
 
 
-    private void updateAriaLabel(){
+    private void updateAriaLabel() {
         String action;
-        if(subItemsVisible) {
+        if (subItemsVisible) {
             action = "Collapse " + text;
         } else {
             action = "Expand " + text;
@@ -166,10 +159,8 @@ public class NaviItem extends Div {
     }
 
     protected static String readFile(String path) throws IOException {
-        try (InputStream resourceAsStream = VaadinService.getCurrent()
-                .getResourceAsStream("frontend://" + path, FakeBrowser.getEs6(),
-                        null)) {
-            return IOUtils.toString(resourceAsStream, Charsets.UTF_8);
+        try (InputStream resourceAsStream = VaadinService.getCurrent().getResourceAsStream("frontend://" + path, FakeBrowser.getEs6(), null)) {
+            return IOUtils.toString(resourceAsStream, StandardCharsets.UTF_8);
         }
     }
 

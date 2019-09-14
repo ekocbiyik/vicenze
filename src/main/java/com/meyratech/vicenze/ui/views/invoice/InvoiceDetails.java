@@ -46,6 +46,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Locale;
+import java.util.Objects;
 
 @Route(value = ViewConst.PAGE_INVOICE_DETAILS, layout = MainLayout.class)
 @PageTitle(ViewConst.TITLE_INVOICE_DETAILS)
@@ -353,7 +354,7 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         binder = new Binder<>(Invoice.class);
         binder.forField(cbxProject)
                 .asRequired("Projectis required!")
-                .withValidator(p -> p != null, "Project can not be empty!")
+                .withValidator(Objects::nonNull, "Project can not be empty!")
                 .bind(Invoice::getProject, Invoice::setProject);
 
         binder.forField(cbxVendor)

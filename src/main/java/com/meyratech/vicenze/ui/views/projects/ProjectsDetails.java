@@ -42,9 +42,6 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
 
     public int RECENT_TRANSACTIONS = 4;
 
-    private ListItem availability;
-    private ListItem companyLabel;
-    private ListItem creationInfo;
     private Project project;
     private ProjectServiceImpl projectService;
 
@@ -99,7 +96,7 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
         image.setHeight("200px");
         image.setWidth("200px");
 
-        companyLabel = new ListItem(
+        ListItem companyLabel = new ListItem(
                 UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION),
                 project.getCompany(),
                 String.format("Project no: %s", project.getId())
@@ -108,14 +105,14 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
         companyLabel.setDividerVisible(true);
         companyLabel.setWhiteSpace(WhiteSpace.PRE_LINE);
 
-        availability = new ListItem(
+        ListItem availability = new ListItem(
                 UIUtils.createTertiaryIcon(VaadinIcon.INFO_CIRCLE),
                 project.getEmail(),
                 project.getPhone()
         );
         availability.setDividerVisible(true);
 
-        creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy().getFullName(), UIUtils.formatDatetime(project.getCreationDate()));
+        ListItem creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy().getFullName(), UIUtils.formatDatetime(project.getCreationDate()));
 
         FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
         listItems.setFlexDirection(FlexDirection.COLUMN);

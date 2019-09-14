@@ -43,7 +43,7 @@ public class InvoiceServiceImpl implements IInvoiceService {
     @Transactional
     @Override
     public List<Invoice> getLastInvoices(int count) {
-        return invoiceDao.findTopInvoices(new PageRequest(0, count, Sort.Direction.DESC, "id"));
+        return invoiceDao.findTopInvoices(PageRequest.of(0, count, Sort.Direction.DESC, "id"));
     }
 
     @Transactional

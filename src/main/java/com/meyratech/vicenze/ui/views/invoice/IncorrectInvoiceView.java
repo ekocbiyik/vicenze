@@ -92,14 +92,13 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
         searchField.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.setSizeFull();
-        searchField.addValueChangeListener(e -> {
-            incorrectDataProvider.addFilter((item) ->
-                    StringUtils.containsIgnoreCase(item.getInvoice().getProject().getProjectName(), searchField.getValue())
-                            || StringUtils.containsIgnoreCase(item.getInvoiceNumber(), searchField.getValue())
-                            || StringUtils.containsIgnoreCase(item.getInvoiceCode(), searchField.getValue())
-                            || StringUtils.containsIgnoreCase(item.getCreatedBy().getFullName(), searchField.getValue())
-            );
-        });
+        searchField.addValueChangeListener(e ->
+                incorrectDataProvider.addFilter((item) ->
+                        StringUtils.containsIgnoreCase(item.getInvoice().getProject().getProjectName(), searchField.getValue())
+                                || StringUtils.containsIgnoreCase(item.getInvoiceNumber(), searchField.getValue())
+                                || StringUtils.containsIgnoreCase(item.getInvoiceCode(), searchField.getValue())
+                                || StringUtils.containsIgnoreCase(item.getCreatedBy().getFullName(), searchField.getValue())
+                ));
 
         HorizontalLayout container = new HorizontalLayout(searchField, new Label());
         container.setSizeFull();
@@ -135,10 +134,10 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
     }
 
     private Component viewDetails(IncorrectInvoice incorrectInvoice) {
-        /**
-         * varolan invoice ekranını incorrectler için de kullanaiblmek için -1 ile çarpıyoruz.
-         * invoiceDetail ekranına negatif id li kayıt gelirse bu incorrect bir kaydın id'si demek oluyor..
-         * */
+        /*
+          varolan invoice ekranını incorrectler için de kullanaiblmek için -1 ile çarpıyoruz.
+          invoiceDetail ekranına negatif id li kayıt gelirse bu incorrect bir kaydın id'si demek oluyor..
+          */
         Button btnEdit = UIUtils.createButton(
                 VaadinIcon.EDIT,
                 (ComponentEventListener<ClickEvent<Button>>) e -> UI.getCurrent().navigate(InvoiceDetails.class, (-1 * incorrectInvoice.getId()))
@@ -149,8 +148,7 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
 
     private void initializeItemListener() {
         incorrectGrid.getDataProvider().addDataProviderListener(e -> {
-            int size = incorrectGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).collect(Collectors.toList()).size();
-            lblItemSize.setText(String.valueOf(size));
+            lblItemSize.setText(String.valueOf((int) incorrectGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).count()));
         });
 
     }

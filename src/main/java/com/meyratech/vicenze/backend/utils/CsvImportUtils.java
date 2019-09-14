@@ -67,9 +67,8 @@ public class CsvImportUtils {
             });
         } catch (IOException e) {
             logger.error(e.getMessage());
-        } finally {
-            return csvList;
         }
+        return csvList;
     }
 
     public static void validateInvoiceCsv(Grid<CsvModel> csvGrid, Grid<Invoice> invoiceGrid) {

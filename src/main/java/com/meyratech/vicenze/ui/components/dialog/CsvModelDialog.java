@@ -27,15 +27,13 @@ public class CsvModelDialog extends Dialog {
 
     private static final String CLASS_NAME = "details-drawer";
 
-    private Button btnSave;
-    private Button btnCancel;
     private CsvModel csvModel;
     private ListDataProvider<CsvModel> csvDataProvider;
     private TextField txtProject;
     private TextField txtVendor;
     private TextField txtEventType;
     private TextField txtMainItem;
-    private TextField txtbook;
+    private TextField txtBook;
     private TextField txtTransaction;
     private TextField txtInvoiceNumber;
     private TextField txtInvoiceCode;
@@ -95,9 +93,9 @@ public class CsvModelDialog extends Dialog {
         txtMainItem.setWidthFull();
         txtMainItem.setValue(csvModel.getMAIN_ITEM());
 
-        txtbook = new TextField();
-        txtbook.setWidthFull();
-        txtbook.setValue(csvModel.getBOOK());
+        txtBook = new TextField();
+        txtBook.setWidthFull();
+        txtBook.setValue(csvModel.getBOOK());
 
         txtTransaction = new TextField();
         txtTransaction.setWidthFull();
@@ -140,7 +138,7 @@ public class CsvModelDialog extends Dialog {
         form.addFormItem(txtVendor, "Vendor");
         form.addFormItem(txtEventType, "Event Type");
         form.addFormItem(txtMainItem, "Main Item");
-        form.addFormItem(txtbook, "Book");
+        form.addFormItem(txtBook, "Book");
         form.addFormItem(txtTransaction, "Transaction");
         form.addFormItem(txtInvoiceNumber, "Invoice Number");
         form.addFormItem(txtInvoiceCode, "Invoice Code");
@@ -160,8 +158,8 @@ public class CsvModelDialog extends Dialog {
         footer.setPadding(Horizontal.RESPONSIVE_L, Vertical.S, Vertical.S);
         footer.setSpacing(Right.S);
 
-        btnSave = UIUtils.createPrimaryButton("Save");
-        btnCancel = UIUtils.createTertiaryButton("Cancel");
+        Button btnSave = UIUtils.createPrimaryButton("Save");
+        Button btnCancel = UIUtils.createTertiaryButton("Cancel");
         footer.add(btnSave, btnCancel);
 
         btnSave.addClickListener(e -> saveUser());
@@ -175,7 +173,7 @@ public class CsvModelDialog extends Dialog {
         c.setVENDOR(txtVendor.getValue().toUpperCase());
         c.setEVENT_TYPE(txtEventType.getValue().toUpperCase());
         c.setMAIN_ITEM(txtMainItem.getValue().toUpperCase());
-        c.setBOOK(txtbook.getValue().toUpperCase());
+        c.setBOOK(txtBook.getValue().toUpperCase());
         c.setTRANSACTION(txtTransaction.getValue().toUpperCase());
         c.setNUMBER(txtInvoiceNumber.getValue().toUpperCase());
         c.setCODE(txtInvoiceCode.getValue().toUpperCase());
