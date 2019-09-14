@@ -120,6 +120,8 @@ public class CsvModelDialog extends Dialog {
         txtUnitPrize.setValue(csvModel.getUNIT_PRICE());
 
         txtDate = new TextField();
+        txtDate.setWidthFull();
+        txtDate.setPlaceholder("dd/MM/yyyy HH:mm:ss");
         txtDate.setValue(csvModel.getDATE());
 
         txtExplanation = new TextArea();

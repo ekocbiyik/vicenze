@@ -31,8 +31,19 @@ public class ProjectServiceImpl implements IProjectService {
 
     @Transactional
     @Override
+    public Project findByProjectName(String projectName) {
+        return projectDao.findByProjectName(projectName);
+    }
+
+    @Transactional
+    @Override
     public List<Project> findAll() {
         return projectDao.findAllByOrderByCreationDateDesc();
     }
 
+    @Transactional
+    @Override
+    public List<Project> findAllActiveProjects() {
+        return projectDao.findAllByIsActiveOrderByCreationDateDesc(true);
+    }
 }

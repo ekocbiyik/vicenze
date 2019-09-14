@@ -125,7 +125,7 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         });
 
         btnCreate = UIUtils.createPrimaryButton("ADD", VaadinIcon.PLUS_CIRCLE_O);
-        btnCreate.addClickListener(e -> showDetails(null)); // TODO: 9/12/19 burada project name varsa tekrar eklemesin!
+        btnCreate.addClickListener(e -> showDetails(null));
 
         HorizontalLayout container = new HorizontalLayout(btnCreate, searchField);
         container.setSpacing(true);
@@ -268,6 +268,11 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
         }
 
         if (detailedProject == null) {
+            if (projectService.findByProjectName(txtProjectName.getValue()) != null) {
+                Notification.show("Project name already exist!", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+
             detailedProject = new Project();
             detailedProject.setCreatedBy(SecurityUtils.getCurrentUser());
         }

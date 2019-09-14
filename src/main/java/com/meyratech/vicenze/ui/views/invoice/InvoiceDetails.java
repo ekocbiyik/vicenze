@@ -11,7 +11,10 @@ import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.meyratech.vicenze.ui.components.detailsdrawer.DetailsDrawerFooter;
 import com.meyratech.vicenze.ui.components.navigation.bar.AppBar;
-import com.meyratech.vicenze.ui.layout.size.*;
+import com.meyratech.vicenze.ui.layout.size.Horizontal;
+import com.meyratech.vicenze.ui.layout.size.Left;
+import com.meyratech.vicenze.ui.layout.size.Top;
+import com.meyratech.vicenze.ui.layout.size.Vertical;
 import com.meyratech.vicenze.ui.util.*;
 import com.meyratech.vicenze.ui.util.css.BorderRadius;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
@@ -53,8 +56,6 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
     private IIncorrectInvoiceService incorrectInvoiceService;
     private IInvoiceService invoiceService;
     private IProjectService projectService;
-
-
     private DetailsDrawerFooter detailedFooter;
 
     //fields
@@ -162,7 +163,7 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
         cbxProject = new ComboBox<>();
         cbxProject.setWidthFull();
         cbxProject.setItemLabelGenerator(Project::getProjectName);
-        cbxProject.setItems(projectService.findAll());
+        cbxProject.setItems(projectService.findAllActiveProjects());
 
         cbxVendor = new ComboBox<>();
         cbxVendor.setWidthFull();

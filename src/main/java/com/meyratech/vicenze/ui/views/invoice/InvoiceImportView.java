@@ -76,9 +76,6 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
 
         addToPrimary(getPrimaryContent());
         addToSecondary(getSecondaryContent());
-
-        // TODO: 9/10/19 validation kısmında projectName'i sorgu ile getir
-        // TODO: 9/12/19 csvimportutils validator kısmından devam et
     }
 
     private Component getPrimaryContent() {
@@ -222,7 +219,7 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
 
         Button btnSaveDB = UIUtils.createPrimaryButton("Save to Database", VaadinIcon.DATABASE);
         btnSaveDB.setWidth("200px");
-        btnSaveDB.addClickListener(e -> UIUtils.showNotification("Not implemented yet!"));
+        btnSaveDB.addClickListener(e -> CsvImportUtils.insertInvoice2DB(invoiceGrid));
 
         HorizontalLayout container = new HorizontalLayout(btnSaveDB, searchField);
         container.setSpacing(true);
@@ -238,7 +235,7 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
     }
 
     private Component createProjectInfo(Invoice invoice) {
-        return UIUtils.createH3Label(invoice.getProject().getProjectName());
+        return new Label(invoice.getProject().getProjectName());
     }
 
     private Component createUnitPriceInfo(Invoice invoice) {

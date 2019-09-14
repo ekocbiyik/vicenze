@@ -2,10 +2,13 @@ package com.meyratech.vicenze.backend.utils;
 
 import com.meyratech.vicenze.backend.model.CsvModel;
 import com.meyratech.vicenze.backend.model.Invoice;
+import com.meyratech.vicenze.backend.model.ItemDetails;
 import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
 import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.backend.security.UtilsForSpring;
+import com.meyratech.vicenze.ui.util.UIUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import org.apache.commons.csv.CSVFormat;
@@ -83,14 +86,14 @@ public class CsvImportUtils {
                 i.setVendor(validateVendor(c));
                 i.setInvoiceNumber(c.getNUMBER());
                 i.setInvoiceCode(c.getCODE());
-                i.setEventType(c.getEVENT_TYPE());
-                i.setMainItem(c.getMAIN_ITEM());
-                i.setBook(c.getBOOK());
-                i.setTransaction(c.getTRANSACTION());
+                i.setEventType(validateEventType(c));
+                i.setMainItem(validateMainItem(c));
+                i.setBook(validateBook(c));
+                i.setTransaction(validateTransaction(c));
                 i.setExplanation(c.getEXPLANATION());
-                i.setAmount(new BigDecimal(c.getAMOUNT().isEmpty() ? "0" : c.getAMOUNT()));
-                i.setUnitPrice(new BigDecimal(c.getUNIT_PRICE()));
-                i.setDate(LocalDateTime.from(LocalDate.parse(c.getDATE(), DateTimeFormatter.ofPattern("M/d/yyyy")).atStartOfDay()));
+                i.setAmount(validateAmount(c));
+                i.setUnitPrice(validateUnitPrice(c));
+                i.setDate(validateDate(c));
                 i.setCreatedBy(SecurityUtils.getCurrentUser());
                 i.setCreationDate(LocalDateTime.now());
 
@@ -103,6 +106,30 @@ public class CsvImportUtils {
         }
         csvDataProvider.getItems().removeAll(validatedList);
         csvDataProvider.refreshAll();
+    }
+
+    public static void insertInvoice2DB(Grid<Invoice> invoiceGrid) {
+        IInvoiceService invoiceService = UtilsForSpring.getSingleBeanOfType(IInvoiceService.class);
+        ListDataProvider<Invoice> invoiceProvider = (ListDataProvider<Invoice>) invoiceGrid.getDataProvider();
+        List<Invoice> savedList = new ArrayList<>();
+
+        if (invoiceProvider.getItems().size() == 0) {
+            UIUtils.showNotification("Table is empty!");
+            return;
+        }
+
+        for (Invoice i : invoiceProvider.getItems()) {
+            try {
+                invoiceService.save(i);
+                savedList.add(i);
+            } catch (Exception e) {
+                e.printStackTrace(); // db error
+            }
+        }
+
+        invoiceProvider.getItems().removeAll(savedList);
+        invoiceProvider.refreshAll();
+        UIUtils.showNotification(savedList.size() + " invioce(s) saved!");
     }
 
     private static Project validateProject(CsvModel csvModel, List<Project> projectList) throws Exception {
@@ -119,5 +146,57 @@ public class CsvImportUtils {
         return csvModel.getVENDOR();
     }
 
+    private static String validateEventType(CsvModel csvModel) throws Exception {
+        if (csvModel.getEVENT_TYPE().isEmpty() || !ItemDetails.eventTypeList.contains(csvModel.getEVENT_TYPE())) throw new Exception("EventType does not exist!");
+        return csvModel.getEVENT_TYPE();
+    }
+
+    private static String validateMainItem(CsvModel csvModel) throws Exception {
+        if (csvModel.getMAIN_ITEM().isEmpty() || !ItemDetails.mainItemList.contains(csvModel.getMAIN_ITEM())) throw new Exception("MainItem does not exist!");
+        return csvModel.getMAIN_ITEM();
+    }
+
+    private static String validateBook(CsvModel csvModel) throws Exception {
+        if (csvModel.getBOOK().isEmpty() || !ItemDetails.bookList.contains(csvModel.getBOOK())) throw new Exception("Book does not exist!");
+        return csvModel.getBOOK();
+    }
+
+    private static String validateTransaction(CsvModel csvModel) throws Exception {
+        if (csvModel.getTRANSACTION().isEmpty() || !ItemDetails.transactionList.contains(csvModel.getTRANSACTION())) throw new Exception("Transaction does not exist!");
+        return csvModel.getTRANSACTION();
+    }
+
+    private static BigDecimal validateAmount(CsvModel csvModel) throws Exception {
+        if (csvModel.getAMOUNT().isEmpty()) throw new Exception("Amount does not exist!");
+        return new BigDecimal(csvModel.getAMOUNT());
+    }
+
+    private static BigDecimal validateUnitPrice(CsvModel csvModel) throws Exception {
+        if (csvModel.getUNIT_PRICE().isEmpty()) throw new Exception("UnitPrice does not exist!");
+        return new BigDecimal(csvModel.getUNIT_PRICE());
+    }
+
+    private static LocalDateTime validateDate(CsvModel csvModel) throws Exception {
+        if (csvModel.getDATE().isEmpty()) throw new Exception("Date does not exist!");
+        LocalDateTime date;
+        String dateString = csvModel.getDATE();
+        String exceptFormat = (dateString.contains(" ") && dateString.contains(":")) ? "d/M/yyyy HH:mm:ss" : "d/M/yyyy";
+        String errorFormat = (dateString.contains(" ") && dateString.contains(":")) ? "M/d/yyyy HH:mm:ss" : "M/d/yyyy";
+
+        try {
+            if (exceptFormat.contains(":")) {
+                date = LocalDateTime.parse(dateString, DateTimeFormatter.ofPattern(exceptFormat));
+            } else {
+                date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(exceptFormat)).atStartOfDay();
+            }
+        } catch (Exception e) {
+            if (errorFormat.contains(":")) {
+                date = LocalDateTime.parse(dateString, DateTimeFormatter.ofPattern(errorFormat));
+            } else {
+                date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(errorFormat)).atStartOfDay();
+            }
+        }
+        return date;
+    }
 
 }

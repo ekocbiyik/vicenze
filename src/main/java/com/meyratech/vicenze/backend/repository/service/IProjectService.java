@@ -13,6 +13,10 @@ public interface IProjectService {
 
     Project findById(Long id);
 
+    Project findByProjectName(String projectName);
+
     List<Project> findAll();
+
+    List<Project> findAllActiveProjects();
 
 }

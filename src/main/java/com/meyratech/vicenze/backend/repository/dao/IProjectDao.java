@@ -12,5 +12,10 @@ import java.util.List;
 @Repository
 public interface IProjectDao extends JpaRepository<Project, Long> {
 
+    Project findByProjectName(String projectName);
+
     List<Project> findAllByOrderByCreationDateDesc();
+
+    List<Project> findAllByIsActiveOrderByCreationDateDesc(boolean isActive);
+
 }
