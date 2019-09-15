@@ -199,6 +199,7 @@ public class DataGenerator implements HasLogger {
     private Project createProject(String projectName, String description, String email, String phone) {
         Project project = new Project();
         project.setCompany(projectName.toUpperCase() + " COMPANY");
+        project.setProjectLogo(String.format("logo-%s.png", projectService.findAll().size() % 40));
         project.setEmail(email);
         project.setPhone(phone);
         project.setProjectName(projectName);

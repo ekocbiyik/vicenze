@@ -6,6 +6,7 @@ import com.meyratech.vicenze.backend.repository.dao.IUserDao;
 import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +16,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 /**
  * Configures spring security, doing the following:
@@ -45,6 +49,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private IUserService userService;
 
     @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
+    @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public CurrentUser currentUser(IUserDao userDao) {
         final String username = SecurityUtils.getUsername();
@@ -68,21 +82,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // Not using Spring CSRF here to be able to use plain HTML for the login page
         http.csrf().disable()
-
-                // Register our CustomRequestCache, that saves unauthorized access attempts, so
-                // the user is redirected after login.
                 .requestCache().requestCache(new CustomRequestCache())
-
-                // Restrict access to our application.
                 .and().authorizeRequests()
-
-                // Allow all flow internal requests.
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-
-                // Allow all requests by logged in users.
                 .anyRequest().hasAnyAuthority(Role.getAllRoles())
-
-                // Configure the login page.
                 .and()
                 .formLogin()
                 .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
@@ -94,6 +97,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+        http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
     }
 
     /**

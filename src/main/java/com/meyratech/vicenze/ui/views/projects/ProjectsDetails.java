@@ -90,7 +90,9 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     }
 
     private FlexBoxLayout createLogoSection() {
-        Image image = DummyData.getLogo();
+
+        String imgName = project.getProjectLogo() == null ? "logo-only.svg" : project.getProjectLogo();
+        Image image = new Image(String.format("%s%s", UIUtils.IMG_PATH, imgName), "");
         image.addClassName(LumoStyles.Margin.Horizontal.L);
         UIUtils.setBorderRadius(BorderRadius._50, image);
         image.setHeight("200px");

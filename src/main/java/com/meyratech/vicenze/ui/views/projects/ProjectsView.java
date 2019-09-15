@@ -65,7 +65,6 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
 
     private DetailsDrawer detailsDrawer;
     private DetailsDrawerFooter detailedFooter;
-    private TextField txtProjectNumber;
     private TextField txtProjectName;
     private ComboBox<String> cbxCompany;
     private EmailField txtEmail;
@@ -155,11 +154,6 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
 
     private FormLayout createDetails() {
 
-        txtProjectNumber = new TextField();
-        txtProjectNumber.setWidthFull();
-        txtProjectNumber.setEnabled(false);
-        txtProjectNumber.setValue(UIUtils.formatId(null));
-
         txtProjectName = new TextField();
         txtProjectName.setWidthFull();
         txtProjectName.setValueChangeMode(ValueChangeMode.EAGER);
@@ -203,7 +197,6 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
                 new FormLayout.ResponsiveStep("1024px", 3, FormLayout.ResponsiveStep.LabelsPosition.TOP)
         );
 
-        form.addFormItem(txtProjectNumber, "Project Number");
         form.addFormItem(txtProjectName, "Project Name");
         form.addFormItem(cbxCompany, "Company");
         form.addFormItem(txtCreatedBy, "Created By");
@@ -248,7 +241,6 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
     }
 
     private void initializeProjectDetails() {
-        txtProjectNumber.setValue(detailedProject.getId().toString());
         txtProjectName.setValue(detailedProject.getProjectName().toUpperCase());
         cbxCompany.setValue(detailedProject.getCompany());
         rdActive.setValue(detailedProject.isActive());
@@ -266,14 +258,22 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
             return;
         }
 
-        if (detailedProject == null) {
-            if (projectService.findByProjectName(txtProjectName.getValue()) != null) {
+        Project existProject = projectService.findByProjectName(txtProjectName.getValue());
+        if (existProject != null) {
+            if (detailedProject != null && (existProject.getId() != detailedProject.getId())) {
                 Notification.show("Project name already exist!", 3000, Notification.Position.MIDDLE);
                 return;
             }
+            if (detailedProject == null) {
+                Notification.show("Project name already exist!", 3000, Notification.Position.MIDDLE);
+                return;
+            }
+        }
 
+        if (detailedProject == null) {
             detailedProject = new Project();
             detailedProject.setCreatedBy(SecurityUtils.getCurrentUser());
+            detailedProject.setProjectLogo(String.format("logo-%s.png", projectService.findAll().size() % 40));
         }
 
         detailedProject.setProjectName(txtProjectName.getValue());
@@ -336,6 +336,5 @@ public class ProjectsView extends SplitViewFrame implements RouterLayout {
     private Component creationDate(Project project) {
         return new Span(UIUtils.formatDatetime(project.getCreationDate()));
     }
-
 
 }

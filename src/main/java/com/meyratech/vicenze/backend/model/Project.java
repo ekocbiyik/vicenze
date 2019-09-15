@@ -28,6 +28,9 @@ public class Project {
     @Column(name = "company", nullable = false)
     private String company;
 
+    @Column(name = "project_logo")
+    private String projectLogo;
+
     @NotEmpty
     @Email
     @Size(max = 255)
@@ -74,6 +77,14 @@ public class Project {
 
     public void setCompany(String company) {
         this.company = company;
+    }
+
+    public String getProjectLogo() {
+        return projectLogo;
+    }
+
+    public void setProjectLogo(String projectLogo) {
+        this.projectLogo = projectLogo;
     }
 
     public String getEmail() {

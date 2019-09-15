@@ -1,30 +1,40 @@
 package com.meyratech.vicenze.ui.views.home;
 
+import com.meyratech.vicenze.backend.model.User;
+import com.meyratech.vicenze.backend.repository.service.IUserService;
+import com.meyratech.vicenze.backend.security.SecurityUtils;
 import com.meyratech.vicenze.ui.MainLayout;
-import com.meyratech.vicenze.ui.components.DataSeriesItemWithRadius;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
 import com.meyratech.vicenze.ui.components.ListItem;
 import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.meyratech.vicenze.ui.layout.size.Bottom;
 import com.meyratech.vicenze.ui.layout.size.Top;
 import com.meyratech.vicenze.ui.layout.size.*;
-import com.meyratech.vicenze.ui.util.*;
-import com.meyratech.vicenze.ui.util.css.Position;
-import com.meyratech.vicenze.ui.util.css.*;
+import com.meyratech.vicenze.ui.util.LumoStyles;
+import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.util.ViewConst;
+import com.meyratech.vicenze.ui.util.css.BorderRadius;
+import com.meyratech.vicenze.ui.util.css.FlexDirection;
+import com.meyratech.vicenze.ui.util.css.Shadow;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.board.Row;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
-import com.vaadin.flow.component.charts.model.style.LabelStyle;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Route(value = ViewConst.PAGE_HOME, layout = MainLayout.class)
 @PageTitle(ViewConst.TITLE_HOME)
@@ -33,179 +43,61 @@ public class HomeView extends ViewFrame {
 
     private static final String CLASS_NAME = "dashboard";
     public static final String MAX_WIDTH = "1024px";
+    private IUserService userService;
 
-    public HomeView() {
+
+    @Autowired
+    public HomeView(IUserService userService) {
+        this.userService = userService;
         setViewContent(createContent());
     }
 
     private Component createContent() {
 
         FlexBoxLayout content = new FlexBoxLayout(
-                createPayments(),
-                createTransactions(),
-//                createPieChart(),
-                createMixedChart(),
-                createDocs()
+                createNotifications()
+//                createReports()
         );
-        content.setAlignItems(FlexComponent.Alignment.CENTER);
+
         content.setFlexDirection(FlexDirection.COLUMN);
+        content.setAlignItems(FlexComponent.Alignment.CENTER);
+        content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_X);
+        content.setMaxWidth("840px");
+        content.setBorderRadius(BorderRadius.S);
+        content.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
+
         return content;
     }
 
-    private Component createPayments() {
-        FlexBoxLayout payments = new FlexBoxLayout(createHeader(VaadinIcon.CREDIT_CARD, "Payments"), createPaymentsCharts());
-        payments.setBoxSizing(BoxSizing.BORDER_BOX);
-        payments.setDisplay(Display.BLOCK);
-        payments.setMargin(Top.L);
-        payments.setMaxWidth(MAX_WIDTH);
-        payments.setPadding(Horizontal.RESPONSIVE_L);
-        payments.setWidth("100%");
-        return payments;
-    }
+    private Component createNotifications() {
 
-    private FlexBoxLayout createHeader(VaadinIcon icon, String title) {
-        FlexBoxLayout header = new FlexBoxLayout(UIUtils.createIcon(IconSize.M, TextColor.TERTIARY, icon), UIUtils.createH3Label(title));
-        header.setAlignItems(FlexComponent.Alignment.CENTER);
-        header.setMargin(Bottom.L, Horizontal.RESPONSIVE_L);
-        header.setSpacing(Right.L);
-        return header;
-    }
+        List<User> allUser = userService.findAll();
+        List<User> activeUsers = allUser.stream().filter(user -> user.isActive()).collect(Collectors.toList());
+        List<User> passiveUsers = allUser.stream().filter(user -> !user.isActive()).collect(Collectors.toList());
+        List<User> lockedUsers = allUser.stream().filter(user -> user.isLocked()).collect(Collectors.toList());
+        List<String> onlineUsers = SecurityUtils.getOnlineUsers();
 
-    private Component createPaymentsCharts() {
-        Row charts = new Row();
-        UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, charts);
-        UIUtils.setBorderRadius(BorderRadius.S, charts);
-        UIUtils.setShadow(Shadow.S, charts);
+        // grid content
+        Grid<String> userGrid = new Grid<>();
+        userGrid.setHeight("300px");
+        userGrid.setMinWidth("400px");
+        ListDataProvider<String> dataProvider = DataProvider.ofCollection(SecurityUtils.getOnlineUsers());
+        userGrid.setDataProvider(dataProvider);
+        userGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setWidth("40px").setFrozen(true);
+        userGrid.addColumn(new ComponentRenderer<>(this::createUserInfo)).setFlexGrow(1).setSortable(true).setWidth(UIUtils.COLUMN_WIDTH_XL);
 
-//        for (Payment.Status status : Payment.Status.values()) {
-//            charts.add(createPaymentChart(status));
-//        }
-        return charts;
-    }
+        Div gridContent = new Div(userGrid);
+        gridContent.addClassName("grid-view");
 
-    private Component createPaymentChart() {
-        int value;
-//        switch (status) {
-//            case PENDING:
-//                value = 24;
-//                break;
-//
-//            case SUBMITTED:
-//                value = 40;
-//                break;
-//
-//            case CONFIRMED:
-//                value = 32;
-//                break;
-//
-//            default:
-//                value = 4;
-//                break;
-//        }
 
-        FlexBoxLayout textContainer = new FlexBoxLayout(UIUtils.createH2Label(Integer.toString(61)), UIUtils.createLabel(FontSize.S, "%"));
-        textContainer.setAlignItems(FlexComponent.Alignment.BASELINE);
-        textContainer.setPosition(Position.ABSOLUTE);
-        textContainer.setSpacing(Right.XS);
+        // user Chart
+        Chart userChart = new Chart(ChartType.PIE);
+        userChart.setSizeUndefined();
+        userChart.setHeight("300px");
+        userChart.setVisibilityTogglingDisabled(false);
 
-        Chart chart = createProgressChart(61);
-        FlexBoxLayout chartContainer = new FlexBoxLayout(chart, textContainer);
-        chartContainer.setAlignItems(FlexComponent.Alignment.CENTER);
-        chartContainer.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        chartContainer.setPosition(Position.RELATIVE);
-        chartContainer.setHeight("120px");
-        chartContainer.setWidth("120px");
-
-        FlexBoxLayout paymentChart = new FlexBoxLayout(new Label("enbiya"), chartContainer);
-        paymentChart.addClassName(CLASS_NAME + "__payment-chart");
-        paymentChart.setAlignItems(FlexComponent.Alignment.CENTER);
-        paymentChart.setFlexDirection(FlexDirection.COLUMN);
-        paymentChart.setPadding(Bottom.S, Top.M);
-        return paymentChart;
-    }
-
-    private Chart createProgressChart(int value) {
-        Chart chart = new Chart();
-//        chart.addClassName(status.getName().toLowerCase());
-        chart.setSizeFull();
-
-        Configuration configuration = chart.getConfiguration();
-        configuration.getChart().setType(ChartType.SOLIDGAUGE);
-        configuration.setTitle("");
-        configuration.getTooltip().setEnabled(false);
-
-        configuration.getyAxis().setMin(0);
-        configuration.getyAxis().setMax(100);
-        configuration.getyAxis().getLabels().setEnabled(false);
-
-        PlotOptionsSolidgauge opt = new PlotOptionsSolidgauge();
-        opt.getDataLabels().setEnabled(false);
-        configuration.setPlotOptions(opt);
-
-        DataSeriesItemWithRadius point = new DataSeriesItemWithRadius();
-        point.setY(value);
-        point.setInnerRadius("100%");
-        point.setRadius("110%");
-        configuration.setSeries(new DataSeries(point));
-
-        Pane pane = configuration.getPane();
-        pane.setStartAngle(0);
-        pane.setEndAngle(360);
-
-        Background background = new Background();
-        background.setShape(BackgroundShape.ARC);
-        background.setInnerRadius("100%");
-        background.setOuterRadius("110%");
-        pane.setBackground(background);
-
-        return chart;
-    }
-
-    private Component createTransactions() {
-        FlexBoxLayout transactions = new FlexBoxLayout(createHeader(VaadinIcon.MONEY_EXCHANGE, "Transactions"), createAreaChart());
-        transactions.setBoxSizing(BoxSizing.BORDER_BOX);
-        transactions.setDisplay(Display.BLOCK);
-        transactions.setMargin(Top.XL);
-        transactions.setMaxWidth(MAX_WIDTH);
-        transactions.setPadding(Horizontal.RESPONSIVE_L);
-        transactions.setWidth("100%");
-        return transactions;
-    }
-
-    private Component createAreaChart() {
-        Chart chart = new Chart(ChartType.AREASPLINE);
-        Configuration conf = chart.getConfiguration();
-        conf.setTitle("2019");
-        conf.setExporting(true);
-        conf.getLegend().setEnabled(false);
-
-        XAxis xAxis = new XAxis();
-        xAxis.setCategories("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-        conf.addxAxis(xAxis);
-
-        conf.getyAxis().setTitle("Number of Processed Transactions");
-
-        conf.addSeries(new ListSeries(220, 240, 400, 360, 420, 640, 580, 800, 600, 580, 740, 800));
-
-        FlexBoxLayout card = new FlexBoxLayout(chart);
-        card.setBorderRadius(BorderRadius.S);
-        card.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
-        card.setBoxSizing(BoxSizing.BORDER_BOX);
-        card.setHeight("400px");
-        card.setPadding(Uniform.M);
-        card.setShadow(Shadow.S);
-        return card;
-    }
-
-    private Component createPieChart() {
-        Chart chart = new Chart(ChartType.PIE);
-        Configuration conf = chart.getConfiguration();
-        conf.setExporting(true);
-        conf.setTitle("Browser market shares in January, 2018");
-
-        Tooltip tooltip = new Tooltip();
-        tooltip.setValueDecimals(1);
-        conf.setTooltip(tooltip);
+        Configuration conf = userChart.getConfiguration();
+        conf.setTooltip(new Tooltip());
 
         PlotOptionsPie plotOptions = new PlotOptionsPie();
         plotOptions.setAllowPointSelect(true);
@@ -214,173 +106,53 @@ public class HomeView extends ViewFrame {
         conf.setPlotOptions(plotOptions);
 
         DataSeries series = new DataSeries();
-        DataSeriesItem chrome = new DataSeriesItem("Chrome", 61.41);
-        chrome.setSliced(true);
-        chrome.setSelected(true);
-        series.add(chrome);
-        series.add(new DataSeriesItem("Internet Explorer", 11.84));
-        series.add(new DataSeriesItem("Firefox", 10.85));
-        series.add(new DataSeriesItem("Edge", 4.67));
-        series.add(new DataSeriesItem("Safari", 4.18));
-        series.add(new DataSeriesItem("Sogou Explorer", 1.64));
-        series.add(new DataSeriesItem("Opera", 6.2));
-        series.add(new DataSeriesItem("QQ", 1.2));
-        series.add(new DataSeriesItem("Others", 2.61));
+        series.add(new DataSeriesItem("Passive Users", passiveUsers.size(), 1)); //siyah
+        series.add(new DataSeriesItem("Online Users", onlineUsers.size(), 2)); //yeşil
+        series.add(new DataSeriesItem("Active Users", activeUsers.size(), 3)); //turuncu
+        series.add(new DataSeriesItem("Locked Users", lockedUsers.size(), 5)); // kırmızı
         conf.setSeries(series);
-        chart.setVisibilityTogglingDisabled(true);
 
-        chart.addPointLegendItemClickListener(event -> UIUtils.showNotification("Legend item click" + " : " + event.getItemIndex() + " : " + event.getItem().getName()));
-        return new FlexBoxLayout(createHeader(VaadinIcon.MONEY_EXCHANGE, "Transactions"), chart);
+        userChart.addPointSelectListener(event -> {
+                    ListDataProvider<String> provider;
+                    if (event.getItem().getName().equals("Passive Users")) {
+                        provider = DataProvider.ofCollection(passiveUsers.stream().map(User::getEmail).collect(Collectors.toList()));
+                    } else if (event.getItem().getName().equals("Locked Users")) {
+                        provider = DataProvider.ofCollection(lockedUsers.stream().map(User::getEmail).collect(Collectors.toList()));
+                    } else if (event.getItem().getName().equals("Active Users")) {
+                        provider = DataProvider.ofCollection(activeUsers.stream().map(User::getEmail).collect(Collectors.toList()));
+                    } else {
+                        provider = DataProvider.ofCollection(SecurityUtils.getOnlineUsers());
+                    }
+                    userGrid.setDataProvider(provider);
+                }
+        );
+
+        FlexBoxLayout layout = new FlexBoxLayout();
+        layout.setSizeFull();
+        layout.addClassName(CLASS_NAME + "__payment-chart");
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
+        layout.setShadow(Shadow.S);
+        layout.setFlexDirection(FlexDirection.ROW);
+        layout.setPadding(Top.L, Right.S, Bottom.L, Left.S);
+        layout.add(userChart, gridContent);
+        return layout;
     }
 
-    public Component createMixedChart() {
-        Chart chart = new Chart();
-        Configuration conf = chart.getConfiguration();
-        conf.setTitle("Combined Chart");
-        conf.setExporting(true);
-
-        XAxis x = new XAxis();
-        x.setCategories(new String[]{"Apples", "Oranges", "Pears", "Bananas", "Plums"});
-        conf.addxAxis(x);
-
-        LabelStyle labelStyle = new LabelStyle();
-        labelStyle.setTop("8px");
-        labelStyle.setLeft("40px");
-        conf.setLabels(new HTMLLabels(labelStyle, new HTMLLabelItem("Total fruit consumption")));
-
-        DataSeries series = new DataSeries();
-        PlotOptionsColumn plotOptions = new PlotOptionsColumn();
-        series.setPlotOptions(plotOptions);
-        series.setName("Jane");
-        series.setData(3, 2, 1, 3, 4);
-        conf.addSeries(series);
-
-        series = new DataSeries();
-        plotOptions = new PlotOptionsColumn();
-        series.setPlotOptions(plotOptions);
-        series.setName("John");
-        series.setData(2, 3, 5, 7, 6);
-        conf.addSeries(series);
-
-        series = new DataSeries();
-        plotOptions = new PlotOptionsColumn();
-        series.setPlotOptions(plotOptions);
-        series.setName("Joe");
-        series.setData(4, 3, 3, 9, 0);
-        conf.addSeries(series);
-
-        series = new DataSeries();
-        PlotOptionsSpline splinePlotOptions = new PlotOptionsSpline();
-        series.setPlotOptions(splinePlotOptions);
-        series.setName("Average");
-        series.setData(3, 2.67, 3, 6.33, 3.33);
-        conf.addSeries(series);
-
-        series = new DataSeries();
-        series.setPlotOptions(new PlotOptionsPie());
-        series.setName("Total consumption");
-        DataSeriesItem item = new DataSeriesItem("Jane", 13);
-        series.add(item);
-        item = new DataSeriesItem("John", 23);
-        series.add(item);
-        item = new DataSeriesItem("Joe", 19);
-        series.add(item);
-
-        PlotOptionsPie plotOptionsPie = new PlotOptionsPie();
-        plotOptionsPie.setSize("100px");
-        plotOptionsPie.setCenter("100px", "80px");
-        plotOptionsPie.setShowInLegend(false);
-        series.setPlotOptions(plotOptionsPie);
-        conf.addSeries(series);
-
-        FlexBoxLayout card = new FlexBoxLayout(chart);
-        card.setBorderRadius(BorderRadius.S);
-        card.setBackgroundColor(LumoStyles.Color.BASE_COLOR);
-        card.setBoxSizing(BoxSizing.BORDER_BOX);
-        card.setHeight("400px");
-        card.setPadding(Uniform.M);
-        card.setShadow(Shadow.S);
-
-
-        FlexBoxLayout transactions = new FlexBoxLayout(createHeader(VaadinIcon.CALC_BOOK, "Statistics"), card);
-        transactions.setBoxSizing(BoxSizing.BORDER_BOX);
-        transactions.setDisplay(Display.BLOCK);
-        transactions.setMargin(Top.XL);
-        transactions.setMaxWidth(MAX_WIDTH);
-        transactions.setPadding(Horizontal.RESPONSIVE_L);
-        transactions.setWidth("100%");
-
-        return transactions;
-
+    private Component viewDetails(String username) {
+        return UIUtils.createButton(
+                VaadinIcon.INFO,
+                (ComponentEventListener<ClickEvent<Button>>) e -> UIUtils.showNotification("Not implemented yet!")
+        );
     }
 
-    private Component createDocs() {
-        Component reports = createReports();
-        Component logs = createLogs();
-
-        Row docs = new Row(reports, logs);
-        docs.addClassName(LumoStyles.Margin.Top.XL);
-        UIUtils.setMaxWidth(MAX_WIDTH, docs);
-        docs.setWidth("100%");
-
-        return docs;
+    private Component createUserInfo(String user) {
+        ListItem item = new ListItem(
+                UIUtils.createInitials(user.substring(0, 1)),
+                user
+        );
+        item.setHorizontalPadding(false);
+        return item;
     }
-
-    private Component createReports() {
-        FlexBoxLayout header = createHeader(VaadinIcon.RECORDS, "Reports");
-
-        Tabs tabs = new Tabs();
-        for (String label : new String[]{"All", "Archive", "Workflows", "Support"}) {
-            tabs.add(new Tab(label));
-        }
-
-        Div items = new Div(
-                new ListItem(UIUtils.createIcon(IconSize.M, TextColor.TERTIARY, VaadinIcon.CHART), "Weekly Report", "Generated Oct 5, 2018", createInfoButton()),
-                new ListItem(UIUtils.createIcon(IconSize.M, TextColor.TERTIARY, VaadinIcon.SITEMAP), "Payment Workflows", "Last modified Oct 24, 2018", createInfoButton()));
-        items.addClassNames(LumoStyles.Padding.Vertical.S);
-
-        Div card = new Div(tabs, items);
-        UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, card);
-        UIUtils.setBorderRadius(BorderRadius.S, card);
-        UIUtils.setShadow(Shadow.S, card);
-
-        FlexBoxLayout reports = new FlexBoxLayout(header, card);
-        reports.addClassName(CLASS_NAME + "__reports");
-        reports.setFlexDirection(FlexDirection.COLUMN);
-        reports.setPadding(Bottom.XL, Left.RESPONSIVE_L);
-        return reports;
-    }
-
-    private Component createLogs() {
-        FlexBoxLayout header = createHeader(VaadinIcon.EDIT, "Logs");
-
-        Tabs tabs = new Tabs();
-        for (String label : new String[]{"All", "Transfer", "Security", "Change"}) {
-            tabs.add(new Tab(label));
-        }
-
-        Div items = new Div(
-                new ListItem(UIUtils.createIcon(IconSize.M, TextColor.TERTIARY, VaadinIcon.EXCHANGE), "Transfers (October)", "Generated Oct 31, 2018", createInfoButton()),
-                new ListItem(UIUtils.createIcon(IconSize.M, TextColor.TERTIARY, VaadinIcon.SHIELD), "Security Log", "Updated 16:31 CET", createInfoButton()));
-        items.addClassNames(LumoStyles.Padding.Vertical.S);
-
-        Div card = new Div(tabs, items);
-        UIUtils.setBackgroundColor(LumoStyles.Color.BASE_COLOR, card);
-        UIUtils.setBorderRadius(BorderRadius.S, card);
-        UIUtils.setShadow(Shadow.S, card);
-
-        FlexBoxLayout logs = new FlexBoxLayout(header, card);
-        logs.addClassName(CLASS_NAME + "__logs");
-        logs.setFlexDirection(FlexDirection.COLUMN);
-        logs.setPadding(Bottom.XL, Right.RESPONSIVE_L);
-        return logs;
-    }
-
-    private Button createInfoButton() {
-        Button infoButton = UIUtils.createSmallButton(VaadinIcon.INFO);
-        infoButton.addClickListener(e -> UIUtils.showNotification("Not implemented yet."));
-        return infoButton;
-    }
-
 
 }
