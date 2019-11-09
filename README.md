@@ -1,1 +1,3 @@
-#Vaadin flow review with springboot & spring security for new developers.
+Spring boot application with Vaadin 13 frameworks. Used to Spring security & JPA.
+
+

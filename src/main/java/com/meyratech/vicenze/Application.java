@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.annotation.PostConstruct;
+import java.time.ZoneId;
+import java.util.TimeZone;
+
 /**
  * Spring boot web application initializer.
  */
@@ -21,11 +25,15 @@ public class Application extends SpringBootServletInitializer {
         SpringApplication.run(Application.class, args);
     }
 
+    @PostConstruct
+    public void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Europe/Athens")));
+    }
+
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Application.class);
     }
-
 
     /**
      * The password encoder to use when encrypting passwords.

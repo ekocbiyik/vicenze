@@ -1,7 +1,10 @@
 package com.meyratech.vicenze.ui.components.navigation.bar;
 
-import static com.meyratech.vicenze.ui.util.UIUtils.IMG_PATH;
-
+import com.meyratech.vicenze.ui.MainLayout;
+import com.meyratech.vicenze.ui.components.navigation.tab.NaviTabs;
+import com.meyratech.vicenze.ui.util.LumoStyles;
+import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Composite;
@@ -13,11 +16,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.meyratech.vicenze.ui.MainLayout;
-import com.meyratech.vicenze.ui.components.navigation.tab.NaviTabs;
-import com.meyratech.vicenze.ui.util.LumoStyles;
-import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.views.HomeView;
+
+import static com.meyratech.vicenze.ui.util.UIUtils.IMG_PATH;
 
 public class TabBar extends Composite<FlexLayout> {
 
@@ -26,7 +26,6 @@ public class TabBar extends Composite<FlexLayout> {
     private Button menuIcon;
 
     private FlexLayout actionItems;
-    private Image avatar;
 
     private Button addTab;
     private NaviTabs tabs;
@@ -40,7 +39,7 @@ public class TabBar extends Composite<FlexLayout> {
         menuIcon.addClassName(CLASS_NAME + "__navi-icon");
         menuIcon.addClickListener(e -> MainLayout.get().getNaviDrawer().toggle());
 
-        avatar = new Image();
+        Image avatar = new Image();
         avatar.setClassName(CLASS_NAME + "__avatar");
         avatar.setSrc(IMG_PATH + "avatar.png");
 
@@ -87,14 +86,14 @@ public class TabBar extends Composite<FlexLayout> {
     }
 
     public Tab addTab(String text,
-            Class<? extends Component> navigationTarget) {
+                      Class<? extends Component> navigationTarget) {
         Tab tab = tabs.addTab(text, navigationTarget);
         configureTab(tab);
         return tab;
     }
 
     public Tab addClosableTab(String text,
-            Class<? extends Component> navigationTarget) {
+                              Class<? extends Component> navigationTarget) {
         Tab tab = tabs.addClosableTab(text, navigationTarget);
         configureTab(tab);
         return tab;
@@ -109,7 +108,7 @@ public class TabBar extends Composite<FlexLayout> {
     }
 
     public void updateSelectedTab(String text,
-            Class<? extends Component> navigationTarget) {
+                                  Class<? extends Component> navigationTarget) {
         tabs.updateSelectedTab(text, navigationTarget);
     }
 

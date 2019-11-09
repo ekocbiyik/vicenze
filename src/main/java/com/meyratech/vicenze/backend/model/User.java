@@ -1,17 +1,22 @@
 package com.meyratech.vicenze.backend.model;
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Entity(name = "t_user")
-public class User extends AbstractEntity {
+@Entity
+@Table(name = "t_user")
+public class User {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @NotEmpty
     @Email
@@ -40,8 +45,30 @@ public class User extends AbstractEntity {
     @Column(name = "locked", nullable = false)
     private boolean locked = false; // parola yanlış girerse
 
+    @Column(name = "try_count")
+    private int tryCount = 0;
+
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
+    public String getFullName() {
+        return String.format("%s %s", getFirstName(), getLastName());
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getEmail() {
         return email;
@@ -75,10 +102,6 @@ public class User extends AbstractEntity {
         this.lastName = lastName;
     }
 
-    public String getFullName() {
-        return String.format("%s %s", getFirstName(), getLastName());
-    }
-
     public String getRole() {
         return role;
     }
@@ -92,7 +115,7 @@ public class User extends AbstractEntity {
     }
 
     public void setActive(boolean active) {
-        this.isActive = active;
+        isActive = active;
     }
 
     public boolean isLocked() {
@@ -103,11 +126,35 @@ public class User extends AbstractEntity {
         this.locked = locked;
     }
 
+    public int getTryCount() {
+        return tryCount;
+    }
+
+    public void setTryCount(int tryCount) {
+        this.tryCount = tryCount;
+    }
+
     public LocalDateTime getLastLogin() {
         return lastLogin;
     }
 
     public void setLastLogin(LocalDateTime lastLogin) {
         this.lastLogin = lastLogin;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 }

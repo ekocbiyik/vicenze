@@ -1,16 +1,16 @@
 package com.meyratech.vicenze.ui.components;
 
+import com.meyratech.vicenze.ui.util.FontSize;
+import com.meyratech.vicenze.ui.util.TextColor;
+import com.meyratech.vicenze.ui.util.UIUtils;
+import com.meyratech.vicenze.ui.util.css.FlexDirection;
+import com.meyratech.vicenze.ui.util.css.WhiteSpace;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasStyle;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.meyratech.vicenze.ui.util.FontSize;
-import com.meyratech.vicenze.ui.util.TextColor;
-import com.meyratech.vicenze.ui.util.UIUtils;
-import com.meyratech.vicenze.ui.util.css.FlexDirection;
-import com.meyratech.vicenze.ui.util.css.WhiteSpace;
 
 public class ListItem extends FlexLayout implements HasStyle {
 
@@ -18,13 +18,11 @@ public class ListItem extends FlexLayout implements HasStyle {
 
     private Div prefix;
     private Div suffix;
-
-    private FlexBoxLayout content;
-
     private Label primary;
     private Label secondary;
-
+    private Label lblStatus;
     private Div divider;
+    private FlexBoxLayout content;
 
     public ListItem(String primary, String secondary) {
         setClassName(CLASS_NAME);
@@ -55,7 +53,6 @@ public class ListItem extends FlexLayout implements HasStyle {
     }
 
     /* === SUFFIX === */
-
     public ListItem(String primary, String secondary, Component suffix) {
         this(primary, secondary);
         setSuffix(suffix);
@@ -66,9 +63,7 @@ public class ListItem extends FlexLayout implements HasStyle {
     }
 
     /* === PREFIX & SUFFIX === */
-
-    public ListItem(Component prefix, String primary, String secondary,
-                    Component suffix) {
+    public ListItem(Component prefix, String primary, String secondary, Component suffix) {
         this(primary, secondary);
         setPrefix(prefix);
         setSuffix(suffix);
@@ -79,7 +74,6 @@ public class ListItem extends FlexLayout implements HasStyle {
     }
 
     /* === MISC === */
-
     public FlexBoxLayout getContent() {
         return content;
     }
@@ -132,8 +126,7 @@ public class ListItem extends FlexLayout implements HasStyle {
         if (suffix == null) {
             suffix = new Div();
             suffix.addClassName(CLASS_NAME + "__suffix");
-            getElement().insertChild(getElement().getChildCount(),
-                    suffix.getElement());
+            getElement().insertChild(getElement().getChildCount(), suffix.getElement());
         }
         suffix.removeAll();
         suffix.add(components);

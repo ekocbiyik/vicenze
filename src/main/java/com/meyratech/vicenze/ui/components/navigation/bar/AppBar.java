@@ -2,7 +2,7 @@ package com.meyratech.vicenze.ui.components.navigation.bar;
 
 import static com.meyratech.vicenze.ui.util.UIUtils.IMG_PATH;
 
-import com.meyratech.vicenze.ui.views.HomeView;
+import com.meyratech.vicenze.ui.views.home.HomeView;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -28,8 +28,6 @@ import com.meyratech.vicenze.ui.util.UIUtils;
 public class AppBar extends Composite<FlexLayout> {
 
     private String CLASS_NAME = "app-bar";
-
-    private FlexBoxLayout container;
 
     private Button menuIcon;
     private Button contextIcon;
@@ -82,7 +80,7 @@ public class AppBar extends Composite<FlexLayout> {
     }
 
     private void initContextIcon() {
-        contextIcon = UIUtils.createTertiaryInlineButton(VaadinIcon.ARROW_LEFT);
+        contextIcon = UIUtils.createTertiaryInlineButton(VaadinIcon.REPLY_ALL);
         contextIcon.removeThemeVariants(ButtonVariant.LUMO_ICON);
         contextIcon.addClassNames(CLASS_NAME + "__context-icon");
         contextIcon.setVisible(false);
@@ -106,6 +104,7 @@ public class AppBar extends Composite<FlexLayout> {
         avatar.setClassName(CLASS_NAME + "__avatar");
         avatar.setSrc(IMG_PATH + "logo-18.png");
         avatar.setAlt("User menu");
+        avatar.setVisible(false);
 
         ContextMenu contextMenu = new ContextMenu(avatar);
         contextMenu.setOpenOnClick(true);
@@ -121,7 +120,7 @@ public class AppBar extends Composite<FlexLayout> {
     }
 
     private void initContainer() {
-        container = new FlexBoxLayout(menuIcon, contextIcon, this.title, search, actionItems, avatar);
+        FlexBoxLayout container = new FlexBoxLayout(menuIcon, contextIcon, this.title, search, actionItems, avatar);
         container.addClassName(CLASS_NAME + "__container");
         container.setAlignItems(FlexComponent.Alignment.CENTER);
         container.setFlexGrow(1, search);

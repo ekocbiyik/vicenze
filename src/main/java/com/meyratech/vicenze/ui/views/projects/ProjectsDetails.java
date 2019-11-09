@@ -2,6 +2,7 @@ package com.meyratech.vicenze.ui.views.projects;
 
 import com.meyratech.vicenze.backend.DummyData;
 import com.meyratech.vicenze.backend.model.Project;
+import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.repository.service.ProjectServiceImpl;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
@@ -10,8 +11,7 @@ import com.meyratech.vicenze.ui.components.navigation.bar.AppBar;
 import com.meyratech.vicenze.ui.layout.size.*;
 import com.meyratech.vicenze.ui.util.*;
 import com.meyratech.vicenze.ui.util.css.*;
-import com.meyratech.vicenze.ui.views.Accounts;
-import com.meyratech.vicenze.ui.views.ViewFrame;
+import com.meyratech.vicenze.ui.components.ViewFrame;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
@@ -31,18 +31,17 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import java.time.LocalDate;
 
 @Route(value = ViewConst.PAGE_PROJECTS_DETAILS, layout = MainLayout.class)
-@PageTitle(ViewConst.PAGE_PROJECTS_DETAILS)
+@PageTitle(ViewConst.TITLE_PROJECTS_DETAILS)
+@Secured(Role.ADMIN)
 public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> {
 
     public int RECENT_TRANSACTIONS = 4;
 
-    private ListItem availability;
-    private ListItem bankAccount;
-    private ListItem updated;
     private Project project;
     private ProjectServiceImpl projectService;
 
@@ -52,26 +51,21 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     }
 
     @Override
-    protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-
-        // TODO: 4/28/19 burada kaldık
-
-
-        AppBar appBar = initAppBar();
-        appBar.setTitle(project.getProjectName());
-//        UI.getCurrent().getPage().setTitle(account.getOwner());
-
-        availability.setPrimaryText("burası primary text");
-        bankAccount.setPrimaryText("burası 2");
-        bankAccount.setSecondaryText("burası 3");
-        updated.setPrimaryText(UIUtils.formatDatetime(project.getCreationDate()));
+    public void setParameter(BeforeEvent beforeEvent, Long id) {
+        try {
+            project = projectService.findById(id);
+            setViewContent(createContent());
+        } catch (Exception e) {
+            UI.getCurrent().navigate(ProjectsView.class);
+            return;
+        }
     }
 
     @Override
-    public void setParameter(BeforeEvent beforeEvent, Long id) {
-        setViewContent(createContent());
-        project = projectService.findById(id);
+    protected void onAttach(AttachEvent attachEvent) {
+        super.onAttach(attachEvent);
+        AppBar appBar = initAppBar();
+        appBar.setTitle(project.getProjectName());
     }
 
     private AppBar initAppBar() {
@@ -82,11 +76,13 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     }
 
     private Component createContent() {
-        FlexBoxLayout content = new FlexBoxLayout(createLogoSection(),
+        FlexBoxLayout content = new FlexBoxLayout(
+                createLogoSection(),
                 createRecentTransactionsHeader(),
                 createRecentTransactionsList(),
                 createMonthlyOverviewHeader(),
-                createMonthlyOverviewChart());
+                createMonthlyOverviewChart()
+        );
         content.setFlexDirection(FlexDirection.COLUMN);
         content.setMargin(Horizontal.AUTO, Vertical.RESPONSIVE_L);
         content.setMaxWidth("840px");
@@ -94,29 +90,33 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
     }
 
     private FlexBoxLayout createLogoSection() {
-        Image image = DummyData.getLogo();
+
+        String imgName = project.getProjectLogo() == null ? "logo-only.svg" : project.getProjectLogo();
+        Image image = new Image(String.format("%s%s", UIUtils.IMG_PATH, imgName), "");
         image.addClassName(LumoStyles.Margin.Horizontal.L);
         UIUtils.setBorderRadius(BorderRadius._50, image);
         image.setHeight("200px");
         image.setWidth("200px");
 
-        availability = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.DOLLAR), "", "Availability");
-        availability.setId("availability");
-        availability.getPrimary().addClassName(LumoStyles.Heading.H2);
+        ListItem companyLabel = new ListItem(
+                UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION),
+                project.getCompany(),
+                String.format("Project no: %s", project.getId())
+        );
+        companyLabel.getPrimary().addClassName(LumoStyles.Heading.H2);
+        companyLabel.setDividerVisible(true);
+        companyLabel.setWhiteSpace(WhiteSpace.PRE_LINE);
+
+        ListItem availability = new ListItem(
+                UIUtils.createTertiaryIcon(VaadinIcon.INFO_CIRCLE),
+                project.getEmail(),
+                project.getPhone()
+        );
         availability.setDividerVisible(true);
-        availability.setReverse(true);
 
-        bankAccount = new ListItem(
-                UIUtils.createTertiaryIcon(VaadinIcon.INSTITUTION), "", "");
-        bankAccount.setId("bankAccount");
-        bankAccount.setDividerVisible(true);
-        bankAccount.setReverse(true);
-        bankAccount.setWhiteSpace(WhiteSpace.PRE_LINE);
+        ListItem creationInfo = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), project.getCreatedBy().getFullName(), UIUtils.formatDatetime(project.getCreationDate()));
 
-        updated = new ListItem(UIUtils.createTertiaryIcon(VaadinIcon.CALENDAR), "", "Updated");
-        updated.setReverse(true);
-
-        FlexBoxLayout listItems = new FlexBoxLayout(availability, bankAccount, updated);
+        FlexBoxLayout listItems = new FlexBoxLayout(companyLabel, availability, creationInfo);
         listItems.setFlexDirection(FlexDirection.COLUMN);
 
         FlexBoxLayout section = new FlexBoxLayout(image, listItems);
@@ -156,10 +156,12 @@ public class ProjectsDetails extends ViewFrame implements HasUrlParameter<Long> 
                 UIUtils.setTextColor(TextColor.ERROR, amountLabel);
             }
 
-            ListItem item = new ListItem(DummyData.getLogo(),
+            ListItem item = new ListItem(
+                    DummyData.getLogo(),
                     DummyData.getCompany(),
                     UIUtils.formatDate(LocalDate.now().minusDays(i)),
-                    amountLabel);
+                    amountLabel
+            );
 
             // Dividers for all but the last item
             item.setDividerVisible(i < RECENT_TRANSACTIONS - 1);

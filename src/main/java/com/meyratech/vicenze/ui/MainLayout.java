@@ -11,10 +11,11 @@ import com.meyratech.vicenze.ui.util.LumoStyles;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import com.meyratech.vicenze.ui.util.css.FlexDirection;
 import com.meyratech.vicenze.ui.util.css.Overflow;
-import com.meyratech.vicenze.ui.views.HomeView;
-import com.meyratech.vicenze.ui.views.Payments;
-import com.meyratech.vicenze.ui.views.personnel.Accountants;
-import com.meyratech.vicenze.ui.views.personnel.Managers;
+import com.meyratech.vicenze.ui.views.home.HomeView;
+import com.meyratech.vicenze.ui.views.invoice.IncorrectInvoiceView;
+import com.meyratech.vicenze.ui.views.invoice.InvoiceImportView;
+import com.meyratech.vicenze.ui.views.invoice.InvoiceView;
+import com.meyratech.vicenze.ui.views.personnel.PersonelView;
 import com.meyratech.vicenze.ui.views.projects.ProjectsView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
@@ -70,15 +71,9 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
         setFlexDirection(FlexDirection.COLUMN);
         setSizeFull();
 
-        // Initialise the UI building blocks
         initStructure();
-
-        // Configure the headers and footers (optional)
         initHeadersAndFooters();
-
         if (SecurityUtils.isUserLoggedIn()) {
-
-            // Populate the navigation drawer
             initNaviItems();
         }
     }
@@ -113,23 +108,26 @@ public class MainLayout extends FlexBoxLayout implements RouterLayout, PageConfi
      */
     private void initNaviItems() {
         NaviMenu menu = naviDrawer.getMenu();
-        menu.addNaviItem(VaadinIcon.HOME, ViewConst.TITLE_HOME, HomeView.class);
-        menu.addNaviItem(VaadinIcon.INSTITUTION, ViewConst.TITLE_PROJECTS, ProjectsView.class);
-        menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Payments", Payments.class);
 
-        NaviItem personnel = menu.addNaviItem(VaadinIcon.USERS, "Personnel", null);
-        menu.addNaviItem(personnel, "Accountants", Accountants.class);
-        menu.addNaviItem(personnel, "Managers", Managers.class);
+        menu.addNaviItem(VaadinIcon.HOME, ViewConst.TITLE_HOME, HomeView.class);
+        if (SecurityUtils.isAccessGranted(PersonelView.class)) {
+            menu.addNaviItem(VaadinIcon.USERS, ViewConst.TITLE_PERSONNELS, PersonelView.class);
+        }
+
+        if (SecurityUtils.isAccessGranted(ProjectsView.class)) {
+            menu.addNaviItem(VaadinIcon.INSTITUTION, ViewConst.TITLE_PROJECTS, ProjectsView.class);
+        }
+
+        NaviItem personnel = menu.addNaviItem(VaadinIcon.CREDIT_CARD, "Invoice", null);
+        menu.addNaviItem(personnel, "Invoice List", InvoiceView.class);
+        menu.addNaviItem(personnel, "Incorrect List", IncorrectInvoiceView.class);
+        menu.addNaviItem(personnel, "Invoice Import", InvoiceImportView.class);
     }
 
     /**
      * Configure the app's inner and outer headers and footers.
      */
     private void initHeadersAndFooters() {
-        // With tabs:
-        // the title, avatar and menu button (small screens) go into the TabBar
-        // Without:
-        // all of them go into the AppBar
 
         appBar = new AppBar("");
 

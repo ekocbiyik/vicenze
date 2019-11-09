@@ -1,8 +1,10 @@
 package com.meyratech.vicenze.backend.security;
 
-import com.meyratech.vicenze.ui.views.LoginView;
+import com.meyratech.vicenze.backend.model.User;
+import com.meyratech.vicenze.backend.repository.dao.IUserDao;
 import com.meyratech.vicenze.ui.views.errors.AccessDeniedView;
 import com.meyratech.vicenze.ui.views.errors.CustomRouteNotFoundError;
+import com.meyratech.vicenze.ui.views.login.LoginView;
 import com.vaadin.flow.server.ServletHelper.RequestType;
 import com.vaadin.flow.shared.ApplicationConstants;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -12,11 +14,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -44,6 +48,12 @@ public final class SecurityUtils {
         }
         // Anonymous or no authentication.
         return null;
+    }
+
+    public static User getCurrentUser() {
+        return UtilsForSpring
+                .getSingleBeanOfType(IUserDao.class)
+                .findByEmailIgnoreCase(getUsername());
     }
 
     /**
@@ -101,9 +111,21 @@ public final class SecurityUtils {
      * @param request {@link HttpServletRequest}
      * @return true if is an internal framework request. False otherwise.
      */
-    static boolean isFrameworkInternalRequest(HttpServletRequest request) {
+    public static boolean isFrameworkInternalRequest(HttpServletRequest request) {
         final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
         return parameterValue != null && Stream.of(RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
+    }
+
+    public static List<String> getOnlineUsers() {
+
+        SessionRegistry sessionRegistry = UtilsForSpring.getSingleBeanOfType(SessionRegistry.class);
+        return sessionRegistry
+                .getAllPrincipals()
+                .stream()
+                .filter(p -> p instanceof UserDetails)
+                .map(UserDetails.class::cast)
+                .map(UserDetails::getUsername)
+                .collect(Collectors.toList());
     }
 
 }

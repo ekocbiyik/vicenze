@@ -1,26 +1,67 @@
 package com.meyratech.vicenze.backend.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 /**
  * ekocbiyik on 4/28/19
  */
-@Entity(name = "t_project")
-public class Project extends AbstractEntity {
+@Entity
+@Table(name = "t_project")
+public class Project {
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @NotBlank
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "project_name", nullable = false)
     private String projectName;
 
+    @NotBlank
+    @Column(name = "company", nullable = false)
+    private String company;
+
+    @Column(name = "project_logo")
+    private String projectLogo;
+
+    @NotEmpty
+    @Email
     @Size(max = 255)
-    @Column(name = "password")
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Size(max = 255)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true; // aktivate-deactivate
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User createdBy;
+
+    @CreationTimestamp
+    @Column(name = "creation_date", nullable = false)
+    private LocalDateTime creationDate;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getProjectName() {
         return projectName;
@@ -28,6 +69,38 @@ public class Project extends AbstractEntity {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
+    public String getProjectLogo() {
+        return projectLogo;
+    }
+
+    public void setProjectLogo(String projectLogo) {
+        this.projectLogo = projectLogo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getDescription() {
@@ -46,4 +119,19 @@ public class Project extends AbstractEntity {
         isActive = active;
     }
 
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public LocalDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDateTime creationDate) {
+        this.creationDate = creationDate;
+    }
 }

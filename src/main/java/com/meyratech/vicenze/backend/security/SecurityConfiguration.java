@@ -3,8 +3,10 @@ package com.meyratech.vicenze.backend.security;
 import com.meyratech.vicenze.backend.model.Role;
 import com.meyratech.vicenze.backend.model.User;
 import com.meyratech.vicenze.backend.repository.dao.IUserDao;
+import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +16,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 /**
  * Configures spring security, doing the following:
@@ -41,11 +45,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private IUserService userService;
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public CurrentUser currentUser(IUserDao IUserDao) {
+    public CurrentUser currentUser(IUserDao userDao) {
         final String username = SecurityUtils.getUsername();
-        User user = username != null ? IUserDao.findByEmailIgnoreCase(username) : null;
+        User user = username != null ? userDao.findByEmailIgnoreCase(username) : null;
         return () -> user;
     }
 
@@ -65,21 +82,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // Not using Spring CSRF here to be able to use plain HTML for the login page
         http.csrf().disable()
-
-                // Register our CustomRequestCache, that saves unauthorized access attempts, so
-                // the user is redirected after login.
                 .requestCache().requestCache(new CustomRequestCache())
-
-                // Restrict access to our application.
                 .and().authorizeRequests()
-
-                // Allow all flow internal requests.
                 .requestMatchers(SecurityUtils::isFrameworkInternalRequest).permitAll()
-
-                // Allow all requests by logged in users.
                 .anyRequest().hasAnyAuthority(Role.getAllRoles())
-
-                // Configure the login page.
                 .and()
                 .formLogin()
                 .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
@@ -87,46 +93,33 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .loginProcessingUrl(LOGIN_PROCESSING_URL)
                 .failureUrl(LOGIN_FAILURE_URL)
-                .successHandler(new SavedRequestAwareAuthenticationSuccessHandler())
+                .successHandler(new CustomAuthenticationSuccessHandler(userService))
                 .and()
                 .logout()
                 .logoutSuccessUrl(LOGOUT_SUCCESS_URL);
+        http.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry());
     }
 
     /**
      * Allows access to static resources, bypassing Spring security.
      */
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(WebSecurity web) {
         web.ignoring().antMatchers(
-                // Vaadin Flow static resources
-                "/VAADIN/**",
-
-                // the standard favicon URI
-                "/favicon.ico",
-
-                // the robots exclusion standard
-                "/robots.txt",
-
-                // web application manifest
-                "/manifest.webmanifest",
+                "/VAADIN/**",   // Vaadin Flow static resources
+                "/favicon.ico",             // the standard favicon URI
+                "/robots.txt",              // the robots exclusion standard
+                "/manifest.webmanifest",    // web application manifest
                 "/sw.js",
                 "/offline-page.html",
-
-                // icons and images
-                "/icons/**",
+                "/icons/**",                // icons and images
                 "/images/**",
-
-                // (development mode) static resources
-                "/frontend/**",
-
-                // (development mode) webjars
-                "/webjars/**",
-
-                // (development mode) H2 debugging console
-                "/h2-console/**",
-
-                // (production mode) static resources
-                "/frontend-es5/**", "/frontend-es6/**");
+                "/frontend/**",             // (development mode) static resources
+                "/webjars/**",              // (development mode) webjars
+                "/h2-console/**",           // (development mode) H2 debugging console
+                "/frontend-es5/**",         // (production mode) static resources
+                "/frontend-es6/**"
+        );
     }
+
 }

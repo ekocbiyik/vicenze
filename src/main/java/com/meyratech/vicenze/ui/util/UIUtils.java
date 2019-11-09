@@ -1,12 +1,11 @@
 package com.meyratech.vicenze.ui.util;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
+import com.meyratech.vicenze.ui.components.FlexBoxLayout;
+import com.meyratech.vicenze.ui.layout.size.Right;
+import com.meyratech.vicenze.ui.util.css.*;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -19,17 +18,12 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.theme.lumo.Lumo;
-import com.meyratech.vicenze.backend.Address;
-import com.meyratech.vicenze.backend.DummyData;
-import com.meyratech.vicenze.ui.components.FlexBoxLayout;
-import com.meyratech.vicenze.ui.layout.size.Right;
-import com.meyratech.vicenze.ui.util.css.AlignSelf;
-import com.meyratech.vicenze.ui.util.css.BorderRadius;
-import com.meyratech.vicenze.ui.util.css.BoxSizing;
-import com.meyratech.vicenze.ui.util.css.Overflow;
-import com.meyratech.vicenze.ui.util.css.Shadow;
-import com.meyratech.vicenze.ui.util.css.TextAlign;
-import com.meyratech.vicenze.ui.util.css.WhiteSpace;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class UIUtils {
 
@@ -39,19 +33,19 @@ public class UIUtils {
     public static final String COLUMN_WIDTH_S = "120px";
     public static final String COLUMN_WIDTH_M = "160px";
     public static final String COLUMN_WIDTH_L = "200px";
-    public static final String COLUMN_WIDTH_XL = "240px";
+    public static final String COLUMN_WIDTH_XL = "250px";
+    public static final String COLUMN_WIDTH_FULL = "100%";
 
     /**
      * Thread-unsafe formatters.
      */
-    private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,###.00"));
-    private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("MMM dd, YYYY"));
-    private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("MMM dd, YYYY HH:mm:ss"));
+    private static final ThreadLocal<DecimalFormat> decimalFormat = ThreadLocal.withInitial(() -> new DecimalFormat("###,###,##0.00"));
+    private static final ThreadLocal<DateTimeFormatter> dateFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    private static final ThreadLocal<DateTimeFormatter> dateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    private static final ThreadLocal<DateTimeFormatter> fileNamedateTimeFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+    private static final ThreadLocal<DateTimeFormatter> idFormat = ThreadLocal.withInitial(() -> DateTimeFormatter.ofPattern("yyMMddHHmmss"));
 
     /* ==== BUTTONS ==== */
-
-    // Styles
-
     public static Button createPrimaryButton(String text) {
         return createButton(text, ButtonVariant.LUMO_PRIMARY);
     }
@@ -160,8 +154,6 @@ public class UIUtils {
         return createButton(text, icon, ButtonVariant.LUMO_CONTRAST, ButtonVariant.LUMO_PRIMARY);
     }
 
-    // Size
-
     public static Button createSmallButton(String text) {
         return createButton(text, ButtonVariant.LUMO_SMALL);
     }
@@ -187,7 +179,6 @@ public class UIUtils {
     }
 
     // Text
-
     public static Button createButton(String text, ButtonVariant... variants) {
         Button button = new Button(text);
         button.addThemeVariants(variants);
@@ -196,15 +187,17 @@ public class UIUtils {
     }
 
     // Icon
-
     public static Button createButton(VaadinIcon icon, ButtonVariant... variants) {
         Button button = new Button(new Icon(icon));
         button.addThemeVariants(variants);
         return button;
     }
 
-    // Text and icon
+    public static Button createButton(VaadinIcon icon, ComponentEventListener<ClickEvent<Button>> clickListener) {
+        return new Button(new Icon(icon), clickListener);
+    }
 
+    // Text and icon
     public static Button createButton(String text, VaadinIcon icon, ButtonVariant... variants) {
         Button button = new Button(text, new Icon(icon));
         button.addThemeVariants(variants);
@@ -212,15 +205,23 @@ public class UIUtils {
     }
 
     /* ==== TEXTFIELDS ==== */
-
     public static TextField createSmallTextField() {
         TextField textField = new TextField();
         textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         return textField;
     }
 
-    /* ==== LABELS ==== */
+    public static TextField createCurrencyTextField(String value) {
+        TextField textField = new TextField();
+        textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        textField.setPrefixComponent(new Icon(VaadinIcon.EURO));
+        textField.setValue(value);
+        textField.setReadOnly(true);
+        textField.setClearButtonVisible(true);
+        return textField;
+    }
 
+    /* ==== LABELS ==== */
     public static Label createLabel(FontSize size, TextColor color, String text) {
         Label label = new Label(text);
         setFontSize(size, label);
@@ -288,10 +289,6 @@ public class UIUtils {
         return layout;
     }
 
-    public static String formatAddress(Address address) {
-        return address.getStreet() + "\n" + address.getCity() + ", " + address.getCity() + " " + address.getZip();
-    }
-
     public static Button createFloatingActionButton(VaadinIcon icon) {
         Button button = createPrimaryButton(icon);
         button.addThemeName("fab");
@@ -300,12 +297,9 @@ public class UIUtils {
 
     public static FlexLayout createPhoneLayout() {
         TextField prefix = new TextField();
-        prefix.setValue("+358");
         prefix.setWidth("80px");
 
         TextField number = new TextField();
-        number.setValue(DummyData.getPhoneNumber());
-
         FlexBoxLayout layout = new FlexBoxLayout(prefix, number);
         layout.setFlexGrow(1, number);
         layout.setSpacing(Right.S);
@@ -323,7 +317,12 @@ public class UIUtils {
     }
 
     public static Label createAmountLabel(double amount) {
+        return createAmountLabel("", amount);
+    }
+
+    public static Label createAmountLabel(String title, double amount) {
         Label label = createH5Label(formatAmount(amount));
+        if (!title.isEmpty()) label.setTitle(title);
         label.addClassName(LumoStyles.FontFamily.MONOSPACE);
         return label;
     }
@@ -339,7 +338,6 @@ public class UIUtils {
     }
 
     /* === ICONS === */
-
     public static Icon createPrimaryIcon(VaadinIcon icon) {
         Icon i = new Icon(icon);
         setTextColor(TextColor.PRIMARY, i);
@@ -404,13 +402,20 @@ public class UIUtils {
     }
 
     public static String formatDatetime(LocalDateTime date) {
-        return dateTimeFormat.get().format(date);
+        return date == null ? "" : dateTimeFormat.get().format(date);
+    }
+
+    public static String formatFileNameDatetime(LocalDateTime date) {
+        return date == null ? "" : fileNamedateTimeFormat.get().format(date);
+    }
+
+    public static String formatId(LocalDateTime date) {
+        return idFormat.get().format(date == null ? LocalDateTime.now() : date);
     }
 
     /* === NOTIFICATIONS === */
-
     public static void showNotification(String text) {
-        Notification.show(text, 3000, Notification.Position.BOTTOM_CENTER);
+        Notification.show(text, 3000, Notification.Position.TOP_END);
     }
 
     /* === CSS UTILITIES === */
