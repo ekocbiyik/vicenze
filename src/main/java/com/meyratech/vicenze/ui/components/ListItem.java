@@ -18,10 +18,12 @@ public class ListItem extends FlexLayout implements HasStyle {
 
     private Div prefix;
     private Div suffix;
+
+    private FlexBoxLayout content;
+
     private Label primary;
     private Label secondary;
     private Div divider;
-    private FlexBoxLayout content;
 
     public ListItem(String primary, String secondary) {
         setClassName(CLASS_NAME);

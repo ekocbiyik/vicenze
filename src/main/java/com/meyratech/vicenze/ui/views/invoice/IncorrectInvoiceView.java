@@ -149,6 +149,5 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
         incorrectGrid.getDataProvider().addDataProviderListener(e -> {
             lblItemSize.setText(String.valueOf((int) incorrectGrid.getDataProvider().withConfigurableFilter().fetch(new Query<>()).count()));
         });
-
     }
 }
