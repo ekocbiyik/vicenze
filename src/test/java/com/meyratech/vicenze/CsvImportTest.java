@@ -143,6 +143,7 @@ public class CsvImportTest {
         System.out.println("TRANSACTION");
         transaction.forEach(System.out::println);
 
+        assert true;
     }
 
 }

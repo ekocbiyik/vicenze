@@ -2,7 +2,6 @@ package com.meyratech.vicenze.ui.views.invoice;
 
 import com.meyratech.vicenze.backend.model.CsvModel;
 import com.meyratech.vicenze.backend.model.Invoice;
-import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.utils.CsvImportUtils;
 import com.meyratech.vicenze.ui.MainLayout;
 import com.meyratech.vicenze.ui.components.FlexBoxLayout;
@@ -40,11 +39,9 @@ import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLayout;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 
 @Route(value = ViewConst.PAGE_INVOICE_IMPORT, layout = MainLayout.class)
@@ -76,20 +73,20 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
         csvGrid = new Grid<>();
         csvGrid.setSizeFull();
         csvGrid.setDataProvider(csvDataProvider);
+        csvGrid.addColumn(new ComponentRenderer<>(this::viewCsvDetails)).setFrozen(true).setHeader("Edit").setWidth(UIUtils.COLUMN_WIDTH_XS);
 
-        Grid.Column<CsvModel> col0 = csvGrid.addColumn(new ComponentRenderer<>(this::viewCsvDetails)).setFrozen(true).setHeader("Edit").setWidth(UIUtils.COLUMN_WIDTH_XS);
-        Grid.Column<CsvModel> col1 = csvGrid.addColumn(CsvModel::getPROJECT).setHeader("Project Name").setSortable(true).setComparator(CsvModel::getPROJECT).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col2 = csvGrid.addColumn(CsvModel::getVENDOR).setHeader("Vendor").setSortable(true).setComparator(CsvModel::getVENDOR).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col3 = csvGrid.addColumn(CsvModel::getEVENT_TYPE).setHeader("Event Type").setSortable(true).setComparator(CsvModel::getEVENT_TYPE).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col4 = csvGrid.addColumn(CsvModel::getMAIN_ITEM).setHeader("Main Item").setSortable(true).setComparator(CsvModel::getMAIN_ITEM).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col5 = csvGrid.addColumn(CsvModel::getBOOK).setHeader("Book").setSortable(true).setComparator(CsvModel::getBOOK).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col6 = csvGrid.addColumn(CsvModel::getTRANSACTION).setHeader("Transaction").setSortable(true).setComparator(CsvModel::getTRANSACTION).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col7 = csvGrid.addColumn(CsvModel::getNUMBER).setHeader("Number").setSortable(true).setComparator(CsvModel::getCODE).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col8 = csvGrid.addColumn(CsvModel::getEXPLANATION).setHeader("Explanation").setSortable(true).setComparator(CsvModel::getEXPLANATION).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col9 = csvGrid.addColumn(CsvModel::getAMOUNT).setHeader("Amount").setSortable(true).setComparator(CsvModel::getAMOUNT).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col10 = csvGrid.addColumn(CsvModel::getUNIT_PRICE).setHeader("Unit Prize").setSortable(true).setComparator(CsvModel::getUNIT_PRICE).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col11 = csvGrid.addColumn(CsvModel::getTOTAL_AMOUNT).setHeader("Total Amount").setSortable(true).setComparator(CsvModel::getTOTAL_AMOUNT).setWidth(UIUtils.COLUMN_WIDTH_L);
-        Grid.Column<CsvModel> col12 = csvGrid.addColumn(CsvModel::getDATE).setHeader("Date").setSortable(true).setComparator(CsvModel::getDATE).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col1 = csvGrid.addColumn(CsvModel::getProject).setHeader("Project Name").setSortable(true).setComparator(CsvModel::getProject).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col2 = csvGrid.addColumn(CsvModel::getVendor).setHeader("Vendor").setSortable(true).setComparator(CsvModel::getVendor).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col3 = csvGrid.addColumn(CsvModel::getEventType).setHeader("Event Type").setSortable(true).setComparator(CsvModel::getEventType).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col4 = csvGrid.addColumn(CsvModel::getMainItem).setHeader("Main Item").setSortable(true).setComparator(CsvModel::getMainItem).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col5 = csvGrid.addColumn(CsvModel::getBook).setHeader("Book").setSortable(true).setComparator(CsvModel::getBook).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col6 = csvGrid.addColumn(CsvModel::getTransaction).setHeader("Transaction").setSortable(true).setComparator(CsvModel::getTransaction).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col7 = csvGrid.addColumn(CsvModel::getNumber).setHeader("Number").setSortable(true).setComparator(CsvModel::getCode).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col8 = csvGrid.addColumn(CsvModel::getExplanation).setHeader("Explanation").setSortable(true).setComparator(CsvModel::getExplanation).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col9 = csvGrid.addColumn(CsvModel::getAmount).setHeader("Amount").setSortable(true).setComparator(CsvModel::getAmount).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col10 = csvGrid.addColumn(CsvModel::getUnitPrice).setHeader("Unit Prize").setSortable(true).setComparator(CsvModel::getUnitPrice).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col11 = csvGrid.addColumn(CsvModel::getTotalAmount).setHeader("Total Amount").setSortable(true).setComparator(CsvModel::getTotalAmount).setWidth(UIUtils.COLUMN_WIDTH_L);
+        Grid.Column<CsvModel> col12 = csvGrid.addColumn(CsvModel::getDate).setHeader("Date").setSortable(true).setComparator(CsvModel::getDate).setWidth(UIUtils.COLUMN_WIDTH_L);
 
         csvGrid.prependHeaderRow().join(col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12).setComponent(getCsvSearchBar());
         csvGrid.appendFooterRow().getCell(csvGrid.getColumns().get(0)).setComponent(csvItemSize);
@@ -148,18 +145,18 @@ public class InvoiceImportView extends SplitLayout implements RouterLayout {
         searchField.setValueChangeMode(ValueChangeMode.EAGER);
         searchField.setSizeFull();
         searchField.addValueChangeListener(e -> csvDataProvider.addFilter(
-                (item) -> StringUtils.containsIgnoreCase(item.getPROJECT(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getVENDOR(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getEVENT_TYPE(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getMAIN_ITEM(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getBOOK(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getTRANSACTION(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getNUMBER(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getEXPLANATION(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getAMOUNT(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getUNIT_PRICE(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getTOTAL_AMOUNT(), searchField.getValue())
-                        || StringUtils.containsIgnoreCase(item.getDATE(), searchField.getValue())
+                (item) -> StringUtils.containsIgnoreCase(item.getProject(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getVendor(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getEventType(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getMainItem(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getBook(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getTransaction(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getNumber(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getExplanation(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getAmount(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getUnitPrice(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getTotalAmount(), searchField.getValue())
+                        || StringUtils.containsIgnoreCase(item.getDate(), searchField.getValue())
         ));
 
         // upload

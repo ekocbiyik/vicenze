@@ -20,7 +20,6 @@ public class ListItem extends FlexLayout implements HasStyle {
     private Div suffix;
     private Label primary;
     private Label secondary;
-    private Label lblStatus;
     private Div divider;
     private FlexBoxLayout content;
 

@@ -6,7 +6,6 @@ import com.meyratech.vicenze.backend.repository.dao.IUserDao;
 import com.meyratech.vicenze.backend.repository.service.IUserService;
 import com.meyratech.vicenze.ui.util.ViewConst;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

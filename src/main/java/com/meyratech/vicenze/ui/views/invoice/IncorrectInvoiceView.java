@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 @Route(value = ViewConst.PAGE_INCORRECT_INVOICE, layout = MainLayout.class)
 @ParentLayout(MainLayout.class)
@@ -62,8 +61,8 @@ public class IncorrectInvoiceView extends SplitViewFrame implements RouterLayout
 
         incorrectDataProvider = DataProvider.ofCollection(incorrectService.findAll());
         incorrectGrid.setDataProvider(incorrectDataProvider);
+        incorrectGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Edit").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
 
-        Grid.Column<IncorrectInvoice> col0 = incorrectGrid.addColumn(new ComponentRenderer<>(this::viewDetails)).setFrozen(true).setHeader("Edit").setFlexGrow(0).setWidth(UIUtils.COLUMN_WIDTH_XS);
         Grid.Column<IncorrectInvoice> col1 = incorrectGrid.addColumn(new ComponentRenderer<>(this::createProjectInfo)).setFlexGrow(1).setHeader("Project").setWidth(UIUtils.COLUMN_WIDTH_XL);
         Grid.Column<IncorrectInvoice> col2 = incorrectGrid.addColumn(new ComponentRenderer<>(this::createActive)).setFlexGrow(0).setHeader("Active").setSortable(true).setComparator(IncorrectInvoice::isActive).setWidth(UIUtils.COLUMN_WIDTH_S);
         Grid.Column<IncorrectInvoice> col3 = incorrectGrid.addColumn(IncorrectInvoice::getInvoiceNumber).setFlexGrow(0).setHeader("Invoice Number").setSortable(true).setComparator(IncorrectInvoice::getInvoiceNumber).setWidth(UIUtils.COLUMN_WIDTH_L);

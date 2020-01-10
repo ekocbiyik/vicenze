@@ -5,121 +5,121 @@ package com.meyratech.vicenze.backend.model;
  */
 public class CsvModel {
 
-    private String PROJECT;
-    private String VENDOR;
-    private String EVENT_TYPE;
-    private String MAIN_ITEM;
-    private String BOOK;
-    private String TRANSACTION;
-    private String NUMBER;
-    private String CODE;
-    private String EXPLANATION;
-    private String AMOUNT;
-    private String UNIT_PRICE;
-    private String TOTAL_AMOUNT;
-    private String DATE;
+    private String project;
+    private String vendor;
+    private String eventType;
+    private String mainItem;
+    private String book;
+    private String transaction;
+    private String number;
+    private String code;
+    private String explanation;
+    private String amount;
+    private String unitPrice;
+    private String totalAmount;
+    private String date;
 
-    public String getPROJECT() {
-        return PROJECT;
+    public String getProject() {
+        return project;
     }
 
-    public void setPROJECT(String PROJECT) {
-        this.PROJECT = PROJECT;
+    public void setProject(String project) {
+        this.project = project;
     }
 
-    public String getVENDOR() {
-        return VENDOR;
+    public String getVendor() {
+        return vendor;
     }
 
-    public void setVENDOR(String VENDOR) {
-        this.VENDOR = VENDOR;
+    public void setVendor(String vendor) {
+        this.vendor = vendor;
     }
 
-    public String getEVENT_TYPE() {
-        return EVENT_TYPE;
+    public String getEventType() {
+        return eventType;
     }
 
-    public void setEVENT_TYPE(String EVENT_TYPE) {
-        this.EVENT_TYPE = EVENT_TYPE;
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
-    public String getMAIN_ITEM() {
-        return MAIN_ITEM;
+    public String getMainItem() {
+        return mainItem;
     }
 
-    public void setMAIN_ITEM(String MAIN_ITEM) {
-        this.MAIN_ITEM = MAIN_ITEM;
+    public void setMainItem(String mainItem) {
+        this.mainItem = mainItem;
     }
 
-    public String getBOOK() {
-        return BOOK;
+    public String getBook() {
+        return book;
     }
 
-    public void setBOOK(String BOOK) {
-        this.BOOK = BOOK;
+    public void setBook(String book) {
+        this.book = book;
     }
 
-    public String getTRANSACTION() {
-        return TRANSACTION;
+    public String getTransaction() {
+        return transaction;
     }
 
-    public void setTRANSACTION(String TRANSACTION) {
-        this.TRANSACTION = TRANSACTION;
+    public void setTransaction(String transaction) {
+        this.transaction = transaction;
     }
 
-    public String getDATE() {
-        return DATE;
+    public String getNumber() {
+        return number;
     }
 
-    public void setDATE(String DATE) {
-        this.DATE = DATE;
+    public void setNumber(String number) {
+        this.number = number;
     }
 
-    public String getNUMBER() {
-        return NUMBER;
+    public String getCode() {
+        return code;
     }
 
-    public void setNUMBER(String NUMBER) {
-        this.NUMBER = NUMBER;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getCODE() {
-        return CODE;
+    public String getExplanation() {
+        return explanation;
     }
 
-    public void setCODE(String CODE) {
-        this.CODE = CODE;
+    public void setExplanation(String explanation) {
+        this.explanation = explanation;
     }
 
-    public String getEXPLANATION() {
-        return EXPLANATION;
+    public String getAmount() {
+        return amount;
     }
 
-    public void setEXPLANATION(String EXPLANATION) {
-        this.EXPLANATION = EXPLANATION;
+    public void setAmount(String amount) {
+        this.amount = amount;
     }
 
-    public String getAMOUNT() {
-        return AMOUNT;
+    public String getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setAMOUNT(String AMOUNT) {
-        this.AMOUNT = AMOUNT;
+    public void setUnitPrice(String unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
-    public String getUNIT_PRICE() {
-        return UNIT_PRICE;
+    public String getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setUNIT_PRICE(String UNIT_PRICE) {
-        this.UNIT_PRICE = UNIT_PRICE;
+    public void setTotalAmount(String totalAmount) {
+        this.totalAmount = totalAmount;
     }
 
-    public String getTOTAL_AMOUNT() {
-        return TOTAL_AMOUNT;
+    public String getDate() {
+        return date;
     }
 
-    public void setTOTAL_AMOUNT(String TOTAL_AMOUNT) {
-        this.TOTAL_AMOUNT = TOTAL_AMOUNT;
+    public void setDate(String date) {
+        this.date = date;
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * ekocbiyik on 31.08.2019
  */
-public class ItemDetails {
+public class ItemDetailUtils {
 
     public static List<String> eventTypeList = Arrays.asList("IN", "INV_IN", "EXP", "OUT");
     public static List<String> mainItemList = Arrays.asList("UNASSIGNED", "LOAN", "PLOT", "CONSTRUCTION", "OFFICIAL SET UP", "GENERAL EXPENSES", "FIXTURE", "SALES", "CP", "INTERBOOK", "SALES & MARKETING");

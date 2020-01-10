@@ -79,51 +79,51 @@ public class CsvModelDialog extends Dialog {
 
         txtProject = new TextField();
         txtProject.setWidthFull();
-        txtProject.setValue(csvModel.getPROJECT());
+        txtProject.setValue(csvModel.getProject());
 
         txtVendor = new TextField();
         txtVendor.setWidthFull();
-        txtVendor.setValue(csvModel.getVENDOR());
+        txtVendor.setValue(csvModel.getVendor());
 
         txtEventType = new TextField();
         txtEventType.setWidthFull();
-        txtEventType.setValue(csvModel.getEVENT_TYPE());
+        txtEventType.setValue(csvModel.getEventType());
 
         txtMainItem = new TextField();
         txtMainItem.setWidthFull();
-        txtMainItem.setValue(csvModel.getMAIN_ITEM());
+        txtMainItem.setValue(csvModel.getMainItem());
 
         txtBook = new TextField();
         txtBook.setWidthFull();
-        txtBook.setValue(csvModel.getBOOK());
+        txtBook.setValue(csvModel.getBook());
 
         txtTransaction = new TextField();
         txtTransaction.setWidthFull();
-        txtTransaction.setValue(csvModel.getTRANSACTION());
+        txtTransaction.setValue(csvModel.getTransaction());
 
         txtInvoiceNumber = new TextField();
         txtInvoiceNumber.setWidthFull();
-        txtInvoiceNumber.setValue(csvModel.getNUMBER());
+        txtInvoiceNumber.setValue(csvModel.getNumber());
 
         txtInvoiceCode = new TextField();
         txtInvoiceCode.setWidthFull();
-        txtInvoiceCode.setValue(csvModel.getCODE());
+        txtInvoiceCode.setValue(csvModel.getCode());
 
         txtAmount = new TextField();
         txtAmount.setWidthFull();
-        txtAmount.setValue(csvModel.getAMOUNT());
+        txtAmount.setValue(csvModel.getAmount());
 
         txtUnitPrize = new TextField();
         txtUnitPrize.setWidthFull();
-        txtUnitPrize.setValue(csvModel.getUNIT_PRICE());
+        txtUnitPrize.setValue(csvModel.getUnitPrice());
 
         txtDate = new TextField();
         txtDate.setWidthFull();
         txtDate.setPlaceholder("dd/MM/yyyy HH:mm:ss");
-        txtDate.setValue(csvModel.getDATE());
+        txtDate.setValue(csvModel.getDate());
 
         txtExplanation = new TextArea();
-        txtExplanation.setValue(csvModel.getEXPLANATION());
+        txtExplanation.setValue(csvModel.getExplanation());
         txtExplanation.setWidthFull();
         txtExplanation.setHeight(UIUtils.COLUMN_WIDTH_XS);
 
@@ -169,18 +169,18 @@ public class CsvModelDialog extends Dialog {
 
     private void saveUser() {
         CsvModel c = new CsvModel();
-        c.setPROJECT(txtProject.getValue().toUpperCase());
-        c.setVENDOR(txtVendor.getValue().toUpperCase());
-        c.setEVENT_TYPE(txtEventType.getValue().toUpperCase());
-        c.setMAIN_ITEM(txtMainItem.getValue().toUpperCase());
-        c.setBOOK(txtBook.getValue().toUpperCase());
-        c.setTRANSACTION(txtTransaction.getValue().toUpperCase());
-        c.setNUMBER(txtInvoiceNumber.getValue().toUpperCase());
-        c.setCODE(txtInvoiceCode.getValue().toUpperCase());
-        c.setAMOUNT(txtAmount.getValue().toUpperCase());
-        c.setUNIT_PRICE(txtUnitPrize.getValue().toUpperCase());
-        c.setDATE(txtDate.getValue().toUpperCase());
-        c.setEXPLANATION(txtExplanation.getValue().toUpperCase());
+        c.setProject(txtProject.getValue().toUpperCase());
+        c.setVendor(txtVendor.getValue().toUpperCase());
+        c.setEventType(txtEventType.getValue().toUpperCase());
+        c.setMainItem(txtMainItem.getValue().toUpperCase());
+        c.setBook(txtBook.getValue().toUpperCase());
+        c.setTransaction(txtTransaction.getValue().toUpperCase());
+        c.setNumber(txtInvoiceNumber.getValue().toUpperCase());
+        c.setCode(txtInvoiceCode.getValue().toUpperCase());
+        c.setAmount(txtAmount.getValue().toUpperCase());
+        c.setUnitPrice(txtUnitPrize.getValue().toUpperCase());
+        c.setDate(txtDate.getValue().toUpperCase());
+        c.setExplanation(txtExplanation.getValue().toUpperCase());
 
         csvDataProvider.getItems().remove(csvModel);
         csvDataProvider.getItems().add(c);

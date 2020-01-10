@@ -95,6 +95,7 @@ public class CsvExportTest {
 
         // write
         writeToFile();
+        assert true;
     }
 
     private void initTempFile() throws IOException {

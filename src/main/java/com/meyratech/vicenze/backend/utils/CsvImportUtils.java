@@ -2,7 +2,7 @@ package com.meyratech.vicenze.backend.utils;
 
 import com.meyratech.vicenze.backend.model.CsvModel;
 import com.meyratech.vicenze.backend.model.Invoice;
-import com.meyratech.vicenze.backend.model.ItemDetails;
+import com.meyratech.vicenze.backend.model.ItemDetailUtils;
 import com.meyratech.vicenze.backend.model.Project;
 import com.meyratech.vicenze.backend.repository.service.IInvoiceService;
 import com.meyratech.vicenze.backend.repository.service.IProjectService;
@@ -49,19 +49,19 @@ public class CsvImportUtils {
 
             csvParser.forEach(l -> {
                 CsvModel c = new CsvModel();
-                c.setPROJECT(l.get("PROJECT"));
-                c.setVENDOR(l.get("VENDOR"));
-                c.setEVENT_TYPE(l.get("EVENT_TYPE"));
-                c.setMAIN_ITEM(l.get("MAIN ITEM"));
-                c.setBOOK(l.get("BOOK"));
-                c.setTRANSACTION(l.get("TRANSACTION"));
-                c.setNUMBER(l.get("NUMBER"));
-                c.setCODE(l.get("CODE"));
-                c.setEXPLANATION(l.get("EXPLANATION"));
-                c.setAMOUNT(l.get("AMOUNT").replaceAll("€", "").replaceAll(",", "").trim());
-                c.setUNIT_PRICE(l.get("UNIT_PRICE").replaceAll("€", "").replaceAll(",", "").trim());
-                c.setTOTAL_AMOUNT(l.get("TOTAL_AMOUNT").replaceAll("€", "").replaceAll(",", "").trim());
-                c.setDATE(l.get("DATE"));
+                c.setProject(l.get("PROJECT"));
+                c.setVendor(l.get("VENDOR"));
+                c.setEventType(l.get("EVENT_TYPE"));
+                c.setMainItem(l.get("MAIN ITEM"));
+                c.setBook(l.get("BOOK"));
+                c.setTransaction(l.get("TRANSACTION"));
+                c.setNumber(l.get("NUMBER"));
+                c.setCode(l.get("CODE"));
+                c.setExplanation(l.get("EXPLANATION"));
+                c.setAmount(l.get("AMOUNT").replaceAll("€", "").replaceAll(",", "").trim());
+                c.setUnitPrice(l.get("UNIT_PRICE").replaceAll("€", "").replaceAll(",", "").trim());
+                c.setTotalAmount(l.get("TOTAL_AMOUNT").replaceAll("€", "").replaceAll(",", "").trim());
+                c.setDate(l.get("DATE"));
 
                 csvList.add(c);
             });
@@ -83,13 +83,13 @@ public class CsvImportUtils {
                 Invoice i = new Invoice();
                 i.setProject(validateProject(c, projectList));
                 i.setVendor(validateVendor(c));
-                i.setInvoiceNumber(c.getNUMBER());
-                i.setInvoiceCode(c.getCODE());
+                i.setInvoiceNumber(c.getNumber());
+                i.setInvoiceCode(c.getCode());
                 i.setEventType(validateEventType(c));
                 i.setMainItem(validateMainItem(c));
                 i.setBook(validateBook(c));
                 i.setTransaction(validateTransaction(c));
-                i.setExplanation(c.getEXPLANATION());
+                i.setExplanation(c.getExplanation());
                 i.setAmount(validateAmount(c));
                 i.setUnitPrice(validateUnitPrice(c));
                 i.setDate(validateDate(c));
@@ -133,67 +133,81 @@ public class CsvImportUtils {
 
     private static Project validateProject(CsvModel csvModel, List<Project> projectList) throws Exception {
         Project project = projectList.stream()
-                .filter(p -> csvModel.getPROJECT().equals(p.getProjectName()))
+                .filter(p -> csvModel.getProject().equals(p.getProjectName()))
                 .findAny()
                 .orElse(null);
-        if (project == null) throw new Exception("Project does not exist!");
+        if (project == null) {
+            throw new Exception("Project does not exist!");
+        }
         return project;
     }
 
     private static String validateVendor(CsvModel csvModel) throws Exception {
-        if (csvModel.getVENDOR().isEmpty()) throw new Exception("Vendor does not exist!");
-        return csvModel.getVENDOR();
+        if (csvModel.getVendor().isEmpty()) {
+            throw new Exception("Vendor does not exist!");
+        }
+        return csvModel.getVendor();
     }
 
     private static String validateEventType(CsvModel csvModel) throws Exception {
-        if (csvModel.getEVENT_TYPE().isEmpty() || !ItemDetails.eventTypeList.contains(csvModel.getEVENT_TYPE())) throw new Exception("EventType does not exist!");
-        return csvModel.getEVENT_TYPE();
+        if (csvModel.getEventType().isEmpty() || !ItemDetailUtils.eventTypeList.contains(csvModel.getEventType())) {
+            throw new Exception("EventType does not exist!");
+        }
+        return csvModel.getEventType();
     }
 
     private static String validateMainItem(CsvModel csvModel) throws Exception {
-        if (csvModel.getMAIN_ITEM().isEmpty() || !ItemDetails.mainItemList.contains(csvModel.getMAIN_ITEM())) throw new Exception("MainItem does not exist!");
-        return csvModel.getMAIN_ITEM();
+        if (csvModel.getMainItem().isEmpty() || !ItemDetailUtils.mainItemList.contains(csvModel.getMainItem())) {
+            throw new Exception("MainItem does not exist!");
+        }
+        return csvModel.getMainItem();
     }
 
     private static String validateBook(CsvModel csvModel) throws Exception {
-        if (csvModel.getBOOK().isEmpty() || !ItemDetails.bookList.contains(csvModel.getBOOK())) throw new Exception("Book does not exist!");
-        return csvModel.getBOOK();
+        if (csvModel.getBook().isEmpty() || !ItemDetailUtils.bookList.contains(csvModel.getBook())) {
+            throw new Exception("Book does not exist!");
+        }
+        return csvModel.getBook();
     }
 
     private static String validateTransaction(CsvModel csvModel) throws Exception {
-        if (csvModel.getTRANSACTION().isEmpty() || !ItemDetails.transactionList.contains(csvModel.getTRANSACTION())) throw new Exception("Transaction does not exist!");
-        return csvModel.getTRANSACTION();
+        if (csvModel.getTransaction().isEmpty() || !ItemDetailUtils.transactionList.contains(csvModel.getTransaction())) {
+            throw new Exception("Transaction does not exist!");
+        }
+        return csvModel.getTransaction();
     }
 
     private static BigDecimal validateAmount(CsvModel csvModel) throws Exception {
-        if (csvModel.getAMOUNT().isEmpty()) throw new Exception("Amount does not exist!");
-        return new BigDecimal(csvModel.getAMOUNT());
+        if (csvModel.getAmount().isEmpty()) {
+            throw new Exception("Amount does not exist!");
+        }
+        return new BigDecimal(csvModel.getAmount());
     }
 
     private static BigDecimal validateUnitPrice(CsvModel csvModel) throws Exception {
-        if (csvModel.getUNIT_PRICE().isEmpty()) throw new Exception("UnitPrice does not exist!");
-        return new BigDecimal(csvModel.getUNIT_PRICE());
+        if (csvModel.getUnitPrice().isEmpty()) {
+            throw new Exception("UnitPrice does not exist!");
+        }
+        return new BigDecimal(csvModel.getUnitPrice());
     }
 
     private static LocalDateTime validateDate(CsvModel csvModel) throws Exception {
-        if (csvModel.getDATE().isEmpty()) throw new Exception("Date does not exist!");
+        if (csvModel.getDate().isEmpty()) {
+            throw new Exception("Date does not exist!");
+        }
         LocalDateTime date;
-        String dateString = csvModel.getDATE();
+        String dateString = csvModel.getDate();
         String exceptFormat = (dateString.contains(" ") && dateString.contains(":")) ? "d/M/yyyy HH:mm:ss" : "d/M/yyyy";
         String errorFormat = (dateString.contains(" ") && dateString.contains(":")) ? "M/d/yyyy HH:mm:ss" : "M/d/yyyy";
 
         try {
-            if (exceptFormat.contains(":")) {
-                date = LocalDateTime.parse(dateString, DateTimeFormatter.ofPattern(exceptFormat));
-            } else {
-                date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(exceptFormat)).atStartOfDay();
-            }
+            date = exceptFormat.contains(":")
+                    ? LocalDateTime.parse(dateString, DateTimeFormatter.ofPattern(exceptFormat))
+                    : LocalDate.parse(dateString, DateTimeFormatter.ofPattern(exceptFormat)).atStartOfDay();
         } catch (Exception e) {
-            if (errorFormat.contains(":")) {
-                date = LocalDateTime.parse(dateString, DateTimeFormatter.ofPattern(errorFormat));
-            } else {
-                date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern(errorFormat)).atStartOfDay();
-            }
+            date = exceptFormat.contains(":")
+                    ? LocalDateTime.parse(dateString, DateTimeFormatter.ofPattern(errorFormat))
+                    : LocalDate.parse(dateString, DateTimeFormatter.ofPattern(errorFormat)).atStartOfDay();
         }
         return date;
     }

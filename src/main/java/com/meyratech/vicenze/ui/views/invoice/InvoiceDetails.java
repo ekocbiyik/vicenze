@@ -189,19 +189,19 @@ public class InvoiceDetails extends ViewFrame implements HasUrlParameter<Long> {
     private Component getItemDetail() {
         cbxEventType = new ComboBox<>();
         cbxEventType.setWidthFull();
-        cbxEventType.setItems(ItemDetails.eventTypeList);
+        cbxEventType.setItems(ItemDetailUtils.eventTypeList);
 
         cbxMainItem = new ComboBox<>();
         cbxMainItem.setWidthFull();
-        cbxMainItem.setItems(ItemDetails.mainItemList);
+        cbxMainItem.setItems(ItemDetailUtils.mainItemList);
 
         cbxbook = new ComboBox<>();
         cbxbook.setWidthFull();
-        cbxbook.setItems(ItemDetails.bookList);
+        cbxbook.setItems(ItemDetailUtils.bookList);
 
         cbxTransaction = new ComboBox<>();
         cbxTransaction.setWidthFull();
-        cbxTransaction.setItems(ItemDetails.transactionList);
+        cbxTransaction.setItems(ItemDetailUtils.transactionList);
 
         // Form layout
         FormLayout form = new FormLayout();
